@@ -1544,23 +1544,33 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					 * we are sure that this is a catch-all. We substitute it
 					 * with a RustBoolean true.
 					 */
-					if (guardAccumulator instanceof VariableRef
-							&& ((VariableRef) guardAccumulator).getName().equals("_"))
-						guardAccumulator = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
-					else
+					if (!(guardAccumulator instanceof VariableRef
+							&& ((VariableRef) guardAccumulator).getName().equals("_")))
 						guardAccumulator = new RustEqualExpression(currentCfg, locationOf(ctx, filePath), expression,
 								guardAccumulator);
 
 					for (RustMatchKeeper guard : arm.getLeft().subList(1, arm.getLeft().size())) {
 						if (guard instanceof RustMatchOrKeeper) {
-							Expression equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
-									expression, guard.get());
+							Expression equality;
+							if (guard.get() instanceof VariableRef
+									&& ((VariableRef) guard.get()).getName().equals("_")) {
+								equality = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
+							} else {
+								equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
+										expression, guard.get());
+							}
 
 							guardAccumulator = new RustOrExpression(currentCfg, locationOf(ctx, filePath),
 									guardAccumulator, equality);
-						} else // RustMatchAndKeeper
+						} else { // RustMatchAndKeeper
+							if (guardAccumulator instanceof VariableRef
+									&& ((VariableRef) guardAccumulator).getName().equals("_")) {
+								guardAccumulator = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
+							}
+
 							guardAccumulator = new RustAndExpression(currentCfg, locationOf(ctx, filePath),
 									guardAccumulator, guard.get());
+						}
 					}
 
 					currentCfg.addNode(guardAccumulator);
@@ -1574,12 +1584,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 					currentCfg.addEdge(new TrueEdge(currentArm.getLeft(), currentArm.getMiddle()));
 
-					if (currentArm.getLeft() instanceof RustBoolean
-							&& ((RustBoolean) currentArm.getLeft()).getValue() == true) {
+					if (currentArm.getLeft() instanceof VariableRef
+							&& ((VariableRef) currentArm.getLeft()).getName().equals("_")) {
 						// Since we found a catch-all, we remove all the
 						// remaining dangling arms
 						for (Triple<Expression, Statement, Statement> danglingArm : resolvedMatchArms.subList(i + 1,
 								resolvedMatchArms.size())) {
+
 							currentCfg.getAdjacencyMatrix().removeNode(danglingArm.getLeft());
 							currentCfg.getAdjacencyMatrix().removeFrom(danglingArm.getMiddle());
 						}
@@ -1595,7 +1606,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				Expression lastGuard = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getLeft();
 				Statement lastMiddle = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getMiddle();
 				boolean hasOnlyOneCatchAllArm = false;
-				if (lastGuard instanceof RustBoolean && ((RustBoolean) lastGuard).getValue() == true) {
+				if (lastGuard instanceof VariableRef && ((VariableRef) lastGuard).getName().equals("_")) {
 					// If the last element is a catch-all, we can directly skip
 					// it and simplify the graph
 					List<Edge> connectingEdges = new ArrayList<>(currentCfg.getIngoingEdges(lastGuard));
