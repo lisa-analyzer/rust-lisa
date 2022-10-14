@@ -1531,7 +1531,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.match_arms() != null) {
 				List<Triple<List<RustMatchKeeper>, Statement, Statement>> matchArms = visitMatch_arms(ctx.match_arms());
 
-				LinkedList<Triple<Expression, Statement, Statement>> resolvedMatchArms = new LinkedList<>();
+				List<Triple<Expression, Statement, Statement>> resolvedMatchArms = new LinkedList<>();
 				for (Triple<List<RustMatchKeeper>, Statement, Statement> arm : matchArms) {
 
 					Expression guardAccumulator = arm.getLeft().get(0).get();
@@ -1567,16 +1567,33 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					resolvedMatchArms.add(Triple.of(guardAccumulator, arm.getMiddle(), arm.getRight()));
 				}
 
-				// Connect all the nodes except the last ones
+				// Connect all (except the last one) nodes to the right side of
+				// the arm and to one another
 				for (int i = 0; i < resolvedMatchArms.size() - 1; ++i) {
 					Triple<Expression, Statement, Statement> currentArm = resolvedMatchArms.get(i);
 
 					currentCfg.addEdge(new TrueEdge(currentArm.getLeft(), currentArm.getMiddle()));
+
+					if (currentArm.getLeft() instanceof RustBoolean
+							&& ((RustBoolean) currentArm.getLeft()).getValue() == true) {
+						// Since we found a catch-all, we remove all the
+						// remaining dangling arms
+						for (Triple<Expression, Statement, Statement> danglingArm : resolvedMatchArms.subList(i + 1,
+								resolvedMatchArms.size())) {
+							currentCfg.getAdjacencyMatrix().removeNode(danglingArm.getLeft());
+							currentCfg.getAdjacencyMatrix().removeFrom(danglingArm.getMiddle());
+						}
+
+						resolvedMatchArms = resolvedMatchArms.subList(0, i + 1);
+						break;
+					}
+
 					currentCfg.addEdge(new FalseEdge(currentArm.getLeft(), resolvedMatchArms.get(i + 1).getLeft()));
 				}
 
 				// Connect last node
-				Expression lastGuard = resolvedMatchArms.getLast().getLeft();
+				Expression lastGuard = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getLeft();
+				Statement lastMiddle = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getMiddle();
 				boolean hasOnlyOneCatchAllArm = false;
 				if (lastGuard instanceof RustBoolean && ((RustBoolean) lastGuard).getValue() == true) {
 					// If the last element is a catch-all, we can directly skip
@@ -1593,7 +1610,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					for (Pair<Statement, Edge> sourcePair : sources) {
 						Statement source = sourcePair.getLeft();
 						Edge edge = sourcePair.getRight();
-						Edge newEdge = edge.newInstance(source, resolvedMatchArms.getLast().getMiddle());
+						Edge newEdge = edge.newInstance(source, lastMiddle);
 
 						currentCfg.getAdjacencyMatrix().removeEdge(edge);
 						currentCfg.addEdge(newEdge);
