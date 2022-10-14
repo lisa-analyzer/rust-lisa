@@ -93,6 +93,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -1144,6 +1145,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		switch (ctx.getChild(0).getText()) {
 		case "_":
+			// This is often used as a placeholder but has different meaning
+			// depending on the caller function
 			return new VariableRef(currentCfg, locationOf(ctx, filePath), "_");
 		case "(":
 			return visitPat_list_with_dots(ctx.pat_list_with_dots()).get(0);
@@ -1528,46 +1531,116 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.match_arms() != null) {
 				List<Triple<List<RustMatchKeeper>, Statement, Statement>> matchArms = visitMatch_arms(ctx.match_arms());
 
-				List<Expression> resolvedConditions = new ArrayList<>();
+				List<Triple<Expression, Statement, Statement>> resolvedMatchArms = new LinkedList<>();
 				for (Triple<List<RustMatchKeeper>, Statement, Statement> arm : matchArms) {
 
-					// Resolve RustMatchKeeper
-					List<RustMatchKeeper> guards = arm.getLeft().subList(1, arm.getLeft().size());
-					Expression expressionAccumulator = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
-							expression, arm.getLeft().get(0).get());
-					for (RustMatchKeeper guard : guards) {
+					Expression guardAccumulator = arm.getLeft().get(0).get();
+					/*
+					 * A condition inside a match arm can be a '_' (underscore),
+					 * which is a catch-all. Since the grammar parses the
+					 * underscore with the same rules that uses to parse
+					 * variable identifiers, here we can check the variable
+					 * type; if it is a VariableRef with identifier as "_", then
+					 * we are sure that this is a catch-all. We substitute it
+					 * with a RustBoolean true.
+					 */
+					if (!(guardAccumulator instanceof VariableRef
+							&& ((VariableRef) guardAccumulator).getName().equals("_")))
+						guardAccumulator = new RustEqualExpression(currentCfg, locationOf(ctx, filePath), expression,
+								guardAccumulator);
+
+					for (RustMatchKeeper guard : arm.getLeft().subList(1, arm.getLeft().size())) {
 						if (guard instanceof RustMatchOrKeeper) {
-							Expression equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
-									expression, guard.get());
-							expressionAccumulator = new RustOrExpression(currentCfg, locationOf(ctx, filePath),
-									expressionAccumulator, equality);
+							Expression equality;
+							if (guard.get() instanceof VariableRef
+									&& ((VariableRef) guard.get()).getName().equals("_")) {
+								equality = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
+							} else {
+								equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
+										expression, guard.get());
+							}
+
+							guardAccumulator = new RustOrExpression(currentCfg, locationOf(ctx, filePath),
+									guardAccumulator, equality);
 						} else { // RustMatchAndKeeper
-							expressionAccumulator = new RustAndExpression(currentCfg, locationOf(ctx, filePath),
-									expressionAccumulator, guard.get());
+							if (guardAccumulator instanceof VariableRef
+									&& ((VariableRef) guardAccumulator).getName().equals("_")) {
+								guardAccumulator = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
+							}
+
+							guardAccumulator = new RustAndExpression(currentCfg, locationOf(ctx, filePath),
+									guardAccumulator, guard.get());
 						}
 					}
 
-					currentCfg.addNode(expressionAccumulator);
-					resolvedConditions.add(expressionAccumulator);
+					currentCfg.addNode(guardAccumulator);
+					resolvedMatchArms.add(Triple.of(guardAccumulator, arm.getMiddle(), arm.getRight()));
 				}
 
-				// Connect all the nodes
-				for (int i = 0; i < matchArms.size() - 1; ++i) {
-					Triple<List<RustMatchKeeper>, Statement, Statement> currentArm = matchArms.get(i);
-					currentCfg.addEdge(new TrueEdge(resolvedConditions.get(i), currentArm.getMiddle()));
-					currentCfg.addEdge(new FalseEdge(resolvedConditions.get(i), resolvedConditions.get(i + 1)));
+				// Connect all (except the last one) nodes to the right side of
+				// the arm and to one another
+				for (int i = 0; i < resolvedMatchArms.size() - 1; ++i) {
+					Triple<Expression, Statement, Statement> currentArm = resolvedMatchArms.get(i);
+
+					currentCfg.addEdge(new TrueEdge(currentArm.getLeft(), currentArm.getMiddle()));
+
+					if (currentArm.getLeft() instanceof VariableRef
+							&& ((VariableRef) currentArm.getLeft()).getName().equals("_")) {
+						// Since we found a catch-all, we remove all the
+						// remaining dangling arms
+						for (Triple<Expression, Statement, Statement> danglingArm : resolvedMatchArms.subList(i + 1,
+								resolvedMatchArms.size())) {
+
+							currentCfg.getAdjacencyMatrix().removeNode(danglingArm.getLeft());
+							currentCfg.getAdjacencyMatrix().removeFrom(danglingArm.getMiddle());
+						}
+
+						resolvedMatchArms = resolvedMatchArms.subList(0, i + 1);
+						break;
+					}
+
+					currentCfg.addEdge(new FalseEdge(currentArm.getLeft(), resolvedMatchArms.get(i + 1).getLeft()));
 				}
 
 				// Connect last node
-				Expression lastGuard = resolvedConditions.get(resolvedConditions.size() - 1);
-				currentCfg.addEdge(new TrueEdge(lastGuard, matchArms.get(matchArms.size() - 1).getMiddle()));
-				currentCfg.addEdge(new FalseEdge(lastGuard, ending));
+				Expression lastGuard = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getLeft();
+				Statement lastMiddle = resolvedMatchArms.get(resolvedMatchArms.size() - 1).getMiddle();
+				boolean hasOnlyOneCatchAllArm = false;
+				if (lastGuard instanceof VariableRef && ((VariableRef) lastGuard).getName().equals("_")) {
+					// If the last element is a catch-all, we can directly skip
+					// it and simplify the graph
+					List<Edge> connectingEdges = new ArrayList<>(currentCfg.getIngoingEdges(lastGuard));
 
+					if (connectingEdges.size() == 0)
+						hasOnlyOneCatchAllArm = true;
+
+					List<Pair<Statement, Edge>> sources = new ArrayList<>();
+					for (Edge edge : connectingEdges)
+						sources.add(Pair.of(edge.getSource(), edge));
+
+					for (Pair<Statement, Edge> sourcePair : sources) {
+						Statement source = sourcePair.getLeft();
+						Edge edge = sourcePair.getRight();
+						Edge newEdge = edge.newInstance(source, lastMiddle);
+
+						currentCfg.getAdjacencyMatrix().removeEdge(edge);
+						currentCfg.addEdge(newEdge);
+					}
+
+					currentCfg.getAdjacencyMatrix().removeNode(lastGuard);
+
+				} else {
+					// Otherwise, we just connect the node to the ending NoOp
+					// node
+					currentCfg.addEdge(new TrueEdge(lastGuard, matchArms.get(matchArms.size() - 1).getMiddle()));
+					currentCfg.addEdge(new FalseEdge(lastGuard, ending));
+				}
 				// Connect all the end of the block to the noOp
-				for (Triple<List<RustMatchKeeper>, Statement, Statement> arm : matchArms)
+				for (Triple<Expression, Statement, Statement> arm : resolvedMatchArms)
 					currentCfg.addEdge(new SequentialEdge(arm.getRight(), ending));
 
-				firstStmt = resolvedConditions.get(0);
+				firstStmt = hasOnlyOneCatchAllArm ? resolvedMatchArms.get(0).getMiddle()
+						: resolvedMatchArms.get(0).getLeft();
 				lastStmt = ending;
 
 			} else {

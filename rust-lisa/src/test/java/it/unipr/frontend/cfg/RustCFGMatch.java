@@ -37,4 +37,10 @@ public class RustCFGMatch extends RustLiSATestExecutor {
 		perform("cfg/match-or", "match-or.rs", conf);
 	}
 
+	@Test
+	public void testMatchCatchAll() throws AnalysisSetupException {
+		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		perform("cfg/match-catch-all", "match-catch-all.rs", conf);
+	}
+
 }
