@@ -1,19 +1,16 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.CompilationUnit;
-import it.unive.lisa.program.Global;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
-import it.unive.lisa.program.cfg.statement.Expression;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Rust enum struct literal.
@@ -51,11 +48,12 @@ public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpressio
 	public boolean isInstanceOf(RustEnumVariant variant) {
 		if (variant instanceof RustStructType) {
 			CompilationUnit structUnit = ((RustStructType) variant).getUnit();
-			Expression[] expressions = getValue().getSubExpressions();
-			
-			Set<String> globalSet = structUnit.getAllGlobals().stream().map(g -> g.getName()).collect(Collectors.toSet());
-			Set<String> fieldSet = Arrays.asList(getValue().getSubExpressions()).stream().map(g -> ((RustAssignment) g).getLeft().toString()).collect(Collectors.toSet());
-			
+
+			Set<String> globalSet = structUnit.getAllGlobals().stream().map(g -> g.getName())
+					.collect(Collectors.toSet());
+			Set<String> fieldSet = Arrays.asList(getValue().getSubExpressions()).stream()
+					.map(g -> ((RustAssignment) g).getLeft().toString()).collect(Collectors.toSet());
+
 			return globalSet.equals(fieldSet);
 		}
 		return false;

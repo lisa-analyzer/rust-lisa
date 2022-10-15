@@ -28,7 +28,7 @@ public class EnumCompilationUnit extends CompilationUnit {
 	}
 
 	/**
-	 * Yields a list containing the variants of the enum.
+	 * Yields a collection containing the variants of the enum.
 	 * 
 	 * @return a collection of {@link RustEnumVariant}
 	 */

@@ -31,11 +31,12 @@ public abstract class RustEnumLiteral<E> extends Literal<E> {
 	public RustEnumLiteral(CFG cfg, CodeLocation location, E value, Type staticType) {
 		super(cfg, location, value, staticType);
 	}
-	
+
 	/**
-	 * Checks if the current literal is an instance of the give {@link RustEnumVariant}.
+	 * Checks if the current literal is an instance of the give
+	 * {@link RustEnumVariant}.
 	 * 
-	 * @param variant	 the variant to be checked
+	 * @param variant the variant to be checked
 	 * 
 	 * @return the truthfulness of the check
 	 */

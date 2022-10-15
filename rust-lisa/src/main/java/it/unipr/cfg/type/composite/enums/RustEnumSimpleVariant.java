@@ -26,7 +26,12 @@ public class RustEnumSimpleVariant implements RustEnumVariant {
 	public String toString() {
 		return name;
 	}
-	
+
+	/**
+	 * Yields the name of this variant.
+	 * 
+	 * @return the name of this variant
+	 */
 	public String getName() {
 		return name;
 	}

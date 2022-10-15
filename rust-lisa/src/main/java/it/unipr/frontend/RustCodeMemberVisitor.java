@@ -56,7 +56,6 @@ import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.EnumCompilationUnit;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
-import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unipr.cfg.utils.RustAccessResolver;
 import it.unipr.cfg.utils.RustArrayAccessKeeper;
 import it.unipr.cfg.utils.RustAttributeAccessKeeper;
@@ -1028,7 +1027,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			return visitPat_no_mut(ctx.pat_no_mut());
 
 		String name = ctx.ident().getText();
-		
+
 		if (ctx.pat() != null)
 			// TODO Ignoring the meaning of ('@' pat)? part for now
 			return visitPat(ctx.pat());
@@ -1037,7 +1036,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Expression visitPat_no_mut(Pat_no_mutContext ctx) {		
+	public Expression visitPat_no_mut(Pat_no_mutContext ctx) {
 		if (ctx.pat_lit() != null)
 			return visitPat_lit(ctx.pat_lit());
 
@@ -1072,12 +1071,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				Expression name = visitPath(ctx.path());
 				List<Expression> values = visitPat_fields(ctx.pat_fields());
 
-				Type[] types = values
-						.stream()
-						.map(p -> p.getStaticType())
-						.collect(Collectors.toList())
-						.toArray(new Type[0]);
-
 				RustStructType struct = RustStructType.lookup(name.toString(), unit);
 
 				return new RustStructLiteral(
@@ -1091,48 +1084,75 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			return null;
 		}
 
-		if (ctx.path() != null) {
+		if (ctx.path() != null && ctx.macro_tail() == null) {
 			Expression path = visitPath(ctx.path());
 			AccessGlobal accessedPath = (AccessGlobal) path;
 			String typeName = accessedPath.getContainer().getName();
 			String variantName = accessedPath.getTarget().getName();
 
-			if (ctx.children.size() > 1 && ctx.children.get(1).getText().equals("(")) {
-				if (ctx.pat_list_with_dots() != null) {
-					List<Expression> lhs = visitPat_list_with_dots(ctx.pat_list_with_dots());
+			// It is safe to leave this result = null because it is meant to be
+			// used only in the two cases below
+			Expression result = null;
 
-					RustEnumType enumType = RustEnumType.get(typeName);
+			if (ctx.children.size() > 1) {
+				if (ctx.children.get(1).getText().equals("(")) {
+					if (ctx.pat_list_with_dots() != null) {
+						List<Expression> lhs = visitPat_list_with_dots(ctx.pat_list_with_dots());
 
-					if (RustEnumType.has(typeName))
-						return new RustEnumTupleLiteral(
-								currentCfg,
-								locationOf(ctx, filePath),
-								new RustMultipleExpression(
-										currentCfg,
-										locationOf(ctx, filePath),
-										lhs.toArray(new Expression[0])),
-								variantName,
-								enumType);
+						RustEnumType enumType = RustEnumType.get(typeName);
+						if (RustEnumType.has(typeName)) {
+							result = new RustEnumTupleLiteral(
+									currentCfg,
+									locationOf(ctx, filePath),
+									new RustMultipleExpression(
+											currentCfg,
+											locationOf(ctx, filePath),
+											lhs.toArray(new Expression[0])),
+									variantName,
+									enumType);
+						}
+					}
 				}
-			}
 
-			if (ctx.children.size() > 1 && ctx.children.get(1).getText().equals("{")) {
-				if (ctx.pat_fields() != null) {
-					List<Expression> lhs = visitPat_fields(ctx.pat_fields());
+				if (ctx.children.get(1).getText().equals("{")) {
+					if (ctx.pat_fields() != null) {
+						List<Expression> lhs = visitPat_fields(ctx.pat_fields());
 
-					RustEnumType enumType = RustEnumType.get(typeName);
+						RustEnumType enumType = RustEnumType.get(typeName);
 
-					if (RustEnumType.has(typeName)) 
-						return new RustEnumStructLiteral(
-								currentCfg,
-								locationOf(ctx, filePath),
-								new RustMultipleExpression(
-										currentCfg,
-										locationOf(ctx, filePath),
-										lhs.toArray(new Expression[0])),
-								variantName,
-								enumType);
+						if (RustEnumType.has(typeName)) {
+							result = new RustEnumStructLiteral(
+									currentCfg,
+									locationOf(ctx, filePath),
+									new RustMultipleExpression(
+											currentCfg,
+											locationOf(ctx, filePath),
+											lhs.toArray(new Expression[0])),
+									variantName,
+									enumType);
+						}
+					}
 				}
+
+				// Check if field are assignable
+				Type type = result.getStaticType();
+				EnumCompilationUnit ecu = ((RustEnumType) type).getUnit();
+				@SuppressWarnings("unchecked")
+				// This cast is safe because there are 3 types of
+				// RustEnumLiteral, two of them use RustMultipleExpression,
+				// which are the exact ones that are matched here. The remaining
+				// one uses String but it is checked, but because of that is
+				// treated differently and not here
+				RustEnumLiteral<
+						RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
+
+				boolean fieldMatched = ecu.getVariants().stream()
+						.anyMatch(variant -> literalVariant.isInstanceOf(variant));
+
+				if (!fieldMatched)
+					throw new UnsupportedOperationException("Use of undeclared struct field in " + result);
+
+				return result;
 			}
 
 			if (ctx.macro_tail() != null) {
@@ -1145,7 +1165,19 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			}
 
-			return path;
+			// Simple enum variant case
+			RustEnumType enumType = RustEnumType.get(typeName);
+			RustEnumSimpleLiteral esl = new RustEnumSimpleLiteral(currentCfg, locationOf(ctx, filePath), variantName,
+					enumType);
+
+			// Check if field are assignable
+			boolean fieldMatched = enumType.getUnit().getVariants().stream()
+					.anyMatch(variant -> esl.isInstanceOf(variant));
+
+			if (!fieldMatched)
+				throw new UnsupportedOperationException("Use of undeclared struct field in " + esl);
+
+			return esl;
 		}
 
 		switch (ctx.getChild(0).getText()) {
@@ -1261,7 +1293,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public List<Expression> visitPat_fields(Pat_fieldsContext ctx) {
 		// TODO Skipping ".." first production
 		// TODO Skipping all the terminal symbols in the second production
-		
+
 		List<Expression> result = new ArrayList<>();
 		for (Pat_fieldContext pfCtx : ctx.pat_field()) {
 			result.add(visitPat_field(pfCtx));
@@ -1274,9 +1306,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public Expression visitPat_field(Pat_fieldContext ctx) {
 		String name = ctx.ident().getText();
 		Expression value = null;
-		
+
 		if (ctx.pat() != null)
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), new VariableRef(currentCfg, locationOf(ctx, filePath), name), visitPat(ctx.pat()));
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath),
+					new VariableRef(currentCfg, locationOf(ctx, filePath), name), visitPat(ctx.pat()));
 
 		if (ctx.getChild(3) != null && ctx.getChild(3).getText().equals("mut"))
 			value = new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true);
@@ -1758,28 +1791,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.getChild(0).getText().equals("let")) {
 			Expression pat = visitPat(ctx.pat());
 			Expression expr = visitExpr(ctx.expr());
-									
-			Type type = pat.getStaticType();
-			if (type instanceof RustEnumType) {
-				if (pat instanceof RustEnumStructLiteral || pat instanceof RustEnumTupleLiteral) {
-					RustEnumLiteral<RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) pat;
-					
-					EnumCompilationUnit ecu = ((RustEnumType) type).getUnit();
 
-					boolean fieldMatched = false;
-					for (RustEnumVariant variant : ecu.getVariants()) {
-						if (literalVariant.isInstanceOf(variant))
-							fieldMatched = true;
-					
-					if (!fieldMatched)
-						throw new UnsupportedOperationException("Use of undeclared struct field in " + pat);
-						
-					}
-				}
-			} else if (type instanceof RustStructType) {
-				
-			}
-			
 			return new RustDestructuringExpression(currentCfg, locationOf(ctx, filePath), pat, expr);
 		}
 

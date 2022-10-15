@@ -1,7 +1,5 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import java.util.List;
-
 import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
@@ -10,6 +8,7 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.type.Type;
+import java.util.List;
 
 /**
  * Rust enum tuple literal.
@@ -48,10 +47,10 @@ public class RustEnumTupleLiteral extends RustEnumLiteral<RustMultipleExpression
 		if (variant instanceof RustTupleType) {
 			List<Type> types = ((RustTupleType) variant).getTypes();
 			Expression[] multiple = getValue().getSubExpressions();
-			
+
 			if (multiple.length != types.size())
 				return false;
-			
+
 			return true;
 		}
 		return false;

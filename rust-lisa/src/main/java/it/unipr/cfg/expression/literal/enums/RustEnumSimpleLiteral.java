@@ -32,10 +32,9 @@ public class RustEnumSimpleLiteral extends RustEnumLiteral<String> {
 
 	@Override
 	public boolean isInstanceOf(RustEnumVariant variant) {
-		if (variant instanceof RustEnumSimpleVariant) {
+		if (variant instanceof RustEnumSimpleVariant)
 			return getValue().equals(((RustEnumSimpleVariant) variant).getName());
-		}
-		
+
 		return false;
 	}
 }
