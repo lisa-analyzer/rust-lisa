@@ -141,5 +141,14 @@ public class RustTupleType implements RustType, RustEnumVariant {
 		// TODO too coarse
 		return null;
 	}
+	
+	/**
+	 * Yields the list of types inside this tuple.
+	 * 
+	 * @return the ordered list of types inside the tuple
+	 */
+	public List<Type> getTypes() {
+		return types;
+	}
 
 }

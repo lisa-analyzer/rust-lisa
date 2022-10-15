@@ -26,6 +26,10 @@ public class RustEnumSimpleVariant implements RustEnumVariant {
 	public String toString() {
 		return name;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	@Override
 	public Statement match(Expression toMatch) {

@@ -39,6 +39,9 @@ import it.unipr.cfg.expression.literal.RustString;
 import it.unipr.cfg.expression.literal.RustStructLiteral;
 import it.unipr.cfg.expression.literal.RustTupleLiteral;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
+import it.unipr.cfg.expression.literal.enums.RustEnumLiteral;
+import it.unipr.cfg.expression.literal.enums.RustEnumSimpleLiteral;
+import it.unipr.cfg.expression.literal.enums.RustEnumStructLiteral;
 import it.unipr.cfg.expression.literal.enums.RustEnumTupleLiteral;
 import it.unipr.cfg.expression.numeric.RustAddExpression;
 import it.unipr.cfg.expression.numeric.RustDivExpression;
@@ -51,7 +54,9 @@ import it.unipr.cfg.statement.RustLetAssignment;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.enums.EnumCompilationUnit;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
+import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unipr.cfg.utils.RustAccessResolver;
 import it.unipr.cfg.utils.RustArrayAccessKeeper;
 import it.unipr.cfg.utils.RustAttributeAccessKeeper;
@@ -1023,7 +1028,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			return visitPat_no_mut(ctx.pat_no_mut());
 
 		String name = ctx.ident().getText();
-
+		
 		if (ctx.pat() != null)
 			// TODO Ignoring the meaning of ('@' pat)? part for now
 			return visitPat(ctx.pat());
@@ -1032,7 +1037,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Expression visitPat_no_mut(Pat_no_mutContext ctx) {
+	public Expression visitPat_no_mut(Pat_no_mutContext ctx) {		
 		if (ctx.pat_lit() != null)
 			return visitPat_lit(ctx.pat_lit());
 
@@ -1117,8 +1122,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 					RustEnumType enumType = RustEnumType.get(typeName);
 
-					if (RustEnumType.has(typeName))
-						return new RustEnumTupleLiteral(
+					if (RustEnumType.has(typeName)) 
+						return new RustEnumStructLiteral(
 								currentCfg,
 								locationOf(ctx, filePath),
 								new RustMultipleExpression(
@@ -1256,7 +1261,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public List<Expression> visitPat_fields(Pat_fieldsContext ctx) {
 		// TODO Skipping ".." first production
 		// TODO Skipping all the terminal symbols in the second production
-
+		
 		List<Expression> result = new ArrayList<>();
 		for (Pat_fieldContext pfCtx : ctx.pat_field()) {
 			result.add(visitPat_field(pfCtx));
@@ -1269,9 +1274,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public Expression visitPat_field(Pat_fieldContext ctx) {
 		String name = ctx.ident().getText();
 		Expression value = null;
-
+		
 		if (ctx.pat() != null)
-			value = visitPat(ctx.pat());
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), new VariableRef(currentCfg, locationOf(ctx, filePath), name), visitPat(ctx.pat()));
 
 		if (ctx.getChild(3) != null && ctx.getChild(3).getText().equals("mut"))
 			value = new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true);
@@ -1753,7 +1758,28 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.getChild(0).getText().equals("let")) {
 			Expression pat = visitPat(ctx.pat());
 			Expression expr = visitExpr(ctx.expr());
+									
+			Type type = pat.getStaticType();
+			if (type instanceof RustEnumType) {
+				if (pat instanceof RustEnumStructLiteral || pat instanceof RustEnumTupleLiteral) {
+					RustEnumLiteral<RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) pat;
+					
+					EnumCompilationUnit ecu = ((RustEnumType) type).getUnit();
 
+					boolean fieldMatched = false;
+					for (RustEnumVariant variant : ecu.getVariants()) {
+						if (literalVariant.isInstanceOf(variant))
+							fieldMatched = true;
+					
+					if (!fieldMatched)
+						throw new UnsupportedOperationException("Use of undeclared struct field in " + pat);
+						
+					}
+				}
+			} else if (type instanceof RustStructType) {
+				
+			}
+			
 			return new RustDestructuringExpression(currentCfg, locationOf(ctx, filePath), pat, expr);
 		}
 

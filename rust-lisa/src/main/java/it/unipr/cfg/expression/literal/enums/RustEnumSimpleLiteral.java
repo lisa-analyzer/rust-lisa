@@ -1,6 +1,8 @@
 package it.unipr.cfg.expression.literal.enums;
 
+import it.unipr.cfg.type.composite.enums.RustEnumSimpleVariant;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
+import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 
@@ -26,5 +28,14 @@ public class RustEnumSimpleLiteral extends RustEnumLiteral<String> {
 	@Override
 	public String toString() {
 		return getStaticType() + "::" + getValue();
+	}
+
+	@Override
+	public boolean isInstanceOf(RustEnumVariant variant) {
+		if (variant instanceof RustEnumSimpleVariant) {
+			return getValue().equals(((RustEnumSimpleVariant) variant).getName());
+		}
+		
+		return false;
 	}
 }
