@@ -48,6 +48,8 @@ import it.unipr.cfg.expression.numeric.RustMulExpression;
 import it.unipr.cfg.expression.numeric.RustSubExpression;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.statement.RustLetAssignment;
+import it.unipr.cfg.statement.RustUnsafeEnterStatement;
+import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustStructType;
@@ -1743,6 +1745,46 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			firstStmt = freshAssignment;
 			lastStmt = noOp;
+		} else if (ctx.children.get(0).getText().equals("unsafe")) {
+			RustUnsafeEnterStatement enter = new RustUnsafeEnterStatement(currentCfg, locationOf(ctx, filePath));
+			RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath));
+
+			Pair<Statement, Statement> body = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
+
+			currentCfg.addNode(enter);
+			currentCfg.addNode(exit);
+			currentCfg.addEdge(new SequentialEdge(enter, body.getLeft()));
+			
+			firstStmt = enter;
+			
+			// In case of return expression inside a unsafe block, I move the return outside the unsafe block 
+			if (body.getRight() instanceof RustReturnExpression) {
+				Expression e = ((RustReturnExpression) body.getRight()).getSubExpression();
+
+				Expression varAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), Untyped.INSTANCE,
+						new RustVariableRef(currentCfg, locationOf(ctx, filePath), "RUSTLISA_FRESH", false), e);
+				currentCfg.addNode(varAssignment);
+				
+				Collection<Edge> ingoing = currentCfg.getAdjacencyMatrix().getIngoingEdges(body.getRight());
+				for (Edge edge : ingoing) {
+					currentCfg.getAdjacencyMatrix().removeEdge(edge);
+					Edge newEdge = edge.newInstance(edge.getSource(), varAssignment);
+					currentCfg.addEdge(newEdge);
+				}
+				currentCfg.getAdjacencyMatrix().removeNode(body.getRight());
+
+				currentCfg.addEdge(new SequentialEdge(varAssignment, exit));
+
+				RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), new RustVariableRef(currentCfg, locationOf(ctx, filePath), filePath, false));
+				currentCfg.addNode(ret);
+				
+				currentCfg.addEdge(new SequentialEdge(exit, ret));
+				
+				lastStmt = ret;
+			} else {
+				currentCfg.addEdge(new SequentialEdge(body.getRight(), exit));
+				lastStmt = exit;
+			}
 		}
 
 		return Pair.of(firstStmt, lastStmt);
