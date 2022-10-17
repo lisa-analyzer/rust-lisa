@@ -1,8 +1,8 @@
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=style-flat-black&logo=rust&logoColor=white)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=style-flat&logo=java&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=style-flat&logo=Gradle&logoColor=white)
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/VincenzoArceri/rust-lisa/Gradle%20Build%20(master)/master)
-![GitHub last commit](https://img.shields.io/github/last-commit/VincenzoArceri/rust-lisa)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/lisa-analyzer/rust-lisa/Gradle%20Build%20(master)/master)
+![GitHub last commit](https://img.shields.io/github/last-commit/lisa-analyzer/rust-lisa)
 
 # RustLiSA
 An abstract interpretation-based static analyzer for [Rust](https://www.rust-lang.org/) built upon [LiSA](https://unive-ssv.github.io/lisa/) (Library for Static Analysis)
