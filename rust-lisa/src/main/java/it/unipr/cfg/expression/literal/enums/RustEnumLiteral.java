@@ -1,5 +1,6 @@
 package it.unipr.cfg.expression.literal.enums;
 
+import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.literal.Literal;
@@ -30,4 +31,14 @@ public abstract class RustEnumLiteral<E> extends Literal<E> {
 	public RustEnumLiteral(CFG cfg, CodeLocation location, E value, Type staticType) {
 		super(cfg, location, value, staticType);
 	}
+
+	/**
+	 * Checks if the current literal is an instance of the give
+	 * {@link RustEnumVariant}.
+	 * 
+	 * @param variant the variant to be checked
+	 * 
+	 * @return the truthfulness of the check
+	 */
+	public abstract boolean isInstanceOf(RustEnumVariant variant);
 }

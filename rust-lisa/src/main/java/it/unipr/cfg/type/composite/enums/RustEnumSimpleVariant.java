@@ -27,6 +27,15 @@ public class RustEnumSimpleVariant implements RustEnumVariant {
 		return name;
 	}
 
+	/**
+	 * Yields the name of this variant.
+	 * 
+	 * @return the name of this variant
+	 */
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public Statement match(Expression toMatch) {
 		// TODO too coarse
