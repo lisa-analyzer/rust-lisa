@@ -19,4 +19,10 @@ public class RustCFGUnsafe extends RustLiSATestExecutor {
 		perform("cfg/unsafe-fn", "unsafe-fn.rs", conf);
 	}
 
+	@Test
+	public void testUnsafeMethod() throws AnalysisSetupException {
+		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		perform("cfg/unsafe-method", "unsafe-method.rs", conf);
+	}
+
 }
