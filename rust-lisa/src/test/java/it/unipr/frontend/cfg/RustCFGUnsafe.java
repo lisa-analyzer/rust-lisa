@@ -13,4 +13,10 @@ public class RustCFGUnsafe extends RustLiSATestExecutor {
 		perform("cfg/unsafe-block", "unsafe-block.rs", conf);
 	}
 
+	@Test
+	public void testUnsafeFn() throws AnalysisSetupException {
+		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		perform("cfg/unsafe-fn", "unsafe-fn.rs", conf);
+	}
+
 }

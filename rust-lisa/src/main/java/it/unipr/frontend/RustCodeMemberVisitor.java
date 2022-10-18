@@ -2,6 +2,7 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import it.unipr.cfg.RustCFG;
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -57,7 +58,9 @@ import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.utils.RustAccessResolver;
 import it.unipr.cfg.utils.RustArrayAccessKeeper;
 import it.unipr.cfg.utils.RustAttributeAccessKeeper;
+import it.unipr.cfg.utils.RustCFGFactory;
 import it.unipr.cfg.utils.RustFunctionCallKeeper;
+import it.unipr.cfg.utils.RustFunctionDecoratorKeeper;
 import it.unipr.cfg.utils.RustMatchAndKeeper;
 import it.unipr.cfg.utils.RustMatchKeeper;
 import it.unipr.cfg.utils.RustMatchOrKeeper;
@@ -80,8 +83,6 @@ import it.unive.lisa.program.cfg.edge.SequentialEdge;
 import it.unive.lisa.program.cfg.edge.TrueEdge;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NoOp;
-import it.unive.lisa.program.cfg.statement.Ret;
-import it.unive.lisa.program.cfg.statement.Return;
 import it.unive.lisa.program.cfg.statement.Statement;
 import it.unive.lisa.program.cfg.statement.VariableRef;
 import it.unive.lisa.program.cfg.statement.call.Call.CallType;
@@ -90,14 +91,11 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import it.unive.lisa.util.datastructures.graph.AdjacencyMatrix;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -176,155 +174,31 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		return filePath;
 	}
 
-	/**
-	 * Deletes a node that is a leaf node (e.g. a terminating node) in the CFG,
-	 * putting a different node in the same place.
-	 * 
-	 * @param oldNode the node that needs to be deleted from the tree
-	 * @param newNode the new node that need to be inserted
-	 */
-	private void switchLeafNodes(Statement oldNode, Statement newNode) {
-		AdjacencyMatrix<Statement, Edge, CFG> adj = currentCfg.getAdjacencyMatrix();
-
-		Collection<Edge> edges = adj.getIngoingEdges(oldNode);
-		for (Edge e : edges) {
-
-			Edge newEdge = new SequentialEdge(e.getSource(), newNode);
-			if (e instanceof TrueEdge)
-				newEdge = new TrueEdge(e.getSource(), newNode);
-			else if (e instanceof FalseEdge)
-				newEdge = new FalseEdge(e.getSource(), newNode);
-
-			adj.removeEdge(e);
-			currentCfg.addEdge(newEdge);
-		}
-
-		adj.removeNode(oldNode);
-	}
-
-	/**
-	 * Perform a lot of operation needed in order to prepare the CFG for the
-	 * use.
-	 * 
-	 * @param ctx        the context in which to operate
-	 * @param returnType the return type of this CFG (e.g. return type of a
-	 *                       function)
-	 * 
-	 * @return the ready-to-use CFG
-	 */
-	private CFG prepareCFG(ParserRuleContext ctx, Type returnType) {
-		Collection<Statement> nodes = currentCfg.getNodes();
-
-		// Substitute exit points wit
-		if (returnType instanceof RustUnitType) {
-			Ret ret = new Ret(currentCfg, locationOf(ctx, filePath));
-
-			// Add possible missing ret as final instruction
-			if (currentCfg.getAllExitpoints().isEmpty()) {
-				Set<Statement> exitNodes = nodes
-						.stream()
-						.filter(n -> currentCfg.getAdjacencyMatrix().followersOf(n).isEmpty())
-						.collect(Collectors.toSet());
-
-				for (Statement exit : exitNodes) {
-					currentCfg.addNode(ret);
-					currentCfg.addEdge(new SequentialEdge(exit, ret));
-				}
-			} else
-				currentCfg.addNode(ret);
-
-			// Substitute return with ret nodes
-			for (Statement node : nodes) {
-				if (node instanceof RustReturnExpression) {
-					NoOp noOp = new NoOp(currentCfg, locationOf(ctx, filePath));
-					currentCfg.addNode(noOp);
-
-					switchLeafNodes(node, noOp);
-					currentCfg.addEdge(new SequentialEdge(noOp, ret));
-				}
-			}
-		}
-		// Substitute inner RustExplicitReturn with return statements
-		else {
-			List<Statement> nonNoOpNodes = nodes.stream().filter(n -> !(n instanceof NoOp))
-					.collect(Collectors.toList());
-			if (nonNoOpNodes.size() == 1) {
-				AdjacencyMatrix<Statement, Edge, CFG> adj = currentCfg.getAdjacencyMatrix();
-				Statement node = nonNoOpNodes.get(0);
-				adj.getEdges().forEach(e -> adj.removeEdge(e));
-				adj.getNodes().forEach(n -> adj.removeNode(n));
-				currentCfg.addNode(node);
-			}
-
-			// Add return to exit node if it's the only stmt
-			if (currentCfg.getNodes().size() == 1) {
-				Statement onlyNode = nodes.stream().findFirst().get();
-
-				NoOp noOp = new NoOp(currentCfg, locationOf(ctx, filePath));
-				currentCfg.addNode(noOp, true);
-				currentCfg.getEntrypoints().remove(onlyNode);
-
-				currentCfg.addEdge(new SequentialEdge(noOp, onlyNode));
-				currentCfg.getAllExitpoints().add(onlyNode);
-			}
-
-			for (Statement stmt : nodes)
-				if (stmt instanceof RustReturnExpression) {
-					Expression value = ((RustReturnExpression) stmt).getSubExpression();
-
-					Return ret = new Return(currentCfg, locationOf(ctx, filePath), value);
-					currentCfg.addNode(ret);
-
-					switchLeafNodes(stmt, ret);
-				}
-		}
-
-		currentCfg.simplify();
-
-		Set<Edge> toRemove = new HashSet<>();
-		Set<Edge> toAdd = new HashSet<>();
-
-		AdjacencyMatrix<Statement, Edge, CFG> adj = currentCfg.getAdjacencyMatrix();
-		for (Edge e : adj.getEdges())
-			if (e instanceof TrueEdge) {
-				Collection<Edge> ingoinEdges = adj.getIngoingEdges(e.getDestination());
-				for (Edge ingoing : ingoinEdges) {
-					if (ingoing instanceof FalseEdge && ingoing.getSource().equals(e.getSource())) {
-						toRemove.add(e);
-						toRemove.add(ingoing);
-
-						toAdd.add(new SequentialEdge(e.getSource(), e.getDestination()));
-					}
-				}
-			}
-
-		toRemove.forEach(r -> adj.removeEdge(r));
-		toAdd.forEach(a -> adj.addEdge(a));
-
-		return currentCfg;
-	}
-
 	@Override
 	public CFG visitFn_decl(Fn_declContext ctx) {
-		String fnName = getFnName(ctx.fn_head());
+		RustCFGFactory factory = new RustCFGFactory();
+		factory.setLocation(locationOf(ctx, filePath));
+
+		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
+		factory.setDecorators(decorators);
 
 		Type returnType = RustUnitType.getInstance();
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit).visitFn_rtype(ctx.fn_rtype());
 
-		CFGDescriptor cfgDesc = new CFGDescriptor(locationOf(ctx, filePath), unit, false, fnName, returnType,
-				new Parameter[0]);
-		currentCfg = new CFG(cfgDesc);
+		CFGDescriptor cfgDesc = new CFGDescriptor(locationOf(ctx, filePath), unit, false, decorators.getName(),
+				returnType, new Parameter[0]);
+		factory.setDescriptor(cfgDesc);
+
+		RustCFG rustCFG = factory.produce();
+		currentCfg = rustCFG;
 
 		Pair<Statement, Statement> block = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 		currentCfg.getEntrypoints().add(block.getLeft());
 
-		return prepareCFG(ctx, returnType);
-	}
+		rustCFG.finalize(ctx);
 
-	private String getFnName(Fn_headContext fnHead) {
-		// TODO skipping: 'const'? 'unsafe'? extern_abi? ty_params?
-		return fnHead.ident().getText();
+		return rustCFG;
 	}
 
 	@Override
@@ -494,23 +368,29 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 	@Override
 	public CFG visitMethod_decl(Method_declContext ctx) {
-		String methodName = getFnName(ctx.fn_head());
+		RustCFGFactory factory = new RustCFGFactory();
+		factory.setLocation(locationOf(ctx, filePath));
+
+		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
+		factory.setDecorators(decorators);
 
 		Type returnType = RustUnitType.getInstance();
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit).visitFn_rtype(ctx.fn_rtype());
 
-		CFGDescriptor cfgDesc = new CFGDescriptor(locationOf(ctx, filePath), unit, false, methodName, returnType,
-				new Parameter[0]);
+		CFGDescriptor cfgDesc = new CFGDescriptor(locationOf(ctx, filePath), unit, false, decorators.getName(),
+				returnType, new Parameter[0]);
+		factory.setDescriptor(cfgDesc);
 
-		currentCfg = new CFG(cfgDesc);
-		NoOp initPoint = new NoOp(currentCfg, locationOf(ctx, filePath));
-		currentCfg.addNode(initPoint, true);
+		RustCFG rustCFG = factory.produce();
+		currentCfg = rustCFG;
 
 		Pair<Statement, Statement> block = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 		currentCfg.getEntrypoints().add(block.getLeft());
 
-		return prepareCFG(ctx, returnType);
+		rustCFG.finalize(ctx);
+
+		return rustCFG;
 	}
 
 	@Override
@@ -526,9 +406,24 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitFn_head(Fn_headContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public RustFunctionDecoratorKeeper visitFn_head(Fn_headContext ctx) {
+
+		// TODO the implementation of this object need to change in the future
+		RustFunctionDecoratorKeeper decorators = new RustFunctionDecoratorKeeper();
+
+		for (ParseTree child : ctx.children) {
+			// TODO missing parsing of 'const'? 'unsafe'? extern_abi? 'fn' ident
+			// ty_params?
+			if (child.getText().equals("unsafe")) {
+				decorators.setUnsafe(false);
+			}
+
+			if (child == ctx.ident()) {
+				decorators.setName(ctx.ident().getText());
+			}
+		}
+
+		return decorators;
 	}
 
 	@Override
@@ -1754,17 +1649,19 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			currentCfg.addNode(enter);
 			currentCfg.addNode(exit);
 			currentCfg.addEdge(new SequentialEdge(enter, body.getLeft()));
-			
+
 			firstStmt = enter;
-			
-			// In case of return expression inside a unsafe block, I move the return outside the unsafe block 
+
+			// In case of return expression inside a unsafe block, I move the
+			// return outside the unsafe block
 			if (body.getRight() instanceof RustReturnExpression) {
 				Expression e = ((RustReturnExpression) body.getRight()).getSubExpression();
 
-				Expression varAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), Untyped.INSTANCE,
+				Expression varAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath),
+						Untyped.INSTANCE,
 						new RustVariableRef(currentCfg, locationOf(ctx, filePath), "RUSTLISA_FRESH", false), e);
 				currentCfg.addNode(varAssignment);
-				
+
 				Collection<Edge> ingoing = currentCfg.getAdjacencyMatrix().getIngoingEdges(body.getRight());
 				for (Edge edge : ingoing) {
 					currentCfg.getAdjacencyMatrix().removeEdge(edge);
@@ -1775,11 +1672,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 				currentCfg.addEdge(new SequentialEdge(varAssignment, exit));
 
-				RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), new RustVariableRef(currentCfg, locationOf(ctx, filePath), filePath, false));
+				RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath),
+						new RustVariableRef(currentCfg, locationOf(ctx, filePath), filePath, false));
 				currentCfg.addNode(ret);
-				
+
 				currentCfg.addEdge(new SequentialEdge(exit, ret));
-				
+
 				lastStmt = ret;
 			} else {
 				currentCfg.addEdge(new SequentialEdge(body.getRight(), exit));
