@@ -17,6 +17,7 @@ import java.io.IOException;
  * RustLiSA static analyzer build upon LiSA.
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustLiSA {
 
@@ -29,7 +30,7 @@ public class RustLiSA {
 	 * @throws IOException       if anything goes wrong during reading the file
 	 */
 	public static void main(String[] args) throws AnalysisException, IOException {
-		Program program = RustFrontend.processFile("example.rs");
+		Program program = RustFrontend.processFile(args[0]);
 
 		LiSAConfiguration conf = new LiSAConfiguration();
 		conf.setAbstractState(new SimpleAbstractState<>(
