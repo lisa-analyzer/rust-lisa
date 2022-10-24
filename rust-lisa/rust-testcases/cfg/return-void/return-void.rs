@@ -84,3 +84,20 @@ fn func8() {
 	
 	return;
 }
+
+fn func9() {
+	return ();
+}
+
+
+fn func10() {
+	return ()
+}
+
+fn func11() {
+	()
+}
+
+fn func12() {
+	println!("Hello world!")
+}

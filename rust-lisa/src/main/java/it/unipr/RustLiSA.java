@@ -4,6 +4,12 @@ import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
+import it.unive.lisa.LiSAFactory;
+import it.unive.lisa.analysis.SimpleAbstractState;
+import it.unive.lisa.analysis.heap.MonolithicHeap;
+import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
+import it.unive.lisa.analysis.numeric.Interval;
+import it.unive.lisa.analysis.value.TypeDomain;
 import it.unive.lisa.program.Program;
 import java.io.IOException;
 
@@ -11,6 +17,7 @@ import java.io.IOException;
  * RustLiSA static analyzer build upon LiSA.
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustLiSA {
 
@@ -26,8 +33,13 @@ public class RustLiSA {
 		Program program = RustFrontend.processFile(args[0]);
 
 		LiSAConfiguration conf = new LiSAConfiguration();
-		conf.setDumpCFGs(true)
+		conf.setAbstractState(new SimpleAbstractState<>(
+				new MonolithicHeap(),
+				new ValueEnvironment<>(new Interval()),
+				LiSAFactory.getDefaultFor(TypeDomain.class)))
 				.setJsonOutput(true)
+				.setDumpTypeInference(true)
+				.setDumpAnalysis(true)
 				.setWorkdir("output");
 
 		LiSA lisa = new LiSA(conf);

@@ -41,7 +41,7 @@ public class RustLetAssignment extends BinaryExpression {
 
 	@Override
 	public String toString() {
-		return "let " + getLeft() + " : " + getStaticType().toString() + " = " + getRight();
+		return "let " + getLeft().toString() + " : " + getStaticType().toString() + " = " + getRight();
 	}
 
 	@Override
@@ -57,5 +57,4 @@ public class RustLetAssignment extends BinaryExpression {
 					throws SemanticException {
 		return state.assign(left, right, this);
 	}
-
 }
