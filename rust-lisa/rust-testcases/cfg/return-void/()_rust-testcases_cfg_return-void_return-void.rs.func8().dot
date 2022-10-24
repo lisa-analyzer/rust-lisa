@@ -4,10 +4,10 @@ digraph {
 	"node2" [shape="rect",color="gray",label=<==(_x, 4)>];
 	"node3" [shape="rect",color="gray",label=<let _y : untyped = +(_x, 2)>];
 	"node4" [shape="rect",color="gray",label=<let _y : untyped = +(_x, 3)>];
-	"node2" -> "node3" [color="blue",style="dashed"];
-	"node2" -> "node4" [color="red",style="dashed"];
-	"node3" -> "node1" [color="black"];
 	"node0" -> "node2" [color="black"];
+	"node2" -> "node4" [color="red",style="dashed"];
+	"node2" -> "node3" [color="blue",style="dashed"];
+	"node3" -> "node1" [color="black"];
 	"node4" -> "node1" [color="black"];
 subgraph cluster_legend {
 	label="Legend";
