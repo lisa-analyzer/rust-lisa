@@ -1227,6 +1227,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
 			RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+			
 			currentCfg.addNode(ret);
 
 			if (entryStmt == null)
@@ -1266,7 +1267,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		// This expr is the one of return from a function
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
-			RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+			
+			RustReturnExpression ret;
+			if (expr instanceof RustReturnExpression)
+				ret = (RustReturnExpression) expr;
+			else 
+				ret =  new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+			
 			currentCfg.addNode(ret);
 
 			if (entryStmt == null) {
@@ -1649,44 +1656,33 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			lastStmt = noOp;
 		} else if (ctx.children.get(0).getText().equals("unsafe")) {
 			RustUnsafeEnterStatement enter = new RustUnsafeEnterStatement(currentCfg, locationOf(ctx, filePath));
-			RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath));
 
 			Pair<Statement, Statement> body = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 
 			currentCfg.addNode(enter);
-			currentCfg.addNode(exit);
 			currentCfg.addEdge(new SequentialEdge(enter, body.getLeft()));
 
 			firstStmt = enter;
 
-			// In case of return expression inside a unsafe block, I move the
-			// return outside the unsafe block
+			// In case of return expression as a last statement inside an unsafe block, we do not consider a "unsafe exit" block
 			if (body.getRight() instanceof RustReturnExpression) {
-				Expression e = ((RustReturnExpression) body.getRight()).getSubExpression();
-
-				Expression varAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath),
-						Untyped.INSTANCE,
-						new RustVariableRef(currentCfg, locationOf(ctx, filePath), "RUSTLISA_FRESH", false), e);
-				currentCfg.addNode(varAssignment);
-
-				Collection<Edge> ingoing = currentCfg.getAdjacencyMatrix().getIngoingEdges(body.getRight());
-				for (Edge edge : ingoing) {
-					currentCfg.getAdjacencyMatrix().removeEdge(edge);
-					Edge newEdge = edge.newInstance(edge.getSource(), varAssignment);
+				RustReturnExpression oldReturn = (RustReturnExpression) body.getRight();
+				RustReturnExpression newReturn = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), oldReturn.getSubExpression());
+				
+				currentCfg.addNode(newReturn);
+				
+				Collection<Edge> edges = currentCfg.getAdjacencyMatrix().getIngoingEdges(oldReturn);
+				for (Edge e : edges) {
+					currentCfg.getAdjacencyMatrix().removeEdge(e);
+					Edge newEdge = e.newInstance(e.getSource(), newReturn);
 					currentCfg.addEdge(newEdge);
 				}
-				currentCfg.getAdjacencyMatrix().removeNode(body.getRight());
-
-				currentCfg.addEdge(new SequentialEdge(varAssignment, exit));
-
-				RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath),
-						new RustVariableRef(currentCfg, locationOf(ctx, filePath), filePath, false));
-				currentCfg.addNode(ret);
-
-				currentCfg.addEdge(new SequentialEdge(exit, ret));
-
-				lastStmt = ret;
+				
+				lastStmt = body.getRight();
 			} else {
+				RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath));
+				currentCfg.addNode(exit);
+
 				currentCfg.addEdge(new SequentialEdge(body.getRight(), exit));
 				lastStmt = exit;
 			}
@@ -1832,7 +1828,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.getChild(0).getText().equals("(")) {
 			// TODO Ignoring expr_inner_attrs? part
 
-			if (ctx.expr().get(0) != null) {
+			if (ctx.expr().size() > 0 && ctx.expr().get(0) != null) {
 				Expression expr = visitExpr(ctx.expr(0));
 
 				if (ctx.expr_list() != null) {
@@ -1885,7 +1881,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression returnValue = new RustUnitLiteral(currentCfg, locationOf(ctx, filePath));
 			if (ctx.expr(0) != null)
 				returnValue = visitExpr(ctx.expr(0));
-
+			
 			return new RustReturnExpression(currentCfg, locationOf(ctx, filePath), returnValue);
 		} else if (ctx.blocky_expr() != null) {
 			// TODO watch out for expression and statements
