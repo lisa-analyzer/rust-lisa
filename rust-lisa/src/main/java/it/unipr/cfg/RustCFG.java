@@ -3,7 +3,6 @@ package it.unipr.cfg;
 import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
 import it.unipr.cfg.type.RustUnitType;
-import it.unive.lisa.program.SourceCodeLocation;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CFGDescriptor;
 import it.unive.lisa.program.cfg.edge.Edge;
@@ -31,7 +30,17 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public class RustCFG extends CFG {
 	private final boolean unsafe;
-	private final SourceCodeLocation location;
+
+	/**
+	 * Yields a CFG from a descriptor.
+	 * 
+	 * @param descriptor the descriptor of this CFG
+	 * @param unsafe     the decorator unsafe
+	 */
+	public RustCFG(CFGDescriptor descriptor, boolean unsafe) {
+		super(descriptor);
+		this.unsafe = unsafe;
+	}
 
 	/**
 	 * Deletes a node that is a leaf node (e.g. a terminating node) in the CFG,
@@ -70,7 +79,7 @@ public class RustCFG extends CFG {
 
 		// Substitute exit points wit
 		if (getDescriptor().getReturnType() instanceof RustUnitType) {
-			Ret ret = new Ret(this, location);
+			Ret ret = new Ret(this, getDescriptor().getLocation());
 
 			// Add possible missing ret as final instruction
 			if (getAllExitpoints().isEmpty()) {
@@ -94,7 +103,7 @@ public class RustCFG extends CFG {
 					// The value inside the return is null iff the return was
 					// empty or has a RustUnitLiteral
 					if (rustReturn.getSubExpression() instanceof RustUnitLiteral) {
-						NoOp noOp = new NoOp(this, location);
+						NoOp noOp = new NoOp(this, getDescriptor().getLocation());
 						addNode(noOp);
 
 						switchLeafNodes(node, noOp);
@@ -131,7 +140,7 @@ public class RustCFG extends CFG {
 			if (getNodes().size() == 1) {
 				Statement onlyNode = nodes.stream().findFirst().get();
 
-				NoOp noOp = new NoOp(this, location);
+				NoOp noOp = new NoOp(this, getDescriptor().getLocation());
 				addNode(noOp, true);
 				getEntrypoints().remove(onlyNode);
 
@@ -143,7 +152,7 @@ public class RustCFG extends CFG {
 				if (stmt instanceof RustReturnExpression) {
 					Expression value = ((RustReturnExpression) stmt).getSubExpression();
 
-					Return ret = new Return(this, location, value);
+					Return ret = new Return(this, getDescriptor().getLocation(), value);
 					addNode(ret);
 
 					switchLeafNodes(stmt, ret);
@@ -179,19 +188,6 @@ public class RustCFG extends CFG {
 
 		// Removing nodes that are not in the graph
 		getEntrypoints().removeIf(entry -> !getAdjacencyMatrix().containsNode(entry));
-	}
-
-	/**
-	 * Yields a CFG from a descriptor.
-	 * 
-	 * @param descriptor the descriptor of this CFG
-	 * @param unsafe     the decorator unsafe
-	 * @param location   the source code location where this CFG is
-	 */
-	public RustCFG(CFGDescriptor descriptor, boolean unsafe, SourceCodeLocation location) {
-		super(descriptor);
-		this.unsafe = unsafe;
-		this.location = location;
 	}
 
 	/**

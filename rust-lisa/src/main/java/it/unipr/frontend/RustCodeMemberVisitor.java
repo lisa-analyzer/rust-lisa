@@ -177,7 +177,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	@Override
 	public CFG visitFn_decl(Fn_declContext ctx) {
 		RustCFGFactory factory = new RustCFGFactory();
-		factory.setLocation(locationOf(ctx, filePath));
 
 		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
 		factory.setDecorators(decorators);
@@ -369,7 +368,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	@Override
 	public CFG visitMethod_decl(Method_declContext ctx) {
 		RustCFGFactory factory = new RustCFGFactory();
-		factory.setLocation(locationOf(ctx, filePath));
 
 		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
 		factory.setDecorators(decorators);

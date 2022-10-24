@@ -1,7 +1,6 @@
 package it.unipr.cfg.utils;
 
 import it.unipr.cfg.RustCFG;
-import it.unive.lisa.program.SourceCodeLocation;
 import it.unive.lisa.program.cfg.CFGDescriptor;
 
 /**
@@ -14,7 +13,6 @@ import it.unive.lisa.program.cfg.CFGDescriptor;
 public class RustCFGFactory {
 	private RustFunctionDecoratorKeeper decorators;
 	private CFGDescriptor descriptor;
-	private SourceCodeLocation location;
 
 	/**
 	 * Yields a factory for constructing a {@link RustCFG}.
@@ -42,22 +40,12 @@ public class RustCFGFactory {
 	}
 
 	/**
-	 * Set the location used during construction of the CFG.
-	 * 
-	 * @param location the new location
-	 */
-	public void setLocation(SourceCodeLocation location) {
-		this.location = location;
-	}
-
-	/**
 	 * Constructs the {@link RustCFG} using the settings granted before.
 	 * 
 	 * @return the constructed CFG
 	 */
 	public RustCFG produce() {
-		RustCFG rustCFG = new RustCFG(descriptor, decorators.getUnsafe(), location);
-
+		RustCFG rustCFG = new RustCFG(descriptor, decorators.getUnsafe());
 		return rustCFG;
 	}
 
