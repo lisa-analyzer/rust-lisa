@@ -16,8 +16,6 @@ import it.unive.lisa.program.cfg.statement.Ret;
 import it.unive.lisa.program.cfg.statement.Return;
 import it.unive.lisa.program.cfg.statement.Statement;
 import it.unive.lisa.util.datastructures.graph.AdjacencyMatrix;
-import javassist.compiler.ast.Expr;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -92,21 +90,25 @@ public class RustCFG extends CFG {
 			for (Statement node : nodes) {
 				if (node instanceof RustReturnExpression) {
 					RustReturnExpression rustReturn = (RustReturnExpression) node;
-										
-					// The value inside the return is null iff the return was empty or has a RustUnitLiteral
+
+					// The value inside the return is null iff the return was
+					// empty or has a RustUnitLiteral
 					if (rustReturn.getSubExpression() instanceof RustUnitLiteral) {
 						NoOp noOp = new NoOp(this, location);
 						addNode(noOp);
-	
+
 						switchLeafNodes(node, noOp);
 						addEdge(new SequentialEdge(noOp, ret));
 					}
-					// Here the return type of the expression is void but the expression actually do something, so we add a last node that evaluates the inner expression (in case of side-effects)
+					// Here the return type of the expression is void but the
+					// expression actually do something, so we add a last node
+					// that evaluates the inner expression (in case of
+					// side-effects)
 					else {
 						Expression expr = rustReturn.getSubExpression();
 						System.out.println(expr.getClass());
 						addNode(expr);
-	
+
 						switchLeafNodes(node, expr);
 						addEdge(new SequentialEdge(expr, ret));
 					}
@@ -169,10 +171,12 @@ public class RustCFG extends CFG {
 
 		toRemove.forEach(r -> adj.removeEdge(r));
 		toAdd.forEach(a -> adj.addEdge(a));
-		
-		// It can happen sometimes that there are no nodes with parent, adding them
-		getEntrypoints().addAll(getNodes().stream().filter(node -> adj.getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
-		
+
+		// It can happen sometimes that there are no nodes with parent, adding
+		// them
+		getEntrypoints().addAll(
+				getNodes().stream().filter(node -> adj.getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
+
 		// Removing nodes that are not in the graph
 		getEntrypoints().removeIf(entry -> !getAdjacencyMatrix().containsNode(entry));
 	}

@@ -2,20 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import it.unipr.cfg.RustCFG;
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
@@ -105,6 +91,18 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -1227,7 +1225,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
 			RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
-			
+
 			currentCfg.addNode(ret);
 
 			if (entryStmt == null)
@@ -1267,13 +1265,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		// This expr is the one of return from a function
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
-			
+
 			RustReturnExpression ret;
 			if (expr instanceof RustReturnExpression)
 				ret = (RustReturnExpression) expr;
-			else 
-				ret =  new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
-			
+			else
+				ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+
 			currentCfg.addNode(ret);
 
 			if (entryStmt == null) {
@@ -1356,8 +1354,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					var = new RustVariableRef(currentCfg, locationOf(ctx, filePath), v.getName(), v.isMutable(), type);
 				} else
 					throw new UnsupportedOperationException("Unsupported translation: " + ctx.getText());
-				
-					RustLetAssignment assigment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), type, var,
+
+				RustLetAssignment assigment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), type, var,
 						rhs);
 				currentCfg.addNode(assigment);
 
@@ -1664,20 +1662,22 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			firstStmt = enter;
 
-			// In case of return expression as a last statement inside an unsafe block, we do not consider a "unsafe exit" block
+			// In case of return expression as a last statement inside an unsafe
+			// block, we do not consider a "unsafe exit" block
 			if (body.getRight() instanceof RustReturnExpression) {
 				RustReturnExpression oldReturn = (RustReturnExpression) body.getRight();
-				RustReturnExpression newReturn = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), oldReturn.getSubExpression());
-				
+				RustReturnExpression newReturn = new RustReturnExpression(currentCfg, locationOf(ctx, filePath),
+						oldReturn.getSubExpression());
+
 				currentCfg.addNode(newReturn);
-				
+
 				Collection<Edge> edges = currentCfg.getAdjacencyMatrix().getIngoingEdges(oldReturn);
 				for (Edge e : edges) {
 					currentCfg.getAdjacencyMatrix().removeEdge(e);
 					Edge newEdge = e.newInstance(e.getSource(), newReturn);
 					currentCfg.addEdge(newEdge);
 				}
-				
+
 				lastStmt = body.getRight();
 			} else {
 				RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath));
@@ -1881,7 +1881,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression returnValue = new RustUnitLiteral(currentCfg, locationOf(ctx, filePath));
 			if (ctx.expr(0) != null)
 				returnValue = visitExpr(ctx.expr(0));
-			
+
 			return new RustReturnExpression(currentCfg, locationOf(ctx, filePath), returnValue);
 		} else if (ctx.blocky_expr() != null) {
 			// TODO watch out for expression and statements

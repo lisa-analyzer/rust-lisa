@@ -48,14 +48,16 @@ public class RustAddExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		
+
 		AnalysisState<A, H, V, T> result = state.bottom();
-				
+
 		for (Type leftType : left.getRuntimeTypes())
 			for (Type rightType : right.getRuntimeTypes())
 				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
-					result = result.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType, left, right, NumericNonOverflowingAdd.INSTANCE, getLocation()), this));
-		
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+									left, right, NumericNonOverflowingAdd.INSTANCE, getLocation()), this));
+
 		return result;
 	}
 
