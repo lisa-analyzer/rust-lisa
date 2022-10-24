@@ -1680,7 +1680,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 				lastStmt = body.getRight();
 			} else {
-				RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath));
+				RustUnsafeExitStatement exit = new RustUnsafeExitStatement(currentCfg, locationOf(ctx, filePath),
+						enter);
 				currentCfg.addNode(exit);
 
 				currentCfg.addEdge(new SequentialEdge(body.getRight(), exit));

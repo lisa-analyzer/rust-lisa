@@ -22,14 +22,27 @@ import it.unive.lisa.util.datastructures.graph.GraphVisitor;
  */
 public class RustUnsafeExitStatement extends Statement {
 
+	private final RustUnsafeEnterStatement enter;
+
 	/**
 	 * Constructs a {@link RustUnsafeExitStatement}.
 	 * 
 	 * @param cfg      the cfg in which this statement will be put
 	 * @param location the location in the program
+	 * @param enter    the unsafe entry block of reference
 	 */
-	public RustUnsafeExitStatement(CFG cfg, CodeLocation location) {
+	public RustUnsafeExitStatement(CFG cfg, CodeLocation location, RustUnsafeEnterStatement enter) {
 		super(cfg, location);
+		this.enter = enter;
+	}
+
+	/**
+	 * Yields the {@link RustUnsafeEnterStatement} block of reference.
+	 * 
+	 * @return the unsafe entry block of reference
+	 */
+	public RustUnsafeEnterStatement getEnter() {
+		return enter;
 	}
 
 	@Override
