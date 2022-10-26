@@ -20,8 +20,6 @@ public class RustBoolean extends Literal<Boolean> {
 	 * @param value    the boolean value
 	 */
 	public RustBoolean(CFG cfg, CodeLocation location, Boolean value) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, value, RustBooleanType.getInstance());
 	}
 }

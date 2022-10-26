@@ -20,8 +20,6 @@ public class RustFloat extends Literal<Float> {
 	 * @param value    the float value
 	 */
 	public RustFloat(CFG cfg, CodeLocation location, Float value) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, value, RustF64Type.getInstance());
 	}
 }
