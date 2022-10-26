@@ -32,8 +32,6 @@ public class RustReturnExpression extends UnaryExpression {
 	 */
 	public RustReturnExpression(CFG cfg, CodeLocation location,
 			Expression expr) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, "return", Untyped.INSTANCE, expr);
 	}
 
@@ -49,7 +47,9 @@ public class RustReturnExpression extends UnaryExpression {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> unarySemantics(
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
-		// TODO too coarse
+		// Left intentionally blank. This expression is a placeholder for return
+		// statement, but it is then substituted by Return and Ret statement
+		// before starting the analysis.
 		return state.top();
 	}
 

@@ -14,11 +14,14 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.operator.binary.BitwiseShiftLeft;
+import it.unive.lisa.type.Type;
 
 /**
  * Rust left shift expression (e.g., x << y).
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustLeftShiftExpression extends BinaryExpression {
 
@@ -45,8 +48,17 @@ public class RustLeftShiftExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+
+		for (Type leftType : left.getRuntimeTypes())
+			for (Type rightType : right.getRuntimeTypes())
+				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+									left, right, BitwiseShiftLeft.INSTANCE, getLocation()), this));
+
+		return result;
 	}
 
 }
