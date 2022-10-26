@@ -14,6 +14,8 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.operator.binary.ComparisonEq;
+import it.unive.lisa.type.Type;
 
 /**
  * Rust equal expression (e.g., x == y).
@@ -44,8 +46,16 @@ public class RustEqualExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+		AnalysisState<A, H, V, T> result = state.bottom();
+
+		for (Type leftType : left.getRuntimeTypes())
+			for (Type rightType : right.getRuntimeTypes())
+				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+									left, right, ComparisonEq.INSTANCE, getLocation()), this));
+
+		return result;
 	}
 
 }
