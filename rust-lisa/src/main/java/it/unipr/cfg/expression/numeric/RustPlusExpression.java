@@ -19,6 +19,7 @@ import it.unive.lisa.type.Untyped;
  * Rust unary plus expression (e.g., +x).
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  */
 public class RustPlusExpression extends UnaryExpression {
 
