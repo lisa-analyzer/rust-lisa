@@ -139,6 +139,36 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	private CFG currentCfg;
 
 	/**
+	 * Function use by {@link removeFrom} for collecting nodes to remove
+	 * 
+	 * @param nodesList a initially empty list of nodes
+	 * @param edgesList a initially empty list of edges
+	 * @param node
+	 */
+	private void visitNodes(List<Statement> nodesList, List<Edge> edgesList, Statement node) {
+		currentCfg.getOutgoingEdges(node).stream().forEach(edge -> {
+			edgesList.add(edge);
+			nodesList.add(edge.getDestination());
+			visitNodes(nodesList, edgesList, edge.getDestination());
+		});
+	}
+	
+	/**
+	 * Removes every node and edge that is reachable from the given `root`
+	 * 
+	 * @param node the node to use as `root` for removal
+	 */
+	private void removeFrom(Statement node) {
+		List<Statement> nodes = new ArrayList<Statement>();
+		List<Edge> edges = new ArrayList<Edge>();
+		visitNodes(nodes, edges, node);
+		
+		currentCfg.getEdges().removeAll(edges);
+		currentCfg.getNodes().removeAll(nodes);
+		currentCfg.getNodes().remove(node);
+	}
+	
+	/**
 	 * Builds a code member visitor for Rust.
 	 * 
 	 * @param filePath file path of the Rust program to be analyzed
@@ -1404,6 +1434,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		// TODO do not take into account the attr part for now
 		return visitBlocky_expr(ctx.blocky_expr());
 	}
+	
 
 	@Override
 	public Pair<Statement, Statement> visitBlocky_expr(Blocky_exprContext ctx) {
@@ -1535,7 +1566,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 								resolvedMatchArms.size())) {
 
 							currentCfg.getNodes().remove(danglingArm.getLeft());
-							currentCfg.getAdjacencyMatrix().removeFrom(danglingArm.getMiddle());
+							
+							// Remove all node starting from the danglingArm.getMiddle()
+							removeFrom(danglingArm.getMiddle());
 						}
 
 						resolvedMatchArms = resolvedMatchArms.subList(0, i + 1);
