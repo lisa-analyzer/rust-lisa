@@ -9,7 +9,7 @@ public class RustCFGComplex extends RustLiSATestExecutor {
 
 	@Test
 	public void testRectangle() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/rectangle", "rectangle.rs", conf);
 	}
 

@@ -2,6 +2,16 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -36,28 +46,15 @@ import it.unipr.rust.antlr.RustParser.ItemContext;
 import it.unipr.rust.antlr.RustParser.Mod_bodyContext;
 import it.unipr.rust.antlr.RustParser.Pub_itemContext;
 import it.unipr.rust.antlr.RustParser.Struct_declContext;
+import it.unive.lisa.program.ClassUnit;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.program.SourceCodeLocation;
 import it.unive.lisa.program.cfg.CFG;
-import it.unive.lisa.program.cfg.statement.call.assignment.OrderPreservingAssigningStrategy;
-import it.unive.lisa.program.cfg.statement.call.assignment.ParameterAssigningStrategy;
-import it.unive.lisa.program.cfg.statement.call.resolution.ParameterMatchingStrategy;
-import it.unive.lisa.program.cfg.statement.call.resolution.RuntimeTypesMatchingStrategy;
-import it.unive.lisa.program.cfg.statement.call.traversal.HierarcyTraversalStrategy;
-import it.unive.lisa.program.cfg.statement.call.traversal.SingleInheritanceTraversalStrategy;
 import it.unive.lisa.program.cfg.statement.evaluation.EvaluationOrder;
 import it.unive.lisa.program.cfg.statement.evaluation.LeftToRightEvaluation;
 import it.unive.lisa.type.Type;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * The Rust front-end for LiSA.
@@ -71,17 +68,16 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 	 * The strategy of traversing super-unit to search for target call
 	 * implementation.
 	 */
-	public static final HierarcyTraversalStrategy HIERARCY_TRAVERSAL_STRATEGY = SingleInheritanceTraversalStrategy.INSTANCE;
 
 	/**
 	 * The parameter assigning strategy for calls.
 	 */
-	public static final ParameterAssigningStrategy PARAMETER_ASSIGN_STRATEGY = OrderPreservingAssigningStrategy.INSTANCE;
+//	public static final ParameterAssigningStrategy PARAMETER_ASSIGN_STRATEGY = OrderPreservingAssigningStrategy.INSTANCE;
 
 	/**
 	 * The parameter matching strategy for matching method and function calls.
 	 */
-	public static final ParameterMatchingStrategy METHOD_MATCHING_STRATEGY = RuntimeTypesMatchingStrategy.INSTANCE;
+//	public static final ParameterMatchingStrategy METHOD_MATCHING_STRATEGY = RuntimeTypesMatchingStrategy.INSTANCE;
 
 	/**
 	 * The parameter evaluation order strategy.
@@ -111,7 +107,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 	private RustFrontend(String filePath) {
 		this.filePath = filePath;
-		this.program = new Program();
+		this.program = new Program(new RustFeatures());
 	}
 
 	private void registerTypes() {
@@ -187,9 +183,9 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 	@Override
 	public Object visitCrate(CrateContext ctx) {
-		CompilationUnit mainUnit = new CompilationUnit(new SourceCodeLocation(filePath, 0, 0), filePath, false);
+		ClassUnit mainUnit = new ClassUnit(new SourceCodeLocation(filePath, 0, 0), program, filePath, false);
 		currentUnit = mainUnit;
-		program.addCompilationUnit(mainUnit);
+		program.addUnit(mainUnit);
 		return visitMod_body(ctx.mod_body());
 	}
 
@@ -210,10 +206,10 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 			visitPub_item(ctx.pub_item());
 
 		for (Type t : RustStructType.all())
-			program.addCompilationUnit(((RustStructType) t).getUnit());
+			program.addUnit(((RustStructType) t).getUnit());
 
 		for (Type t : RustEnumType.all())
-			program.addCompilationUnit(((RustEnumType) t).getUnit());
+			program.addUnit(((RustEnumType) t).getUnit());
 
 		if (ctx.impl_block() != null) {
 			RustStructType struct = RustStructType.get(ctx.impl_block().impl_what().getText());
@@ -222,11 +218,11 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 			List<CFG> implCfg = new RustCodeMemberVisitor(filePath, program, u).visitImpl_block(ctx.impl_block());
 
 			for (CFG cfg : implCfg)
-				u.addInstanceCFG(cfg);
+				u.addInstanceCodeMember(cfg);
 		}
 
 		if (ctx.pub_item() != null && ctx.pub_item().fn_decl() != null)
-			program.addCFG(new RustCodeMemberVisitor(filePath, program, currentUnit)
+			program.addCodeMember(new RustCodeMemberVisitor(filePath, program, currentUnit)
 					.visitFn_decl(ctx.pub_item().fn_decl()));
 
 		if (ctx.item_macro_use() != null)
@@ -252,11 +248,11 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 	public Void visitStruct_decl(Struct_declContext ctx) {
 		// TODO skipping ty_params? production
 		String name = ctx.ident().getText();
-		CompilationUnit structUnit = new CompilationUnit(locationOf(ctx, filePath), name, true);
+		ClassUnit structUnit = new ClassUnit(locationOf(ctx, filePath), program, name, true);
 
 		RustStructType.lookup(name, structUnit);
 
-		List<Global> fields = new RustTypeVisitor(filePath, currentUnit).visitStruct_tail(ctx.struct_tail());
+		List<Global> fields = new RustTypeVisitor(filePath, currentUnit, program).visitStruct_tail(ctx.struct_tail());
 
 		for (Global f : fields)
 			structUnit.addInstanceGlobal(f);
@@ -268,9 +264,9 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 	public Void visitEnum_decl(Enum_declContext ctx) {
 		// TODO skipping ty_params? and where_clause?
 		String name = ctx.ident().getText();
-		EnumCompilationUnit enumUnit = new EnumCompilationUnit(locationOf(ctx, filePath), name, true);
+		EnumCompilationUnit enumUnit = new EnumCompilationUnit(locationOf(ctx, filePath), program, name, true);
 
-		List<RustEnumVariant> enumVariants = new RustTypeVisitor(filePath, currentUnit)
+		List<RustEnumVariant> enumVariants = new RustTypeVisitor(filePath, currentUnit, program)
 				.visitEnum_variant_list(ctx.enum_variant_list());
 
 		for (RustEnumVariant variant : enumVariants)

@@ -9,7 +9,7 @@ public class RustCFGIfLet extends RustLiSATestExecutor {
 
 	@Test
 	public void testSimpleIfLet() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/simple-if-let", "simple-if-let.rs", conf);
 	}
 

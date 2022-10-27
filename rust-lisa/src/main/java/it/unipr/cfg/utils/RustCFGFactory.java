@@ -1,7 +1,7 @@
 package it.unipr.cfg.utils;
 
 import it.unipr.cfg.RustCFG;
-import it.unive.lisa.program.cfg.CFGDescriptor;
+import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 
 /**
  * Produce a {@link RustCFG} with the current specified settings and
@@ -12,7 +12,7 @@ import it.unive.lisa.program.cfg.CFGDescriptor;
  */
 public class RustCFGFactory {
 	private RustFunctionDecoratorKeeper decorators;
-	private CFGDescriptor descriptor;
+	private CodeMemberDescriptor descriptor;
 
 	/**
 	 * Yields a factory for constructing a {@link RustCFG}.
@@ -35,7 +35,7 @@ public class RustCFGFactory {
 	 * 
 	 * @param descriptor the new descriptor
 	 */
-	public void setDescriptor(CFGDescriptor descriptor) {
+	public void setDescriptor(CodeMemberDescriptor descriptor) {
 		this.descriptor = descriptor;
 	}
 

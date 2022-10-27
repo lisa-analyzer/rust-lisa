@@ -9,7 +9,7 @@ public class RustCFGMacro extends RustLiSATestExecutor {
 
 	@Test
 	public void testMacro() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/macro", "macro.rs", conf);
 	}
 

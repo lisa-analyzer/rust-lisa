@@ -1,10 +1,18 @@
 package it.unipr.cfg;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
 import it.unipr.cfg.type.RustUnitType;
 import it.unive.lisa.program.cfg.CFG;
-import it.unive.lisa.program.cfg.CFGDescriptor;
+import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.edge.Edge;
 import it.unive.lisa.program.cfg.edge.FalseEdge;
 import it.unive.lisa.program.cfg.edge.SequentialEdge;
@@ -14,13 +22,6 @@ import it.unive.lisa.program.cfg.statement.NoOp;
 import it.unive.lisa.program.cfg.statement.Ret;
 import it.unive.lisa.program.cfg.statement.Return;
 import it.unive.lisa.program.cfg.statement.Statement;
-import it.unive.lisa.util.datastructures.graph.AdjacencyMatrix;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Implementation of a CFG of Rust.
@@ -37,7 +38,7 @@ public class RustCFG extends CFG {
 	 * @param descriptor the descriptor of this CFG
 	 * @param unsafe     the decorator unsafe
 	 */
-	public RustCFG(CFGDescriptor descriptor, boolean unsafe) {
+	public RustCFG(CodeMemberDescriptor descriptor, boolean unsafe) {
 		super(descriptor);
 		this.unsafe = unsafe;
 	}
@@ -51,16 +52,16 @@ public class RustCFG extends CFG {
 	 * @param newNode the new node that need to be inserted
 	 */
 	private void switchLeafNodes(Statement oldNode, Statement newNode) {
-		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
+//		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
 
-		Collection<Edge> edges = adj.getIngoingEdges(oldNode);
+		Collection<Edge> edges = getIngoingEdges(oldNode);
 		for (Edge e : edges) {
 			Edge newEdge = e.newInstance(e.getSource(), newNode);
-			adj.removeEdge(e);
+			getEdges().remove(e);
 			addEdge(newEdge);
 		}
 
-		adj.removeNode(oldNode);
+		getNodes().remove(oldNode);
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class RustCFG extends CFG {
 			if (getAllExitpoints().isEmpty()) {
 				Set<Statement> exitNodes = nodes
 						.stream()
-						.filter(n -> getAdjacencyMatrix().followersOf(n).isEmpty())
+						.filter(n -> followersOf(n).isEmpty())
 						.collect(Collectors.toSet());
 
 				for (Statement exit : exitNodes) {
@@ -129,10 +130,12 @@ public class RustCFG extends CFG {
 			List<Statement> nonNoOpNodes = nodes.stream().filter(n -> !(n instanceof NoOp))
 					.collect(Collectors.toList());
 			if (nonNoOpNodes.size() == 1) {
-				AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
+//				AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
 				Statement node = nonNoOpNodes.get(0);
-				adj.getEdges().forEach(e -> adj.removeEdge(e));
-				adj.getNodes().forEach(n -> adj.removeNode(n));
+//				getEdges().forEach(e -> removeEdge(e));
+//				getNodes().forEach(n -> removeNode(n));
+				getEdges().clear();
+				getNodes().clear();
 				addNode(node);
 			}
 
@@ -164,10 +167,10 @@ public class RustCFG extends CFG {
 		Set<Edge> toRemove = new HashSet<>();
 		Set<Edge> toAdd = new HashSet<>();
 
-		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
-		for (Edge e : adj.getEdges())
+//		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
+		for (Edge e : getEdges())
 			if (e instanceof TrueEdge) {
-				Collection<Edge> ingoinEdges = adj.getIngoingEdges(e.getDestination());
+				Collection<Edge> ingoinEdges = getIngoingEdges(e.getDestination());
 				for (Edge ingoing : ingoinEdges) {
 					if (ingoing instanceof FalseEdge && ingoing.getSource().equals(e.getSource())) {
 						toRemove.add(e);
@@ -178,16 +181,16 @@ public class RustCFG extends CFG {
 				}
 			}
 
-		toRemove.forEach(r -> adj.removeEdge(r));
-		toAdd.forEach(a -> adj.addEdge(a));
+		toRemove.forEach(r -> getEdges().remove(r));
+		toAdd.forEach(a -> getEdges().add(a));
 
 		// It can happen sometimes that there are no nodes with parent, adding
 		// them
 		getEntrypoints().addAll(
-				getNodes().stream().filter(node -> adj.getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
+				getNodes().stream().filter(node -> getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
 
 		// Removing nodes that are not in the graph
-		getEntrypoints().removeIf(entry -> !getAdjacencyMatrix().containsNode(entry));
+		getEntrypoints().removeIf(entry -> !containsNode(entry));
 	}
 
 	/**
