@@ -11,7 +11,7 @@ import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.value.TypeDomain;
 import org.junit.Test;
 
-public class RustOperation extends RustLiSATestExecutor {
+public class RustNumerical extends RustLiSATestExecutor {
 
 	@Test
 	public void testLet() throws AnalysisSetupException {
