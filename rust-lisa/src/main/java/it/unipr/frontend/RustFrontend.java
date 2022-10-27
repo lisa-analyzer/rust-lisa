@@ -222,7 +222,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 		}
 
 		if (ctx.pub_item() != null && ctx.pub_item().fn_decl() != null)
-			program.addCodeMember(new RustCodeMemberVisitor(filePath, program, currentUnit)
+			currentUnit.addCodeMember(new RustCodeMemberVisitor(filePath, program, currentUnit)
 					.visitFn_decl(ctx.pub_item().fn_decl()));
 
 		if (ctx.item_macro_use() != null)
