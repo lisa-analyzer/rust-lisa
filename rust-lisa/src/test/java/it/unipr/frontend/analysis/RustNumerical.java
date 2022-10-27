@@ -12,7 +12,7 @@ import it.unive.lisa.analysis.value.TypeDomain;
 import org.junit.Test;
 
 public class RustNumerical extends RustLiSATestExecutor {
-	
+
 	@Test
 	public void testNumerical() throws AnalysisSetupException {
 		LiSAConfiguration conf = new LiSAConfiguration()

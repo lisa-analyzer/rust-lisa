@@ -1,11 +1,13 @@
 digraph {
 	"node0" [shape="rect",color="black",label=<let x : untyped = 42<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>[stack: [42, 42]] ]]<BR/>}} -&gt; [x]>];
-	"node1" [shape="rect",color="gray",label=<let z : untyped = 4.7<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>z: [-Inf, +Inf]<BR/>[stack: [-Inf, +Inf]] ]]<BR/>}} -&gt; [z]>];
-	"node2" [shape="rect",color="black",peripheries="2",label=<ret<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>z: [-Inf, +Inf]<BR/>[stack: _|_] ]]<BR/>}} -&gt; [skip]>];
-	"node3" [shape="rect",color="gray",label=<let y : untyped = &quot;Hello world&quot;<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>[stack: [-Inf, +Inf]] ]]<BR/>}} -&gt; [y]>];
-	"node0" -> "node3" [color="black"];
-	"node1" -> "node2" [color="black"];
-	"node3" -> "node1" [color="black"];
+	"node1" [shape="rect",color="gray",label=<let y : untyped = &quot;Hello world&quot;<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>[stack: [-Inf, +Inf]] ]]<BR/>}} -&gt; [y]>];
+	"node2" [shape="rect",color="gray",label=<let q : untyped = +(x, y)<BR/>{{<BR/>heap [[ _|_ ]]<BR/>value [[ _|_ ]]<BR/>}} -&gt; []>];
+	"node3" [shape="rect",color="black",peripheries="2",label=<ret<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ _|_ ]]<BR/>}} -&gt; [skip]>];
+	"node4" [shape="rect",color="gray",label=<let z : untyped = 4.7<BR/>{{<BR/>heap [[ monolith ]]<BR/>value [[ x: [42, 42]<BR/>z: [-Inf, +Inf]<BR/>[stack: [-Inf, +Inf]] ]]<BR/>}} -&gt; [z]>];
+	"node1" -> "node4" [color="black"];
+	"node2" -> "node3" [color="black"];
+	"node0" -> "node1" [color="black"];
+	"node4" -> "node2" [color="black"];
 subgraph cluster_legend {
 	label="Legend";
 	style=dotted;
