@@ -1,5 +1,6 @@
 package it.unipr.cfg.expression.comparison;
 
+import it.unipr.cfg.expression.literal.RustBoolean;
 import it.unipr.cfg.type.RustBooleanType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -46,15 +47,22 @@ public class RustOrExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
+
 		AnalysisState<A, H, V, T> result = state.bottom();
+		RustBoolean trueBoolean = new RustBoolean(getCFG(), getLocation(), true);
 
 		for (Type leftType : left.getRuntimeTypes())
-			for (Type rightType : right.getRuntimeTypes())
+			for (Type rightType : right.getRuntimeTypes()) {
+				if (leftType.isBooleanType() && rightType.isBooleanType() &&
+						expressions.getState(getLeft()).getComputedExpressions().size() == 1 &&
+						expressions.getState(getLeft()).satisfies(left, trueBoolean).isTop())
+					return state.bottom();
+
 				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
 									left, right, LogicalOr.INSTANCE, getLocation()), this));
-
+			}
 		return result;
 	}
 
