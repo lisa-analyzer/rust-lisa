@@ -62,8 +62,9 @@ public class RustCFG extends CFG {
 			getEdges().remove(e);
 			addEdge(newEdge);
 		}
-
-		getNodes().remove(oldNode);
+		
+		getEdges().removeAll(getOutgoingEdges(oldNode));
+		getNodeList().removeNode(oldNode);
 	}
 
 	/**
@@ -166,6 +167,7 @@ public class RustCFG extends CFG {
 			for (Pair<Statement, Return> toSwitch : toSwitchList) {
 				addNode(toSwitch.getRight());
 				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
+				getNodes().remove(toSwitch.getLeft());
 			}
 		}
 
