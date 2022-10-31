@@ -1,5 +1,6 @@
 package it.unipr.cfg;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.Pair;
 
 import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
@@ -151,15 +153,20 @@ public class RustCFG extends CFG {
 				getAllExitpoints().add(onlyNode);
 			}
 
+			List<Pair<Statement, Return>> toSwitchList = new ArrayList<>();
 			for (Statement stmt : nodes)
 				if (stmt instanceof RustReturnExpression) {
 					Expression value = ((RustReturnExpression) stmt).getSubExpression();
 
 					Return ret = new Return(this, getDescriptor().getLocation(), value);
-					addNode(ret);
-
-					switchLeafNodes(stmt, ret);
+					
+					toSwitchList.add(Pair.of(stmt, ret));
 				}
+			
+			for (Pair<Statement, Return> toSwitch : toSwitchList) {
+				addNode(toSwitch.getRight());
+				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
+			}
 		}
 
 		simplify();
