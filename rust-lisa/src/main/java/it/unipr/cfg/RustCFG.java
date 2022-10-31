@@ -100,6 +100,7 @@ public class RustCFG extends CFG {
 				addNode(ret);
 
 			// Substitute return with ret nodes
+			List<Pair<Statement, Statement>> toSwitchList = new ArrayList<>();
 			for (Statement node : nodes) {
 				if (node instanceof RustReturnExpression) {
 					RustReturnExpression rustReturn = (RustReturnExpression) node;
@@ -108,10 +109,7 @@ public class RustCFG extends CFG {
 					// empty or has a RustUnitLiteral
 					if (rustReturn.getSubExpression() instanceof RustUnitLiteral) {
 						NoOp noOp = new NoOp(this, getDescriptor().getLocation());
-						addNode(noOp);
-
-						switchLeafNodes(node, noOp);
-						addEdge(new SequentialEdge(noOp, ret));
+						toSwitchList.add(Pair.of(node, noOp));
 					}
 					// Here the return type of the expression is void but the
 					// expression actually do something, so we add a last node
@@ -119,14 +117,17 @@ public class RustCFG extends CFG {
 					// side-effects)
 					else {
 						Expression expr = rustReturn.getSubExpression();
-						System.out.println(expr.getClass());
-						addNode(expr);
-
-						switchLeafNodes(node, expr);
-						addEdge(new SequentialEdge(expr, ret));
+						toSwitchList.add(Pair.of(node, expr));
 					}
 				}
 			}
+			
+			for (Pair<Statement, Statement> toSwitch : toSwitchList) {
+				addNode(toSwitch.getRight());
+				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
+				addEdge(new SequentialEdge(toSwitch.getRight(), ret));
+			}
+			
 		}
 		// Substitute inner RustExplicitReturn with return statements
 		else {
@@ -167,10 +168,12 @@ public class RustCFG extends CFG {
 			for (Pair<Statement, Return> toSwitch : toSwitchList) {
 				addNode(toSwitch.getRight());
 				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
-				getNodes().remove(toSwitch.getLeft());
+				getNodeList().removeNode(toSwitch.getLeft());
 			}
 		}
 
+		List<Statement> debug = getNodes().stream().filter(entry -> getNodeList().getNodes().contains(entry)).collect(Collectors.toList());
+		
 		simplify();
 
 		Set<Edge> toRemove = new HashSet<>();

@@ -49,7 +49,7 @@ public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpressio
 		if (variant instanceof RustStructType) {
 			CompilationUnit structUnit = ((RustStructType) variant).getUnit();
 
-			Set<String> globalSet = structUnit.getGlobals().stream().map(g -> g.getName())
+			Set<String> globalSet = structUnit.getInstanceGlobals(false).stream().map(g -> g.getName())
 					.collect(Collectors.toSet());
 			Set<String> fieldSet = Arrays.asList(getValue().getSubExpressions()).stream()
 					.map(g -> ((RustAssignment) g).getLeft().toString()).collect(Collectors.toSet());

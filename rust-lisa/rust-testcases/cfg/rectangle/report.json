@@ -1,4 +1,4 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_rectangle_rectangle.rs.main().dot", "rust-testcases_cfg_rectangle_rectangle.rs_Rect.new().dot", "usize_Rect.area().dot", "usize_Rect.perim().dot" ]
+  "files" : [ "()_rust-testcases_cfg_rectangle_rectangle.rs.main().json", "rust-testcases_cfg_rectangle_rectangle.rs_Rect.new().json", "usize_Rect.area().json", "usize_Rect.perim().json" ]
 }
