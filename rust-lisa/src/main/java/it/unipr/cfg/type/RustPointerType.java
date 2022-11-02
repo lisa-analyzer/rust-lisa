@@ -1,14 +1,15 @@
 package it.unipr.cfg.type;
 
-import it.unive.lisa.caches.Caches;
-import it.unive.lisa.type.PointerType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.Untyped;
-import it.unive.lisa.util.collections.externalSet.ExternalSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import it.unive.lisa.type.PointerType;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Unique instance of the Rust pointer type.
@@ -91,8 +92,8 @@ public class RustPointerType implements PointerType, RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
-		Collection<Type> instances = new HashSet<>();
+	public Set<Type> allInstances(TypeSystem types) {
+		Set<Type> instances = new HashSet<>();
 		for (RustPointerType array : INSTANCES)
 			instances.add(array);
 
@@ -135,8 +136,8 @@ public class RustPointerType implements PointerType, RustType {
 	}
 
 	@Override
-	public ExternalSet<Type> getInnerTypes() {
-		return Caches.types().mkSingletonSet(innerType);
+	public Set<Type> getInnerTypes() {
+		return Collections.singleton(innerType);
 	}
 
 }

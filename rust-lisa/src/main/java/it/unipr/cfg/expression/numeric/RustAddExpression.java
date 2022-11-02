@@ -16,6 +16,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.operator.binary.NumericNonOverflowingAdd;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 
 /**
  * Rust add expression (e.g., x + y).
@@ -35,13 +36,11 @@ public class RustAddExpression extends BinaryExpression {
 	 */
 	public RustAddExpression(CFG cfg, CodeLocation location,
 			Expression left, Expression right) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, "+", RustTyper.resultType(left, right), left, right);
 	}
 
 	@Override
-	protected <A extends AbstractState<A, H, V, T>,
+	public <A extends AbstractState<A, H, V, T>,
 			H extends HeapDomain<H>,
 			V extends ValueDomain<V>,
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
@@ -50,9 +49,10 @@ public class RustAddExpression extends BinaryExpression {
 					throws SemanticException {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
-
-		for (Type leftType : left.getRuntimeTypes())
-			for (Type rightType : right.getRuntimeTypes())
+		TypeSystem types = getProgram().getTypes();
+		
+		for (Type leftType : left.getRuntimeTypes(types))
+			for (Type rightType : right.getRuntimeTypes(types))
 				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,

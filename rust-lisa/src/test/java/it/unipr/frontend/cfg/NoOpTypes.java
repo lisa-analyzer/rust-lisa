@@ -1,22 +1,25 @@
 package it.unipr.frontend.cfg;
 
+import java.util.Set;
 import java.util.function.Predicate;
 
+import it.unipr.frontend.RustTypeSystem;
 import it.unive.lisa.analysis.ScopeToken;
 import it.unive.lisa.analysis.SemanticException;
 import it.unive.lisa.analysis.representation.DomainRepresentation;
 import it.unive.lisa.analysis.representation.StringRepresentation;
 import it.unive.lisa.analysis.value.TypeDomain;
-import it.unive.lisa.caches.Caches;
 import it.unive.lisa.program.cfg.ProgramPoint;
 import it.unive.lisa.symbolic.value.Identifier;
 import it.unive.lisa.symbolic.value.ValueExpression;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
-import it.unive.lisa.util.collections.externalSet.ExternalSet;
 
 class NoOpTypes implements TypeDomain<NoOpTypes> {
-
+	
+	private final TypeSystem types = new RustTypeSystem();
+	
 	@Override
 	public NoOpTypes assign(Identifier id, ValueExpression expression, ProgramPoint pp)
 			throws SemanticException {
@@ -90,8 +93,8 @@ class NoOpTypes implements TypeDomain<NoOpTypes> {
 	}
 
 	@Override
-	public ExternalSet<Type> getInferredRuntimeTypes() {
-		return Caches.types().mkUniversalSet();
+	public Set<Type> getInferredRuntimeTypes() {
+		return types.getTypes();
 	}
 
 	@Override

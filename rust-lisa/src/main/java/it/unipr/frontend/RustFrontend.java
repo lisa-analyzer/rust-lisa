@@ -107,33 +107,33 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 	private RustFrontend(String filePath) {
 		this.filePath = filePath;
-		this.program = new Program(new RustFeatures());
+		this.program = new Program(new RustFeatures(), new RustTypeSystem());
 	}
 
 	private void registerTypes() {
-		program.registerType(RustF32Type.getInstance());
-		program.registerType(RustF64Type.getInstance());
-		program.registerType(RustI8Type.getInstance());
-		program.registerType(RustI16Type.getInstance());
-		program.registerType(RustI32Type.getInstance());
-		program.registerType(RustI64Type.getInstance());
-		program.registerType(RustI128Type.getInstance());
-		program.registerType(RustIsizeType.getInstance());
-		program.registerType(RustU8Type.getInstance());
-		program.registerType(RustU16Type.getInstance());
-		program.registerType(RustU32Type.getInstance());
-		program.registerType(RustU64Type.getInstance());
-		program.registerType(RustU128Type.getInstance());
-		program.registerType(RustUsizeType.getInstance());
-		program.registerType(RustBooleanType.getInstance());
-		program.registerType(RustCharType.getInstance());
-		program.registerType(RustStrType.getInstance());
-		program.registerType(RustUnitType.getInstance());
-		RustPointerType.all().forEach(program::registerType);
-		RustStructType.all().forEach(program::registerType);
-		RustEnumType.all().forEach(program::registerType);
-		RustArrayType.all().forEach(program::registerType);
-		RustTupleType.all().forEach(program::registerType);
+		program.getTypes().registerType(RustF32Type.getInstance());
+		program.getTypes().registerType(RustF64Type.getInstance());
+		program.getTypes().registerType(RustI8Type.getInstance());
+		program.getTypes().registerType(RustI16Type.getInstance());
+		program.getTypes().registerType(RustI32Type.getInstance());
+		program.getTypes().registerType(RustI64Type.getInstance());
+		program.getTypes().registerType(RustI128Type.getInstance());
+		program.getTypes().registerType(RustIsizeType.getInstance());
+		program.getTypes().registerType(RustU8Type.getInstance());
+		program.getTypes().registerType(RustU16Type.getInstance());
+		program.getTypes().registerType(RustU32Type.getInstance());
+		program.getTypes().registerType(RustU64Type.getInstance());
+		program.getTypes().registerType(RustU128Type.getInstance());
+		program.getTypes().registerType(RustUsizeType.getInstance());
+		program.getTypes().registerType(RustBooleanType.getInstance());
+		program.getTypes().registerType(RustCharType.getInstance());
+		program.getTypes().registerType(RustStrType.getInstance());
+		program.getTypes().registerType(RustUnitType.getInstance());
+		RustPointerType.all().forEach(program.getTypes()::registerType);
+		RustStructType.all().forEach(program.getTypes()::registerType);
+		RustEnumType.all().forEach(program.getTypes()::registerType);
+		RustArrayType.all().forEach(program.getTypes()::registerType);
+		RustTupleType.all().forEach(program.getTypes()::registerType);
 	}
 
 	/**

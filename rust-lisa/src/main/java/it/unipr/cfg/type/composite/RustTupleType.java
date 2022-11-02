@@ -1,17 +1,19 @@
 package it.unipr.cfg.type.composite;
 
-import it.unipr.cfg.type.RustType;
-import it.unipr.cfg.type.composite.enums.RustEnumVariant;
-import it.unive.lisa.program.cfg.statement.Expression;
-import it.unive.lisa.program.cfg.statement.Statement;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.composite.enums.RustEnumVariant;
+import it.unive.lisa.program.cfg.statement.Expression;
+import it.unive.lisa.program.cfg.statement.Statement;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Instance of the Rust tuple type.
@@ -96,8 +98,8 @@ public class RustTupleType implements RustType, RustEnumVariant {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
-		Collection<Type> instances = new HashSet<>();
+	public Set<Type> allInstances(TypeSystem types) {
+		Set<Type> instances = new HashSet<>();
 		for (RustTupleType tuple : INSTANCES)
 			instances.add(tuple);
 

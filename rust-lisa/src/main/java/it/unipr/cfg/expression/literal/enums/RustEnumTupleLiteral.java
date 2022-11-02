@@ -1,5 +1,7 @@
 package it.unipr.cfg.expression.literal.enums;
 
+import java.util.List;
+
 import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
@@ -8,7 +10,6 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.type.Type;
-import java.util.List;
 
 /**
  * Rust enum tuple literal.

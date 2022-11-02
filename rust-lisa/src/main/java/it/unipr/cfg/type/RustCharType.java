@@ -1,9 +1,11 @@
 package it.unipr.cfg.type;
 
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.Untyped;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Unique instance of the Rust char type.
@@ -42,7 +44,7 @@ public class RustCharType implements RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
+	public Set<Type> allInstances(TypeSystem types) {
 		return Collections.singleton(INSTANCE);
 	}
 
