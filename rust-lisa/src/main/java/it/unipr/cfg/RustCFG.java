@@ -171,10 +171,8 @@ public class RustCFG extends CFG {
 				getNodeList().removeNode(toSwitch.getLeft());
 			}
 		}
-
-		List<Statement> debug = getNodes().stream().filter(entry -> getNodeList().getNodes().contains(entry)).collect(Collectors.toList());
 		
-		simplify();
+		//simplify();
 
 		Set<Edge> toRemove = new HashSet<>();
 		Set<Edge> toAdd = new HashSet<>();

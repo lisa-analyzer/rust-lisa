@@ -40,6 +40,7 @@ public class RustLiSA {
 				new ValueEnvironment<>(new Interval()),
 				LiSAFactory.getDefaultFor(TypeDomain.class)))
 				.setJsonOutput(true)
+				.setSerializeResults(true)
 				.setDumpAnalysis(GraphType.HTML)
 				.setWorkdir("output");
 
