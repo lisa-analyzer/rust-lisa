@@ -1,5 +1,6 @@
 package it.unipr.frontend;
 
+import static it.unive.lisa.outputs.compare.JsonReportComparer.compare;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -16,6 +17,10 @@ import java.util.HashSet;
 
 import org.apache.commons.io.FileUtils;
 
+import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.RustTupleType;
+import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
@@ -26,11 +31,22 @@ import it.unive.lisa.outputs.json.JsonReport;
 import it.unive.lisa.outputs.json.JsonReport.JsonWarning;
 import it.unive.lisa.program.Program;
 
-import static it.unive.lisa.outputs.compare.JsonReportComparer.compare;
-
 public abstract class RustLiSATestExecutor {
+	
 	protected static final String EXPECTED_RESULTS_DIR = "rust-testcases";
 	protected static final String ACTUAL_RESULTS_DIR = "rust-outputs";
+	
+	/**
+	 * Deregister all types with static attributes, so that every test can be
+	 * performed in isolation
+	 */
+	public static void clearTypes() {
+		RustStructType.clearAll();
+		RustArrayType.clearAll();
+		RustTupleType.clearAll();
+		RustEnumType.clearAll();
+	}
+	
 	protected void perform(String folder, String source, LiSAConfiguration configuration) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, null, source, configuration, false);
@@ -84,6 +100,7 @@ public abstract class RustLiSATestExecutor {
 		configuration.setJsonOutput(true);
 		LiSA lisa = new LiSA(configuration);
 		try {
+			clearTypes();
 			lisa.run(program);
 		} catch (AnalysisException e) {
 			e.printStackTrace(System.err);
