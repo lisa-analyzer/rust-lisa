@@ -1,14 +1,17 @@
 package it.unipr.cfg.type.composite.enums;
 
-import it.unipr.cfg.type.RustType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.UnitType;
-import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
+import it.unipr.cfg.type.RustType;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.UnitType;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Instance of the Rust enum type.
@@ -124,8 +127,8 @@ public class RustEnumType implements RustType, UnitType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
-		Collection<Type> instances = new HashSet<>();
+	public Set<Type> allInstances(TypeSystem types) {
+		Set<Type> instances = new HashSet<>();
 		for (RustEnumType enumType : INSTANCES.values())
 			instances.add(enumType);
 

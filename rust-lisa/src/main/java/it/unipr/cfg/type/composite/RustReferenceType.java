@@ -1,13 +1,15 @@
 package it.unipr.cfg.type.composite;
 
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+
 import it.unipr.cfg.type.RustType;
-import it.unive.lisa.caches.Caches;
 import it.unive.lisa.type.PointerType;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
 import it.unive.lisa.util.collections.externalSet.ExternalSet;
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Builds the Rust reference type.
@@ -45,13 +47,13 @@ public class RustReferenceType implements PointerType, RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
-		return Caches.types().mkSingletonSet(this);
+	public Set<Type> allInstances(TypeSystem types) {
+		return Collections.singleton(this);
 	}
 
 	@Override
-	public ExternalSet<Type> getInnerTypes() {
-		return innerTypes != null ? innerTypes : Caches.types().mkSingletonSet(innerType);
+	public Set<Type> getInnerTypes() {
+		return innerTypes != null ? innerTypes : Collections.singleton(innerType);
 	}
 
 	@Override

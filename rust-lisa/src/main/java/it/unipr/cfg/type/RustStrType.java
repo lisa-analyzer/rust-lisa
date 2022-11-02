@@ -1,10 +1,12 @@
 package it.unipr.cfg.type;
 
+import java.util.Collections;
+import java.util.Set;
+
 import it.unive.lisa.type.StringType;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Unique instance of the Rust str type.
@@ -43,7 +45,7 @@ public class RustStrType implements StringType, RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
+	public Set<Type> allInstances(TypeSystem types) {
 		return Collections.singleton(INSTANCE);
 	}
 

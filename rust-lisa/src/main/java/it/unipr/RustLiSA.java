@@ -1,5 +1,7 @@
 package it.unipr;
 
+import java.io.IOException;
+
 import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
@@ -12,7 +14,6 @@ import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
 import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.value.TypeDomain;
 import it.unive.lisa.program.Program;
-import java.io.IOException;
 
 /**
  * RustLiSA static analyzer build upon LiSA.

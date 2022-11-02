@@ -1,8 +1,10 @@
 package it.unipr.frontend;
 
-import it.unive.lisa.program.SourceCodeLocation;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import it.unipr.rust.antlr.RustBaseVisitor;
+import it.unive.lisa.program.SourceCodeLocation;
 
 /**
  * Utility class useful in multiple {@link RustBaseVisitor}.

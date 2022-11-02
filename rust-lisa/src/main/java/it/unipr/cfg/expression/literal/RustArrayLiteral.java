@@ -1,5 +1,7 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -15,7 +17,6 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.type.Type;
-import java.util.Arrays;
 
 /**
  * Rust array literal.
