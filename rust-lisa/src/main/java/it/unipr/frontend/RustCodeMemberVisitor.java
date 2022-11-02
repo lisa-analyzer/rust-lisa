@@ -2,20 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import it.unipr.cfg.RustCFG;
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
@@ -109,6 +95,18 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -152,7 +150,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			visitNodes(nodesList, edgesList, edge.getDestination());
 		});
 	}
-	
+
 	/**
 	 * Removes every node and edge that is reachable from the given `root`
 	 * 
@@ -162,12 +160,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		List<Statement> nodes = new ArrayList<Statement>();
 		List<Edge> edges = new ArrayList<Edge>();
 		visitNodes(nodes, edges, node);
-		
+
 		currentCfg.getEdges().removeAll(edges);
 		currentCfg.getNodes().removeAll(nodes);
 		currentCfg.getNodes().remove(node);
 	}
-	
+
 	/**
 	 * Builds a code member visitor for Rust.
 	 * 
@@ -221,7 +219,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
-		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false, decorators.getName(),
+		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
+				decorators.getName(),
 				returnType, new Parameter[0]);
 		factory.setDescriptor(cfgDesc);
 
@@ -231,8 +230,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		Pair<Statement, Statement> block = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 		currentCfg.getEntrypoints().add(block.getLeft());
 
+		System.out.println(currentCfg.getNodes().stream().filter(n -> n instanceof NoOp).collect(Collectors.toList()));
+
 		rustCFG.finalize(ctx);
-		
+
 		return rustCFG;
 	}
 
@@ -260,7 +261,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		List<Expression> arguments = visitItem_macro_tail(ctx.item_macro_tail());
 
-		return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "", macroPath.toString() + "!",
+		return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
+				macroPath.toString() + "!",
 				RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, arguments.toArray(new Expression[0]));
 	}
 
@@ -410,7 +412,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
-		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false, decorators.getName(),
+		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
+				decorators.getName(),
 				returnType, new Parameter[0]);
 		factory.setDescriptor(cfgDesc);
 
@@ -1083,7 +1086,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.macro_tail() != null) {
 				List<Expression> macroTail = visitMacro_tail(ctx.macro_tail());
 
-				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "", path.toString() + "!",
+				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
+						path.toString() + "!",
 						RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, macroTail.toArray(new Expression[0]));
 
 			}
@@ -1434,7 +1438,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		// TODO do not take into account the attr part for now
 		return visitBlocky_expr(ctx.blocky_expr());
 	}
-	
 
 	@Override
 	public Pair<Statement, Statement> visitBlocky_expr(Blocky_exprContext ctx) {
@@ -1565,9 +1568,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						for (Triple<Expression, Statement, Statement> danglingArm : resolvedMatchArms.subList(i + 1,
 								resolvedMatchArms.size())) {
 
-							currentCfg.getNodes().remove(danglingArm.getLeft());
-							
-							// Remove all node starting from the danglingArm.getMiddle()
+							currentCfg.getNodeList().removeNode(danglingArm.getLeft());
+
+							// Remove all node starting from the
+							// danglingArm.getMiddle()
 							removeFrom(danglingArm.getMiddle());
 						}
 
@@ -1603,7 +1607,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						currentCfg.addEdge(newEdge);
 					}
 
-					currentCfg.getNodes().remove(lastGuard);
+					currentCfg.getNodeList().removeNode(lastGuard);
 
 				} else {
 					// Otherwise, we just connect the node to the ending NoOp
@@ -1961,7 +1965,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.macro_tail() != null) {
 				List<Expression> macroTail = visitMacro_tail(ctx.macro_tail());
 
-				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "", path.toString() + "!",
+				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
+						path.toString() + "!",
 						RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, macroTail.toArray(new Expression[0]));
 			}
 			return path;
@@ -2085,7 +2090,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			parameters.add(head);
 			parameters.addAll(right.getAccessParameter());
 
-			UnresolvedCall methodCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE, "", right.getMethodName(),
+			UnresolvedCall methodCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE, "",
+					right.getMethodName(),
 					RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, parameters.toArray(new Expression[0]));
 			return methodCall;
 
@@ -2100,7 +2106,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			String targetName = (head instanceof AccessGlobal ? ((AccessGlobal) head).getTarget().getName()
 					: head.toString());
 
-			UnresolvedCall functionCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, receiverName, targetName,
+			UnresolvedCall functionCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC,
+					receiverName, targetName,
 					RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, right.getParameters().toArray(new Expression[0]));
 
 			return functionCall;
