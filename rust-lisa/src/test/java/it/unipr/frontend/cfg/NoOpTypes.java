@@ -13,10 +13,13 @@ import it.unive.lisa.program.cfg.ProgramPoint;
 import it.unive.lisa.symbolic.value.Identifier;
 import it.unive.lisa.symbolic.value.ValueExpression;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
 
 class NoOpTypes implements TypeDomain<NoOpTypes> {
-
+	
+	private final TypeSystem types = new RustTypeSystem();
+	
 	@Override
 	public NoOpTypes assign(Identifier id, ValueExpression expression, ProgramPoint pp)
 			throws SemanticException {
@@ -91,7 +94,7 @@ class NoOpTypes implements TypeDomain<NoOpTypes> {
 
 	@Override
 	public Set<Type> getInferredRuntimeTypes() {
-		return new RustTypeSystem().getTypes();
+		return types.getTypes();
 	}
 
 	@Override
