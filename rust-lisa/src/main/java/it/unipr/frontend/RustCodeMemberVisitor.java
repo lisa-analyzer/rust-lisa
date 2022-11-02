@@ -232,7 +232,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		currentCfg.getEntrypoints().add(block.getLeft());
 
 		rustCFG.finalize(ctx);
-
+		
 		return rustCFG;
 	}
 

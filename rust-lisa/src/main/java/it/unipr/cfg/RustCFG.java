@@ -172,7 +172,7 @@ public class RustCFG extends CFG {
 			}
 		}
 		
-		//simplify();
+		simplify();
 
 		Set<Edge> toRemove = new HashSet<>();
 		Set<Edge> toAdd = new HashSet<>();

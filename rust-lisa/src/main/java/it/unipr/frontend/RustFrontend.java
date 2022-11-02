@@ -11,10 +11,7 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import it.unipr.RustLiSA;
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -67,22 +64,6 @@ import it.unive.lisa.type.Type;
  */
 public class RustFrontend extends RustBaseVisitor<Object> {
 	
-	
-	/**
-	 * The strategy of traversing super-unit to search for target call
-	 * implementation.
-	 */
-
-	/**
-	 * The parameter assigning strategy for calls.
-	 */
-//	public static final ParameterAssigningStrategy PARAMETER_ASSIGN_STRATEGY = OrderPreservingAssigningStrategy.INSTANCE;
-
-	/**
-	 * The parameter matching strategy for matching method and function calls.
-	 */
-//	public static final ParameterMatchingStrategy METHOD_MATCHING_STRATEGY = RuntimeTypesMatchingStrategy.INSTANCE;
-
 	/**
 	 * The parameter evaluation order strategy.
 	 */
