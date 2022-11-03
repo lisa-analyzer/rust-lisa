@@ -230,8 +230,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		Pair<Statement, Statement> block = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 		currentCfg.getEntrypoints().add(block.getLeft());
 
-		System.out.println(currentCfg.getNodes().stream().filter(n -> n instanceof NoOp).collect(Collectors.toList()));
-
 		rustCFG.finalize(ctx);
 
 		return rustCFG;

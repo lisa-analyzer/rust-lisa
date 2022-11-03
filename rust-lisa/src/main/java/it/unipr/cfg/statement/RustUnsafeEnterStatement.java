@@ -12,6 +12,7 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.edge.Edge;
 import it.unive.lisa.program.cfg.statement.Statement;
+import it.unive.lisa.symbolic.value.Skip;
 import it.unive.lisa.util.datastructures.graph.GraphVisitor;
 
 /**
@@ -34,9 +35,7 @@ public class RustUnsafeEnterStatement extends Statement {
 
 	@Override
 	public int setOffset(int offset) {
-		int oldOffset = this.offset;
-		this.offset = offset;
-		return oldOffset;
+		return this.offset = offset;
 	}
 
 	@Override
@@ -57,6 +56,6 @@ public class RustUnsafeEnterStatement extends Statement {
 					AnalysisState<A, H, V, T> entryState, InterproceduralAnalysis<A, H, V, T> interprocedural,
 					StatementStore<A, H, V, T> expressions) throws SemanticException {
 		// TODO Too coarse for now
-		return entryState.top();
+		return entryState.smallStepSemantics(new Skip(getLocation()), this);
 	}
 }
