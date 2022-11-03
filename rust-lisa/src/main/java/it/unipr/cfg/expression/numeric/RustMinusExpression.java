@@ -1,5 +1,6 @@
 package it.unipr.cfg.expression.numeric;
 
+import it.unipr.frontend.RustTypeSystem;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -49,7 +50,7 @@ public class RustMinusExpression extends UnaryExpression {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
 
-		for (Type type : expr.getRuntimeTypes())
+		for (Type type : expr.getRuntimeTypes(new RustTypeSystem()))
 			if (type.isNumericType())
 				result = result
 						.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.UnaryExpression(getStaticType(),

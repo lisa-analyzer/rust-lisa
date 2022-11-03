@@ -20,8 +20,7 @@ public class RustLet extends RustLiSATestExecutor {
 						new MonolithicHeap(),
 						new ValueEnvironment<>(new Interval()),
 						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setDumpTypeInference(true)
-				.setDumpAnalysis(true)
+				.setSerializeResults(true)
 				.setJsonOutput(true);
 
 		perform("analysis/let", "let.rs", conf);

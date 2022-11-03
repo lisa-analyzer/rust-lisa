@@ -20,8 +20,7 @@ public class RustLogical extends RustLiSATestExecutor {
 						new MonolithicHeap(),
 						new ValueEnvironment<>(new Interval()),
 						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setDumpTypeInference(true)
-				.setDumpAnalysis(true)
+				.setSerializeResults(true)
 				.setJsonOutput(true);
 
 		perform("analysis/logical", "logical.rs", conf);

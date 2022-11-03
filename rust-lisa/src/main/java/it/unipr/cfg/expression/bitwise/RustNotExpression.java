@@ -2,6 +2,7 @@ package it.unipr.cfg.expression.bitwise;
 
 import it.unipr.cfg.RustTyper;
 import it.unipr.cfg.type.RustBooleanType;
+import it.unipr.frontend.RustTypeSystem;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -49,7 +50,7 @@ public class RustNotExpression extends UnaryExpression {
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
 		AnalysisState<A, H, V, T> result = state.bottom();
 
-		for (Type type : expr.getRuntimeTypes())
+		for (Type type : expr.getRuntimeTypes(new RustTypeSystem()))
 			if (type instanceof RustBooleanType)
 				result = result
 						.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.UnaryExpression(getStaticType(),
