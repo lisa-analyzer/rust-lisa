@@ -71,6 +71,6 @@ public class RustUnsafeExitStatement extends Statement {
 					AnalysisState<A, H, V, T> entryState, InterproceduralAnalysis<A, H, V, T> interprocedural,
 					StatementStore<A, H, V, T> expressions) throws SemanticException {
 		// TODO Too coarse for now
-		return null;
+		return entryState.top();
 	}
 }
