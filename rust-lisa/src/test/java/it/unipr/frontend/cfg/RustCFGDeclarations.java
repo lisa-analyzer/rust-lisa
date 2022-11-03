@@ -9,19 +9,19 @@ public class RustCFGDeclarations extends RustLiSATestExecutor {
 
 	@Test
 	public void testMutableDeclaration() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/mutable-variable-declaration", "mutable-variable-declaration.rs", conf);
 	}
 
 	@Test
 	public void testSimpleDeclaration() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/variable-declaration", "variable-declaration.rs", conf);
 	}
 
 	@Test
 	public void testSimpleOperationDeclaration() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/simple-operation-variable-declaration", "simple-operation-variable-declaration.rs", conf);
 	}
 

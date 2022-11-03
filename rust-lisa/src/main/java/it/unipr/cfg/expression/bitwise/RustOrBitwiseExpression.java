@@ -35,13 +35,11 @@ public class RustOrBitwiseExpression extends BinaryExpression {
 	 */
 	public RustOrBitwiseExpression(CFG cfg, CodeLocation location,
 			Expression left, Expression right) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, "|", RustTyper.resultType(left, right), left, right);
 	}
 
 	@Override
-	protected <A extends AbstractState<A, H, V, T>,
+	public <A extends AbstractState<A, H, V, T>,
 			H extends HeapDomain<H>,
 			V extends ValueDomain<V>,
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(

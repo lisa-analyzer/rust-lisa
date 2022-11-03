@@ -49,8 +49,10 @@ import it.unipr.rust.antlr.RustParser.Ty_path_segment_no_superContext;
 import it.unipr.rust.antlr.RustParser.Ty_path_tailContext;
 import it.unipr.rust.antlr.RustParser.Ty_sumContext;
 import it.unipr.rust.antlr.RustParser.Ty_sum_listContext;
+import it.unive.lisa.program.ClassUnit;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.Global;
+import it.unive.lisa.program.Program;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
 import java.util.ArrayList;
@@ -67,16 +69,19 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 
 	private final String filePath;
 	private final CompilationUnit unit;
+	private final Program program;
 
 	/**
 	 * Constructs a {@link RustTypeVisitor} instance.
 	 * 
 	 * @param filePath the filePath String of reference
 	 * @param unit     the compilation unit of reference
+	 * @param program  the program to be used for the visitor
 	 */
-	public RustTypeVisitor(String filePath, CompilationUnit unit) {
+	public RustTypeVisitor(String filePath, CompilationUnit unit, Program program) {
 		this.filePath = filePath;
 		this.unit = unit;
+		this.program = program;
 	}
 
 	@Override
@@ -272,7 +277,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		String name = ctx.ident().getText();
 		Type type = visitTy_sum(ctx.ty_sum());
 
-		return new Global(RustFrontendUtilities.locationOf(ctx, filePath), name, type);
+		return new Global(RustFrontendUtilities.locationOf(ctx, filePath), unit, name, true, type);
 	}
 
 	@Override
@@ -321,7 +326,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			if (ctx.enum_field_decl_list() != null) {
 				List<Global> fieldList = visitEnum_field_decl_list(ctx.enum_field_decl_list());
 
-				CompilationUnit structUnit = new CompilationUnit(locationOf(ctx, filePath),
+				ClassUnit structUnit = new ClassUnit(locationOf(ctx, filePath), program,
 						unit.toString() + "::" + name, true);
 				RustStructType struct = RustStructType.lookup(name, structUnit);
 
@@ -354,7 +359,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		String name = ctx.ident().getText();
 		Type type = visitTy_sum(ctx.ty_sum());
 
-		return new Global(RustFrontendUtilities.locationOf(ctx, filePath), name, type);
+		return new Global(RustFrontendUtilities.locationOf(ctx, filePath), unit, name, true, type);
 	}
 
 	@Override

@@ -1,9 +1,10 @@
 package it.unipr.cfg.type;
 
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unique instance of the Rust unit type.
@@ -40,7 +41,7 @@ public class RustUnitType implements RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
+	public Set<Type> allInstances(TypeSystem types) {
 		return Collections.singleton(INSTANCE);
 	}
 

@@ -3,9 +3,10 @@ package it.unipr.cfg.type.numeric.signed;
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unique instance of the Rust i8 type.
@@ -44,7 +45,7 @@ public class RustI8Type implements NumericType, RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
+	public Set<Type> allInstances(TypeSystem types) {
 		return Collections.singleton(INSTANCE);
 	}
 

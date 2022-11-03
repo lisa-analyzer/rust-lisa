@@ -4,7 +4,7 @@ import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
 import it.unipr.cfg.type.RustUnitType;
 import it.unive.lisa.program.cfg.CFG;
-import it.unive.lisa.program.cfg.CFGDescriptor;
+import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.edge.Edge;
 import it.unive.lisa.program.cfg.edge.FalseEdge;
 import it.unive.lisa.program.cfg.edge.SequentialEdge;
@@ -14,13 +14,14 @@ import it.unive.lisa.program.cfg.statement.NoOp;
 import it.unive.lisa.program.cfg.statement.Ret;
 import it.unive.lisa.program.cfg.statement.Return;
 import it.unive.lisa.program.cfg.statement.Statement;
-import it.unive.lisa.util.datastructures.graph.AdjacencyMatrix;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Implementation of a CFG of Rust.
@@ -37,7 +38,7 @@ public class RustCFG extends CFG {
 	 * @param descriptor the descriptor of this CFG
 	 * @param unsafe     the decorator unsafe
 	 */
-	public RustCFG(CFGDescriptor descriptor, boolean unsafe) {
+	public RustCFG(CodeMemberDescriptor descriptor, boolean unsafe) {
 		super(descriptor);
 		this.unsafe = unsafe;
 	}
@@ -51,16 +52,15 @@ public class RustCFG extends CFG {
 	 * @param newNode the new node that need to be inserted
 	 */
 	private void switchLeafNodes(Statement oldNode, Statement newNode) {
-		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
-
-		Collection<Edge> edges = adj.getIngoingEdges(oldNode);
-		for (Edge e : edges) {
+		for (Edge e : getNodeList().getIngoingEdges(oldNode)) {
 			Edge newEdge = e.newInstance(e.getSource(), newNode);
-			adj.removeEdge(e);
+			Edge edgeReference = getEdgeConnecting(e.getSource(), e.getDestination());
+			getNodeList().removeEdge(edgeReference);
 			addEdge(newEdge);
 		}
 
-		adj.removeNode(oldNode);
+		getOutgoingEdges(oldNode).forEach(edge -> getNodeList().removeEdge(edge));
+		getNodeList().removeNode(oldNode);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class RustCFG extends CFG {
 			if (getAllExitpoints().isEmpty()) {
 				Set<Statement> exitNodes = nodes
 						.stream()
-						.filter(n -> getAdjacencyMatrix().followersOf(n).isEmpty())
+						.filter(n -> followersOf(n).isEmpty())
 						.collect(Collectors.toSet());
 
 				for (Statement exit : exitNodes) {
@@ -96,6 +96,7 @@ public class RustCFG extends CFG {
 				addNode(ret);
 
 			// Substitute return with ret nodes
+			List<Pair<Statement, Statement>> toSwitchList = new ArrayList<>();
 			for (Statement node : nodes) {
 				if (node instanceof RustReturnExpression) {
 					RustReturnExpression rustReturn = (RustReturnExpression) node;
@@ -103,11 +104,8 @@ public class RustCFG extends CFG {
 					// The value inside the return is null iff the return was
 					// empty or has a RustUnitLiteral
 					if (rustReturn.getSubExpression() instanceof RustUnitLiteral) {
-						NoOp noOp = new NoOp(this, getDescriptor().getLocation());
-						addNode(noOp);
-
-						switchLeafNodes(node, noOp);
-						addEdge(new SequentialEdge(noOp, ret));
+						NoOp noOp = new NoOp(this, node.getLocation());
+						toSwitchList.add(Pair.of(node, noOp));
 					}
 					// Here the return type of the expression is void but the
 					// expression actually do something, so we add a last node
@@ -115,24 +113,28 @@ public class RustCFG extends CFG {
 					// side-effects)
 					else {
 						Expression expr = rustReturn.getSubExpression();
-						System.out.println(expr.getClass());
-						addNode(expr);
-
-						switchLeafNodes(node, expr);
-						addEdge(new SequentialEdge(expr, ret));
+						toSwitchList.add(Pair.of(node, expr));
 					}
 				}
 			}
+
+			for (Pair<Statement, Statement> toSwitch : toSwitchList) {
+				addNode(toSwitch.getRight());
+				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
+				addEdge(new SequentialEdge(toSwitch.getRight(), ret));
+			}
+
 		}
 		// Substitute inner RustExplicitReturn with return statements
 		else {
 			List<Statement> nonNoOpNodes = nodes.stream().filter(n -> !(n instanceof NoOp))
 					.collect(Collectors.toList());
 			if (nonNoOpNodes.size() == 1) {
-				AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
+				// AdjacencyMatrix<Statement, Edge, CFG> adj =
+				// getAdjacencyMatrix();
 				Statement node = nonNoOpNodes.get(0);
-				adj.getEdges().forEach(e -> adj.removeEdge(e));
-				adj.getNodes().forEach(n -> adj.removeNode(n));
+				getEdges().forEach(e -> getNodeList().removeEdge(e));
+				getNodes().forEach(n -> getNodeList().removeNode(n));
 				addNode(node);
 			}
 
@@ -148,15 +150,21 @@ public class RustCFG extends CFG {
 				getAllExitpoints().add(onlyNode);
 			}
 
+			List<Pair<Statement, Return>> toSwitchList = new ArrayList<>();
 			for (Statement stmt : nodes)
 				if (stmt instanceof RustReturnExpression) {
 					Expression value = ((RustReturnExpression) stmt).getSubExpression();
 
 					Return ret = new Return(this, getDescriptor().getLocation(), value);
-					addNode(ret);
 
-					switchLeafNodes(stmt, ret);
+					toSwitchList.add(Pair.of(stmt, ret));
 				}
+
+			for (Pair<Statement, Return> toSwitch : toSwitchList) {
+				addNode(toSwitch.getRight());
+				switchLeafNodes(toSwitch.getLeft(), toSwitch.getRight());
+				getNodeList().removeNode(toSwitch.getLeft());
+			}
 		}
 
 		simplify();
@@ -164,30 +172,30 @@ public class RustCFG extends CFG {
 		Set<Edge> toRemove = new HashSet<>();
 		Set<Edge> toAdd = new HashSet<>();
 
-		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
-		for (Edge e : adj.getEdges())
+		for (Edge e : getEdges())
 			if (e instanceof TrueEdge) {
-				Collection<Edge> ingoinEdges = adj.getIngoingEdges(e.getDestination());
-				for (Edge ingoing : ingoinEdges) {
-					if (ingoing instanceof FalseEdge && ingoing.getSource().equals(e.getSource())) {
+				Collection<Edge> outgoingEdges = getOutgoingEdges(e.getSource());
+				for (Edge outgoing : outgoingEdges) {
+					if (outgoing instanceof FalseEdge && outgoing.getSource().equals(e.getSource())
+							&& outgoing.getDestination().equals(e.getDestination())) {
 						toRemove.add(e);
-						toRemove.add(ingoing);
+						toRemove.add(outgoing);
 
 						toAdd.add(new SequentialEdge(e.getSource(), e.getDestination()));
 					}
 				}
 			}
 
-		toRemove.forEach(r -> adj.removeEdge(r));
-		toAdd.forEach(a -> adj.addEdge(a));
+		toRemove.forEach(r -> getNodeList().removeEdge(r));
+		toAdd.forEach(a -> getNodeList().addEdge(a));
 
 		// It can happen sometimes that there are no nodes with parent, adding
 		// them
 		getEntrypoints().addAll(
-				getNodes().stream().filter(node -> adj.getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
+				getNodes().stream().filter(node -> getIngoingEdges(node).isEmpty()).collect(Collectors.toSet()));
 
 		// Removing nodes that are not in the graph
-		getEntrypoints().removeIf(entry -> !getAdjacencyMatrix().containsNode(entry));
+		getEntrypoints().removeIf(entry -> !containsNode(entry));
 	}
 
 	/**

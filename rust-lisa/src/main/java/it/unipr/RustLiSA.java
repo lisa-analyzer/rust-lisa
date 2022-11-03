@@ -4,6 +4,7 @@ import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
+import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.LiSAFactory;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.MonolithicHeap;
@@ -38,8 +39,8 @@ public class RustLiSA {
 				new ValueEnvironment<>(new Interval()),
 				LiSAFactory.getDefaultFor(TypeDomain.class)))
 				.setJsonOutput(true)
-				.setDumpTypeInference(true)
-				.setDumpAnalysis(true)
+				.setSerializeResults(true)
+				.setDumpAnalysis(GraphType.HTML)
 				.setWorkdir("output");
 
 		LiSA lisa = new LiSA(conf);

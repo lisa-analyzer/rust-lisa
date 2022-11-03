@@ -3,6 +3,7 @@ package it.unipr.cfg.type.composite;
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.ArrayType;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.HashSet;
@@ -94,8 +95,8 @@ public class RustArrayType implements ArrayType, RustType {
 	}
 
 	@Override
-	public Collection<Type> allInstances() {
-		Collection<Type> instances = new HashSet<>();
+	public Set<Type> allInstances(TypeSystem types) {
+		Set<Type> instances = new HashSet<>();
 		for (RustArrayType array : INSTANCES)
 			instances.add(array);
 

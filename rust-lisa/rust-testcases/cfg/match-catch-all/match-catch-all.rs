@@ -1,6 +1,6 @@
 fn main() {
     let x = 2;
-    
+ 
 	match x {
         _ => println!("I do not know what x is"),
     }
@@ -9,11 +9,11 @@ fn main() {
     	2 => println!("x is definitely 2"),
         _ => println!("x is not 2!"),
     }
-    
+   	
     match x {
     	_ if x == 3 => println!("x is 3"),
     }
-    
+  	
     match x {
     	_ if x == 3 => println!("x is 3"),
     	_ if x == 2 => println!("x is 2"),

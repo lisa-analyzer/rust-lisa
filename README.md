@@ -18,9 +18,12 @@ You need to:
   - *Search* for *Gradle IDE Pack 3.8*
   - *Install Gradle IDE Pack 3.8*
 - import the project into the eclipse workspace as a Gradle project.
+- run `cp ./rust-lisa/gradle.properties.example ./rust-lisa/gradle.properties` add fill with the informations required
 - run the `./rust-lisa/gradlew build`
 
-Run the project with [Java 11](https://www.oracle.com/it/java/technologies/javase/jdk11-archive-downloads.html). **Note:** in order to have gradle run you must run the project necessary with Java 11 **and no greater version**.
+Run the project with [Java 11](https://www.oracle.com/it/java/technologies/javase/jdk11-archive-downloads.html).
+
+**Note:** in order to have gradle run you must run the project necessary with Java 11 **and no greater version**.
 
 # ⚙️ Run
 To run the project by using Eclipse you can use *Run as Java application* in Eclipse and passing a path to a Rust file as first argument.
