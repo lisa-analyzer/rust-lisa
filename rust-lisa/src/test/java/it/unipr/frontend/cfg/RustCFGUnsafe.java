@@ -9,19 +9,19 @@ public class RustCFGUnsafe extends RustLiSATestExecutor {
 
 	@Test
 	public void testUnsafeBlock() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/unsafe-block", "unsafe-block.rs", conf);
 	}
 
 	@Test
 	public void testUnsafeFn() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/unsafe-fn", "unsafe-fn.rs", conf);
 	}
 
 	@Test
 	public void testUnsafeMethod() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/unsafe-method", "unsafe-method.rs", conf);
 	}
 

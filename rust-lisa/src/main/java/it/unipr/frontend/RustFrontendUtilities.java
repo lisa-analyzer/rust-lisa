@@ -1,5 +1,6 @@
 package it.unipr.frontend;
 
+import it.unipr.rust.antlr.RustBaseVisitor;
 import it.unive.lisa.program.SourceCodeLocation;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;

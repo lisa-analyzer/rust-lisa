@@ -9,13 +9,13 @@ public class RustCFGFieldExistance extends RustLiSATestExecutor {
 
 	@Test
 	public void testFieldExistance() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/field-existance", "field-existance.rs", conf);
 	}
 
 	@Test
 	public void testErrorMissingField() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		try {
 			perform("cfg/error-missing-field", "error-missing-field.rs", conf);
 		} catch (UnsupportedOperationException e) {

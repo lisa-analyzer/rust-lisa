@@ -9,7 +9,7 @@ public class RustCFGExpressionGuard extends RustLiSATestExecutor {
 
 	@Test
 	public void testExpressionGuard() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration().setDumpCFGs(true).setJsonOutput(true);
+		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
 		perform("cfg/expression-guard", "expression-guard.rs", conf);
 	}
 
