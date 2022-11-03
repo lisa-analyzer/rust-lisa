@@ -1,4 +1,4 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_unsafe-method_unsafe-method.rs.main().dot", "i32_Number.get().dot" ]
+  "files" : [ "()_rust-testcases_cfg_unsafe-method_unsafe-method.rs.main().json", "i32_Number.get().json" ]
 }
