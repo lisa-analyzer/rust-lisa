@@ -1,15 +1,14 @@
 package it.unipr.cfg.type;
 
+import it.unive.lisa.type.PointerType;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import it.unive.lisa.type.PointerType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.TypeSystem;
-import it.unive.lisa.type.Untyped;
 
 /**
  * Unique instance of the Rust pointer type.

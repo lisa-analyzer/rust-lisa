@@ -2,16 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -55,6 +45,14 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.statement.evaluation.EvaluationOrder;
 import it.unive.lisa.program.cfg.statement.evaluation.LeftToRightEvaluation;
 import it.unive.lisa.type.Type;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * The Rust front-end for LiSA.
@@ -63,7 +61,7 @@ import it.unive.lisa.type.Type;
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustFrontend extends RustBaseVisitor<Object> {
-	
+
 	/**
 	 * The parameter evaluation order strategy.
 	 */

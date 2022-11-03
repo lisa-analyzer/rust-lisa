@@ -1,9 +1,5 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.type.composite.RustStructType;
@@ -12,6 +8,9 @@ import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Rust enum struct literal.

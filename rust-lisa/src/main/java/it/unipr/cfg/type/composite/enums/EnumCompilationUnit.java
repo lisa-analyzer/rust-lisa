@@ -1,11 +1,10 @@
 package it.unipr.cfg.type.composite.enums;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import it.unive.lisa.program.ClassUnit;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.program.cfg.CodeLocation;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Rust compilation unit for enums.
@@ -21,6 +20,7 @@ public class EnumCompilationUnit extends ClassUnit {
 	 * Construct the {@link EnumCompilationUnit} object.
 	 * 
 	 * @param location the type of the element in the array
+	 * @param program  the program to which add this ClassUnit
 	 * @param name     the name of the compilation unit
 	 * @param sealed   true if the compilation unit is sealead
 	 */

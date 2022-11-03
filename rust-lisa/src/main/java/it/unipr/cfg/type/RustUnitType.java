@@ -1,11 +1,10 @@
 package it.unipr.cfg.type;
 
-import java.util.Collections;
-import java.util.Set;
-
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unique instance of the Rust unit type.

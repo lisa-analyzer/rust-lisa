@@ -10,6 +10,12 @@ import it.unive.lisa.program.language.resolution.RuntimeTypesMatchingStrategy;
 import it.unive.lisa.program.language.validation.BaseValidationLogic;
 import it.unive.lisa.program.language.validation.ProgramValidationLogic;
 
+/**
+ * Language features for rust.
+ * 
+ * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
+ */
 public class RustFeatures extends LanguageFeatures {
 
 	@Override

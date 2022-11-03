@@ -1,8 +1,7 @@
 package it.unipr.cfg.utils;
 
-import java.util.List;
-
 import it.unive.lisa.program.cfg.statement.Expression;
+import java.util.List;
 
 /**
  * Rust information keeper for calling methods.

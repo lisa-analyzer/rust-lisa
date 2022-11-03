@@ -4,19 +4,6 @@ import static it.unive.lisa.outputs.compare.JsonReportComparer.compare;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Collection;
-import java.util.HashSet;
-
-import org.apache.commons.io.FileUtils;
-
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTupleType;
@@ -30,12 +17,23 @@ import it.unive.lisa.outputs.compare.JsonReportComparer.REPORT_TYPE;
 import it.unive.lisa.outputs.json.JsonReport;
 import it.unive.lisa.outputs.json.JsonReport.JsonWarning;
 import it.unive.lisa.program.Program;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collection;
+import java.util.HashSet;
+import org.apache.commons.io.FileUtils;
 
 public abstract class RustLiSATestExecutor {
-	
+
 	protected static final String EXPECTED_RESULTS_DIR = "rust-testcases";
 	protected static final String ACTUAL_RESULTS_DIR = "rust-outputs";
-	
+
 	/**
 	 * Deregister all types with static attributes, so that every test can be
 	 * performed in isolation
@@ -46,30 +44,33 @@ public abstract class RustLiSATestExecutor {
 		RustTupleType.clearAll();
 		RustEnumType.clearAll();
 	}
-	
+
 	protected void perform(String folder, String source, LiSAConfiguration configuration) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, null, source, configuration, false);
 	}
-	
+
 	protected void perform(String folder, String subfolder, String source, LiSAConfiguration configuration) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, subfolder, source, configuration, false);
 	}
-	protected void perform(String folder, String source, LiSAConfiguration configuration, boolean update
-			) {
+
+	protected void perform(String folder, String source, LiSAConfiguration configuration, boolean update) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, null, source, configuration, update);
 	}
+
 	protected void perform(String folder, String subfolder, String source, LiSAConfiguration configuration,
 			boolean update) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, subfolder, source, configuration, update);
 	}
+
 	protected void performAux(String folder, String subfolder, String source, LiSAConfiguration configuration) {
 		System.out.println("Testing " + getCaller());
 		performAux(folder, subfolder, source, configuration, false);
 	}
+
 	protected void performAux(String folder, String subfolder, String source, LiSAConfiguration configuration,
 			boolean update) {
 		Path expectedPath = Paths.get(EXPECTED_RESULTS_DIR, folder);
@@ -129,6 +130,7 @@ public abstract class RustLiSATestExecutor {
 			fail("Unable to compare reports");
 		}
 	}
+
 	private String getCaller() {
 		StackTraceElement[] trace = Thread.getAllStackTraces().get(Thread.currentThread());
 		// 0: java.lang.Thread.dumpThreads()
@@ -138,6 +140,7 @@ public abstract class RustLiSATestExecutor {
 		// 4: caller
 		return trace[4].getClassName() + "::" + trace[4].getMethodName();
 	}
+
 	private void regen(Path expectedPath, Path actualPath, File expFile, File actFile, Accumulator acc)
 			throws IOException {
 		boolean updateReport = !acc.addedWarning.isEmpty() || !acc.removedWarning.isEmpty()
@@ -165,6 +168,7 @@ public abstract class RustLiSATestExecutor {
 			System.err.println("- Copied (update) " + fresh);
 		}
 	}
+
 	private class Accumulator implements DiffReporter {
 		private final Collection<Path> changedFileName = new HashSet<>();
 		private final Collection<Path> addedFilePaths = new HashSet<>();
@@ -172,9 +176,11 @@ public abstract class RustLiSATestExecutor {
 		private final Collection<JsonWarning> addedWarning = new HashSet<>();
 		private final Collection<JsonWarning> removedWarning = new HashSet<>();
 		private final Path exp;
+
 		public Accumulator(Path exp) {
 			this.exp = exp;
 		}
+
 		@Override
 		public void report(REPORTED_COMPONENT component, REPORT_TYPE type, Collection<?> reported) {
 			switch (type) {
@@ -207,6 +213,7 @@ public abstract class RustLiSATestExecutor {
 				break;
 			}
 		}
+
 		@Override
 		public void fileDiff(String first, String second, String message) {
 			Path file = Paths.get(first);

@@ -1,9 +1,5 @@
 package it.unipr.cfg.expression;
 
-import java.util.Arrays;
-
-import org.apache.commons.lang3.StringUtils;
-
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -18,6 +14,8 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import java.util.Arrays;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Rust multiple expression separated by a comma (e.g.: a, b, c ).

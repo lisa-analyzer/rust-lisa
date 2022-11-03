@@ -141,7 +141,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 * 
 	 * @param nodesList a initially empty list of nodes
 	 * @param edgesList a initially empty list of edges
-	 * @param node
+	 * @param node      the node to be considered as root for removal
 	 */
 	private void visitNodes(List<Statement> nodesList, List<Edge> edgesList, Statement node) {
 		currentCfg.getOutgoingEdges(node).stream().forEach(edge -> {

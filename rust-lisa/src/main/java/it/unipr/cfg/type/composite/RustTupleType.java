@@ -1,12 +1,5 @@
 package it.unipr.cfg.type.composite;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.cfg.statement.Expression;
@@ -14,6 +7,12 @@ import it.unive.lisa.program.cfg.statement.Statement;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Instance of the Rust tuple type.

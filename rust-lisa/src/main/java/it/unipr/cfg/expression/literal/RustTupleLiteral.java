@@ -1,8 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unive.lisa.analysis.AbstractState;
@@ -19,6 +16,8 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Rust tuple literal.

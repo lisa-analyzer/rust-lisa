@@ -7,7 +7,7 @@ import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.heap.MonolithicHeap;
 
 class CFGTestConfiguration {
-	
+
 	static LiSAConfiguration mkConf() throws AnalysisSetupException {
 		return new LiSAConfiguration()
 				.setSerializeResults(true)

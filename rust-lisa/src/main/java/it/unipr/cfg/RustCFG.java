@@ -1,15 +1,5 @@
 package it.unipr.cfg;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.tuple.Pair;
-
 import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
 import it.unipr.cfg.type.RustUnitType;
@@ -24,6 +14,14 @@ import it.unive.lisa.program.cfg.statement.NoOp;
 import it.unive.lisa.program.cfg.statement.Ret;
 import it.unive.lisa.program.cfg.statement.Return;
 import it.unive.lisa.program.cfg.statement.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Implementation of a CFG of Rust.
@@ -132,7 +130,8 @@ public class RustCFG extends CFG {
 			List<Statement> nonNoOpNodes = nodes.stream().filter(n -> !(n instanceof NoOp))
 					.collect(Collectors.toList());
 			if (nonNoOpNodes.size() == 1) {
-				//				AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
+				// AdjacencyMatrix<Statement, Edge, CFG> adj =
+				// getAdjacencyMatrix();
 				Statement node = nonNoOpNodes.get(0);
 				getEdges().forEach(e -> getNodeList().removeEdge(e));
 				getNodes().forEach(n -> getNodeList().removeNode(n));
@@ -177,7 +176,8 @@ public class RustCFG extends CFG {
 			if (e instanceof TrueEdge) {
 				Collection<Edge> outgoingEdges = getOutgoingEdges(e.getSource());
 				for (Edge outgoing : outgoingEdges) {
-					if (outgoing instanceof FalseEdge && outgoing.getSource().equals(e.getSource()) && outgoing.getDestination().equals(e.getDestination())) {
+					if (outgoing instanceof FalseEdge && outgoing.getSource().equals(e.getSource())
+							&& outgoing.getDestination().equals(e.getDestination())) {
 						toRemove.add(e);
 						toRemove.add(outgoing);
 

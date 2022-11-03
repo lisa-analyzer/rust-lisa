@@ -1,15 +1,14 @@
 package it.unipr.cfg.type.composite;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
-
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.PointerType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
 import it.unive.lisa.util.collections.externalSet.ExternalSet;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Builds the Rust reference type.

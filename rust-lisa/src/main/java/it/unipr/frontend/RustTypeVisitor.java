@@ -2,10 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -59,6 +55,9 @@ import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Type visitor for Rust, managing the parsing of Rust types.
@@ -77,6 +76,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 	 * 
 	 * @param filePath the filePath String of reference
 	 * @param unit     the compilation unit of reference
+	 * @param program  the program to be used for the visitor
 	 */
 	public RustTypeVisitor(String filePath, CompilationUnit unit, Program program) {
 		this.filePath = filePath;

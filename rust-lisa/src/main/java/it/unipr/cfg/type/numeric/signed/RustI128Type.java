@@ -1,13 +1,12 @@
 package it.unipr.cfg.type.numeric.signed;
 
-import java.util.Collections;
-import java.util.Set;
-
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Unique instance of the Rust i128 type.
