@@ -5,14 +5,12 @@ import org.junit.Test;
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
-import it.unive.lisa.LiSAConfiguration.GraphType;
 
 public class RustCFGReturn extends RustLiSATestExecutor {
 
 	@Test
 	public void testReturnVoid() throws AnalysisSetupException {
 		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
-		conf.setDumpAnalysis(GraphType.DOT);
 		perform("cfg/return-void", "return-void.rs", conf);
 	}
 

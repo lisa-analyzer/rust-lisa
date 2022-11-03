@@ -54,16 +54,14 @@ public class RustCFG extends CFG {
 	 * @param newNode the new node that need to be inserted
 	 */
 	private void switchLeafNodes(Statement oldNode, Statement newNode) {
-		//		AdjacencyMatrix<Statement, Edge, CFG> adj = getAdjacencyMatrix();
-
-		Collection<Edge> edges = getIngoingEdges(oldNode);
-		for (Edge e : edges) {
+		for (Edge e : getNodeList().getIngoingEdges(oldNode)) {
 			Edge newEdge = e.newInstance(e.getSource(), newNode);
-			getEdges().remove(e);
+			Edge edgeReference = getEdgeConnecting(e.getSource(), e.getDestination());
+			getNodeList().removeEdge(edgeReference);
 			addEdge(newEdge);
 		}
 
-		getEdges().removeAll(getOutgoingEdges(oldNode));
+		getOutgoingEdges(oldNode).forEach(edge -> getNodeList().removeEdge(edge));
 		getNodeList().removeNode(oldNode);
 	}
 

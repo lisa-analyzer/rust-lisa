@@ -41,8 +41,7 @@ public class RustUnsafeEnterStatement extends Statement {
 
 	@Override
 	public <V> boolean accept(GraphVisitor<CFG, Statement, Edge, V> visitor, V tool) {
-		// TODO too coarse for now
-		return false;
+		return visitor.visit(tool, getCFG(), this);
 	}
 
 	@Override
