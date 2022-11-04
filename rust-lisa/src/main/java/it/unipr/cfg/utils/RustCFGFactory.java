@@ -1,6 +1,6 @@
 package it.unipr.cfg.utils;
 
-import it.unipr.cfg.RustCFG;
+import it.unipr.cfg.program.RustCFG;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 
 /**
@@ -45,7 +45,7 @@ public class RustCFGFactory {
 	 * @return the constructed CFG
 	 */
 	public RustCFG produce() {
-		RustCFG rustCFG = new RustCFG(descriptor, decorators.getUnsafe());
+		RustCFG rustCFG = new RustCFG(descriptor, decorators.isUnsafe());
 		return rustCFG;
 	}
 

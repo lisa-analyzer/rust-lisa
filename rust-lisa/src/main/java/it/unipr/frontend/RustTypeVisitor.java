@@ -41,6 +41,7 @@ import it.unipr.rust.antlr.RustParser.Field_declContext;
 import it.unipr.rust.antlr.RustParser.Field_decl_listContext;
 import it.unipr.rust.antlr.RustParser.Fn_rtypeContext;
 import it.unipr.rust.antlr.RustParser.IdentContext;
+import it.unipr.rust.antlr.RustParser.RtypeContext;
 import it.unipr.rust.antlr.RustParser.Struct_tailContext;
 import it.unipr.rust.antlr.RustParser.TyContext;
 import it.unipr.rust.antlr.RustParser.Ty_pathContext;
@@ -250,6 +251,15 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			types.add(visitTy_sum(tyCtx));
 		}
 		return types;
+	}
+
+	@Override
+	public Type visitRtype(RtypeContext ctx) {
+		// Skipping '!' part
+		if (ctx.ty() != null)
+			return visitTy(ctx.ty());
+
+		return null;
 	}
 
 	@Override

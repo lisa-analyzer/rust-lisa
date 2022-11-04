@@ -31,7 +31,7 @@ public class RustFunctionDecoratorKeeper {
 	 * 
 	 * @return true if the function is unsafe
 	 */
-	public boolean getUnsafe() {
+	public boolean isUnsafe() {
 		return unsafe;
 	}
 
