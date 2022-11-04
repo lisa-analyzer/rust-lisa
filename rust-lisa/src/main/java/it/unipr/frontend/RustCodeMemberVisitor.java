@@ -437,7 +437,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				: visitTrait_method_param_list(ctx.trait_method_param_list());
 
 		Parameter[] parametersArray = parameters.toArray(new Parameter[] {});
-		Type returnType = new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype());
+		Type returnType = ctx.rtype() != null ? new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype())
+				: RustUnitType.getInstance();
 
 		boolean isInstance = false;
 		if (parameters.get(0) != null && parameters.get(0).getName().equals("self"))
@@ -448,13 +449,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		// TODO Skipping where_clause?
 		if (ctx.block_with_inner_attrs() != null) {
+
+			currentCfg = new RustCFG(descriptor, head.isUnsafe());
+
 			Pair<Statement, Statement> body = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
+			currentCfg.getEntrypoints().add(body.getLeft());
 
-			CFG codeMember = new RustCFG(descriptor, head.isUnsafe());
-
-			codeMember.getEntrypoints().add(body.getLeft());
-
-			return codeMember;
+			return currentCfg;
 		} else {
 			return new AbstractCodeMember(descriptor);
 		}
