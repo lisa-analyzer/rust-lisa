@@ -49,6 +49,7 @@ public class RustAddExpression extends BinaryExpression {
 					throws SemanticException {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
+
 		TypeSystem types = getProgram().getTypes();
 
 		for (Type leftType : left.getRuntimeTypes(types))

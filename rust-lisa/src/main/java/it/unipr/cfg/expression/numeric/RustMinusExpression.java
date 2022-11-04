@@ -13,12 +13,16 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.operator.unary.NumericNegation;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
 
 /**
  * Rust unary minus expression (e.g., -x).
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustMinusExpression extends UnaryExpression {
 
@@ -43,8 +47,17 @@ public class RustMinusExpression extends UnaryExpression {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> unarySemantics(
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+		TypeSystem types = getProgram().getTypes();
+
+		for (Type type : expr.getRuntimeTypes(types))
+			if (type.isNumericType())
+				result = result
+						.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.UnaryExpression(getStaticType(),
+								expr, NumericNegation.INSTANCE, getLocation()), this));
+
+		return result;
 	}
 
 }

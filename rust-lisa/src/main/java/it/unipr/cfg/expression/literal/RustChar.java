@@ -21,8 +21,6 @@ public class RustChar extends Literal<Character> {
 	 * @param value    the char value
 	 */
 	public RustChar(CFG cfg, CodeLocation location, Character value) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, value, RustCharType.getInstance());
 	}
 

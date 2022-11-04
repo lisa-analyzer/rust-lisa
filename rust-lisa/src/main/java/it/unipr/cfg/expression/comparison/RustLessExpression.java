@@ -48,7 +48,9 @@ public class RustLessExpression extends BinaryExpression {
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
 		AnalysisState<A, H, V, T> result = state.bottom();
+
 		TypeSystem types = getProgram().getTypes();
+
 		for (Type leftType : left.getRuntimeTypes(types))
 			for (Type rightType : right.getRuntimeTypes(types))
 				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))

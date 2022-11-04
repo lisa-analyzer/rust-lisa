@@ -14,6 +14,9 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.operator.binary.BitwiseXor;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 
 /**
  * Rust xor bitwise expression (e.g., x ^ y).
@@ -46,8 +49,19 @@ public class RustXorBitwiseExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+
+		TypeSystem types = getProgram().getTypes();
+
+		for (Type leftType : left.getRuntimeTypes(types))
+			for (Type rightType : right.getRuntimeTypes(types))
+				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+									left, right, BitwiseXor.INSTANCE, getLocation()), this));
+
+		return result;
 	}
 
 }

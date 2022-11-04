@@ -1,5 +1,6 @@
 package it.unipr.cfg.expression.comparison;
 
+import it.unipr.cfg.expression.literal.RustBoolean;
 import it.unipr.cfg.type.RustBooleanType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -14,6 +15,9 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.operator.binary.LogicalAnd;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 
 /**
  * Rust and expression (e.g., x && y).
@@ -44,8 +48,25 @@ public class RustAndExpression extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+		RustBoolean falseBoolean = new RustBoolean(getCFG(), getLocation(), false);
+
+		TypeSystem types = getProgram().getTypes();
+
+		for (Type leftType : left.getRuntimeTypes(types))
+			for (Type rightType : right.getRuntimeTypes(types)) {
+				if (leftType.isBooleanType() && rightType.isBooleanType() &&
+						expressions.getState(getLeft()).getComputedExpressions().size() == 1 &&
+						expressions.getState(getLeft()).satisfies(left, falseBoolean).isTop())
+					return state.bottom();
+
+				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+									left, right, LogicalAnd.INSTANCE, getLocation()), this));
+			}
+		return result;
 	}
 
 }
