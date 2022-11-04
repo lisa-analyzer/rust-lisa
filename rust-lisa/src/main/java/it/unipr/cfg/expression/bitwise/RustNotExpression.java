@@ -2,7 +2,6 @@ package it.unipr.cfg.expression.bitwise;
 
 import it.unipr.cfg.RustTyper;
 import it.unipr.cfg.type.RustBooleanType;
-import it.unipr.frontend.RustTypeSystem;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -18,6 +17,7 @@ import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.operator.unary.LogicalNegation;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 
 /**
  * Rust unary not expression (e.g., !x).
@@ -50,7 +50,9 @@ public class RustNotExpression extends UnaryExpression {
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
 		AnalysisState<A, H, V, T> result = state.bottom();
 
-		for (Type type : expr.getRuntimeTypes(new RustTypeSystem()))
+		TypeSystem types = getProgram().getTypes();
+
+		for (Type type : expr.getRuntimeTypes(types))
 			if (type instanceof RustBooleanType)
 				result = result
 						.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.UnaryExpression(getStaticType(),

@@ -1,7 +1,6 @@
 package it.unipr.cfg.expression.numeric;
 
 import it.unipr.cfg.RustTyper;
-import it.unipr.frontend.RustTypeSystem;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -17,6 +16,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.operator.binary.NumericNonOverflowingMod;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
 
 /**
  * Rust module expression (e.g., x % y).
@@ -52,8 +52,10 @@ public class RustModExpression extends BinaryExpression {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
 
-		for (Type leftType : left.getRuntimeTypes(new RustTypeSystem()))
-			for (Type rightType : right.getRuntimeTypes(new RustTypeSystem()))
+		TypeSystem types = getProgram().getTypes();
+
+		for (Type leftType : left.getRuntimeTypes(types))
+			for (Type rightType : right.getRuntimeTypes(types))
 				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
