@@ -2,7 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import it.unipr.cfg.RustCFG;
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -50,6 +49,9 @@ import it.unipr.cfg.expression.numeric.RustMinusExpression;
 import it.unipr.cfg.expression.numeric.RustModExpression;
 import it.unipr.cfg.expression.numeric.RustMulExpression;
 import it.unipr.cfg.expression.numeric.RustSubExpression;
+import it.unipr.cfg.program.RustCFG;
+import it.unipr.cfg.program.RustCodeMememberDescriptor;
+import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.statement.RustLetAssignment;
 import it.unipr.cfg.statement.RustUnsafeEnterStatement;
@@ -57,7 +59,6 @@ import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustStructType;
-import it.unipr.cfg.type.composite.enums.EnumCompilationUnit;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.utils.RustAccessResolver;
 import it.unipr.cfg.utils.RustArrayAccessKeeper;
@@ -78,7 +79,9 @@ import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.program.Unit;
+import it.unive.lisa.program.cfg.AbstractCodeMember;
 import it.unive.lisa.program.cfg.CFG;
+import it.unive.lisa.program.cfg.CodeMember;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.Parameter;
 import it.unive.lisa.program.cfg.edge.Edge;
@@ -427,9 +430,34 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitTrait_method_decl(Trait_method_declContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public CodeMember visitTrait_method_decl(Trait_method_declContext ctx) {
+		RustFunctionDecoratorKeeper head = visitFn_head(ctx.fn_head());
+
+		List<Parameter> parameters = ctx.trait_method_param_list() == null ? new ArrayList<>()
+				: visitTrait_method_param_list(ctx.trait_method_param_list());
+
+		Parameter[] parametersArray = parameters.toArray(new Parameter[] {});
+		Type returnType = new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype());
+
+		boolean isInstance = false;
+		if (parameters.get(0) != null && parameters.get(0).getName().equals("self"))
+			isInstance = true;
+
+		CodeMemberDescriptor descriptor = new RustCodeMememberDescriptor(locationOf(ctx, filePath), unit, isInstance,
+				head.getName(), returnType, head.isUnsafe(), parametersArray);
+
+		// TODO Skipping where_clause?
+		if (ctx.block_with_inner_attrs() != null) {
+			Pair<Statement, Statement> body = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
+
+			CFG codeMember = new RustCFG(descriptor, head.isUnsafe());
+
+			codeMember.getEntrypoints().add(body.getLeft());
+
+			return codeMember;
+		} else {
+			return new AbstractCodeMember(descriptor);
+		}
 	}
 
 	@Override
@@ -493,14 +521,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 	@Override
 	public Parameter visitSelf_param(Self_paramContext ctx) {
-		// TODO Skipping second production
+		// TODO Skipping Lifetime? in the second production
 
 		// TODO as of now, mutability in params requires more infrastructure
-		boolean mutability = false;
-		if (ctx.getChild(0).getText().equals("mut"))
-			mutability = true;
 
-		Type type = new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum());
+		Type type = ctx.ty_sum() != null ? new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum())
+				: Untyped.INSTANCE;
 
 		return new Parameter(locationOf(ctx, filePath), "self", type);
 	}
@@ -520,33 +546,30 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitTrait_method_param(Trait_method_paramContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public Parameter visitTrait_method_param(Trait_method_paramContext ctx) {
+		Type type = new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum());
+		String name = visitRestricted_pat(ctx.restricted_pat());
+
+		return new Parameter(locationOf(ctx, filePath), name, type);
 	}
 
 	@Override
-	public Object visitRestricted_pat(Restricted_patContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public String visitRestricted_pat(Restricted_patContext ctx) {
+		// TODO Skipping first part of production
+		return ctx.getText().equals("_") ? "_" : ctx.ident().getText();
 	}
 
 	@Override
-	public Object visitTrait_method_param_list(Trait_method_param_listContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public List<Parameter> visitTrait_method_param_list(Trait_method_param_listContext ctx) {
+		List<Parameter> parameters = new ArrayList<>();
 
-	@Override
-	public Object visitRtype(RtypeContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if (ctx.self_param() != null)
+			parameters.add(visitSelf_param(ctx.self_param()));
 
-	@Override
-	public Type visitFn_rtype(Fn_rtypeContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		for (Trait_method_paramContext tmpCtx : ctx.trait_method_param())
+			parameters.add(visitTrait_method_param(tmpCtx));
+
+		return parameters;
 	}
 
 	@Override
@@ -574,14 +597,18 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitTrait_decl(Trait_declContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public CodeMember visitTrait_item(Trait_itemContext ctx) {
+		// trait_item
+		// : attr* 'type' ident colon_bound? ty_default? ';'
+		// | attr* 'const' ident ':' ty_sum const_default? ';'
+		// | attr* trait_method_decl
+		// | attr* item_macro_path '!' item_macro_tail
 
-	@Override
-	public Object visitTrait_item(Trait_itemContext ctx) {
-		// TODO Auto-generated method stub
+		// Currently taking into account only the third production
+		// trait_method_decl and skipping attr*
+		if (ctx.trait_method_decl() != null)
+			return visitTrait_method_decl(ctx.trait_method_decl());
+
 		return null;
 	}
 
@@ -1062,7 +1089,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 				// Check if field are assignable
 				Type type = result.getStaticType();
-				EnumCompilationUnit ecu = ((RustEnumType) type).getUnit();
+				RustEnumUnit ecu = ((RustEnumType) type).getUnit();
 				@SuppressWarnings("unchecked")
 				// This cast is safe because there are 3 types of
 				// RustEnumLiteral, two of them use RustMultipleExpression,

@@ -2,6 +2,8 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import it.unipr.cfg.program.unit.RustEnumUnit;
+import it.unipr.cfg.program.unit.RustTraitUnit;
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -10,7 +12,6 @@ import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTupleType;
-import it.unipr.cfg.type.composite.enums.EnumCompilationUnit;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unipr.cfg.type.numeric.floating.RustF32Type;
@@ -36,12 +37,15 @@ import it.unipr.rust.antlr.RustParser.ItemContext;
 import it.unipr.rust.antlr.RustParser.Mod_bodyContext;
 import it.unipr.rust.antlr.RustParser.Pub_itemContext;
 import it.unipr.rust.antlr.RustParser.Struct_declContext;
+import it.unipr.rust.antlr.RustParser.Trait_declContext;
+import it.unipr.rust.antlr.RustParser.Trait_itemContext;
 import it.unive.lisa.program.ClassUnit;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.program.SourceCodeLocation;
 import it.unive.lisa.program.cfg.CFG;
+import it.unive.lisa.program.cfg.CodeMember;
 import it.unive.lisa.program.cfg.statement.evaluation.EvaluationOrder;
 import it.unive.lisa.program.cfg.statement.evaluation.LeftToRightEvaluation;
 import it.unive.lisa.type.Type;
@@ -49,6 +53,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -184,8 +189,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 	@Override
 	public Void visitItem(ItemContext ctx) {
-		if (ctx.pub_item() != null && (ctx.pub_item().struct_decl() != null ||
-				ctx.pub_item().enum_decl() != null))
+		if (ctx.pub_item() != null)
 			visitPub_item(ctx.pub_item());
 
 		for (Type t : RustStructType.all())
@@ -204,10 +208,6 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 				u.addInstanceCodeMember(cfg);
 		}
 
-		if (ctx.pub_item() != null && ctx.pub_item().fn_decl() != null)
-			currentUnit.addCodeMember(new RustCodeMemberVisitor(filePath, program, currentUnit)
-					.visitFn_decl(ctx.pub_item().fn_decl()));
-
 		if (ctx.item_macro_use() != null)
 			// Both macro definitions and calls are here
 			// TODO parsing only calls for now
@@ -223,6 +223,13 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 		if (ctx.enum_decl() != null)
 			visitEnum_decl(ctx.enum_decl());
+
+		if (ctx.trait_decl() != null)
+			visitTrait_decl(ctx.trait_decl());
+
+		if (ctx.fn_decl() != null)
+			currentUnit.addCodeMember(new RustCodeMemberVisitor(filePath, program, currentUnit)
+					.visitFn_decl(ctx.fn_decl()));
 
 		return null;
 	}
@@ -247,7 +254,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 	public Void visitEnum_decl(Enum_declContext ctx) {
 		// TODO skipping ty_params? and where_clause?
 		String name = ctx.ident().getText();
-		EnumCompilationUnit enumUnit = new EnumCompilationUnit(locationOf(ctx, filePath), program, name, true);
+		RustEnumUnit enumUnit = new RustEnumUnit(locationOf(ctx, filePath), program, name, true);
 
 		List<RustEnumVariant> enumVariants = new RustTypeVisitor(filePath, currentUnit, program)
 				.visitEnum_variant_list(ctx.enum_variant_list());
@@ -256,6 +263,23 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 			enumUnit.addVariant(variant);
 
 		RustEnumType.lookup(name, enumUnit);
+
+		return null;
+	}
+
+	@Override
+	public Void visitTrait_decl(Trait_declContext ctx) {
+		// TODO skipping auto?, ty_params?, colon_bound? and where_clause?
+		String name = ctx.ident().getText();
+		RustTraitUnit traitUnit = new RustTraitUnit(locationOf(ctx, filePath), program, name,
+				ctx.getChild(0).getText().equals("unsafe"));
+
+		List<CodeMember> fnDefinitions = new ArrayList<>();
+		for (Trait_itemContext traitItemCtx : ctx.trait_item())
+			fnDefinitions.add(new RustCodeMemberVisitor(filePath, program, traitUnit).visitTrait_item(traitItemCtx));
+
+		for (CodeMember definition : fnDefinitions)
+			traitUnit.addInstanceCodeMember(definition);
 
 		return null;
 	}
