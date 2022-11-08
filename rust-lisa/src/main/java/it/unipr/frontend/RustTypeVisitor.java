@@ -231,10 +231,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		case "char":
 			return RustCharType.getInstance();
 		default:
-			if (RustStructType.has(ctx.Ident().getText())) {
-				return RustStructType.lookup(filePath, unit);
-			} else
-				throw new IllegalAccessError("The name of this type was not found");
+			return RustStructType.get(ctx.Ident().getText());
 		}
 	}
 
