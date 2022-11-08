@@ -11,6 +11,7 @@ import it.unipr.cfg.type.RustStrType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
@@ -58,6 +59,7 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * The Rust front-end for LiSA.
@@ -199,13 +201,30 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 			program.addUnit(((RustEnumType) t).getUnit());
 
 		if (ctx.impl_block() != null) {
-			RustStructType struct = RustStructType.get(ctx.impl_block().impl_what().getText());
-			CompilationUnit u = struct.getUnit();
+			System.out.println(ctx.impl_block().impl_what().getText());
 
-			List<CFG> implCfg = new RustCodeMemberVisitor(filePath, program, u).visitImpl_block(ctx.impl_block());
+			String[] structAndTraitName = ctx.impl_block().impl_what().getText().split("for");
+			String structName;
+			if (structAndTraitName.length == 1)
+				structName = structAndTraitName[0];
+			else
+				structName = structAndTraitName[1];
+
+			RustStructType struct = RustStructType.get(structName);
+			Pair<Type, Type> structAndTrait = new RustTypeVisitor(filePath, currentUnit, program)
+					.visitImpl_what(ctx.impl_block().impl_what());
+
+			CompilationUnit structUnit = struct.getUnit();
+			if (structAndTrait.getRight() != null) {
+				RustTraitType trait = RustTraitType.get(structAndTrait.getRight().toString());
+				structUnit.addAncestor(trait.getUnit());
+			}
+
+			List<CFG> implCfg = new RustCodeMemberVisitor(filePath, program, structUnit)
+					.visitImpl_block(ctx.impl_block());
 
 			for (CFG cfg : implCfg)
-				u.addInstanceCodeMember(cfg);
+				structUnit.addInstanceCodeMember(cfg);
 		}
 
 		if (ctx.item_macro_use() != null)
@@ -280,6 +299,8 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 		for (CodeMember definition : fnDefinitions)
 			traitUnit.addInstanceCodeMember(definition);
+
+		RustTraitType.lookup(name, traitUnit);
 
 		return null;
 	}

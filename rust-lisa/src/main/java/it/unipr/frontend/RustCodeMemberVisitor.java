@@ -628,7 +628,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	@Override
 	public List<CFG> visitImpl_block(Impl_blockContext ctx) {
 		// TODO Ignoring: 'unsafe'?, ty_params? where_clause?
-
 		List<CFG> impls = new ArrayList<>();
 		for (Impl_itemContext fdCtx : ctx.impl_item()) {
 			CFG visitedCfg = visitImpl_item(fdCtx);
@@ -636,13 +635,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		}
 
 		return impls;
-	}
-
-	@Override
-	public Type visitImpl_what(Impl_whatContext ctx) {
-		// TODO Skipping trait implementation for now and parsing only the last
-		// rule
-		return new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum(0));
 	}
 
 	@Override
