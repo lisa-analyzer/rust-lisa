@@ -201,8 +201,6 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 			program.addUnit(((RustEnumType) t).getUnit());
 
 		if (ctx.impl_block() != null) {
-			System.out.println(ctx.impl_block().impl_what().getText());
-
 			String[] structAndTraitName = ctx.impl_block().impl_what().getText().split("for");
 			String structName;
 			if (structAndTraitName.length == 1)
