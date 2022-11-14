@@ -1,11 +1,10 @@
 package it.unipr.cfg.type.composite;
 
-import java.util.Collections;
-import java.util.Objects;
-
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
+import java.util.Collections;
+import java.util.Objects;
 
 /**
  * Builds the Rust reference type.

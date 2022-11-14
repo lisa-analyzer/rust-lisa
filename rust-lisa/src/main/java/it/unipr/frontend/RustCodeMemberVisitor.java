@@ -1432,7 +1432,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			Type type = (ctx.ty() == null ? Untyped.INSTANCE : visitTy(ctx.ty()));
 			type = type.isInMemoryType() ? new RustReferenceType(type, false) : type;
-			
+
 			// TODO do not take into account the attr part for now
 			if (ctx.expr() != null) {
 				Expression rhs = visitExpr(ctx.expr());
@@ -1894,7 +1894,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						locationOf(ctx, filePath),
 						structType,
 						fields.stream()
-								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(), e.getRight()))
+								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(),
+										e.getRight()))
 								.collect(Collectors.toList())
 								.toArray(new Expression[0]));
 
