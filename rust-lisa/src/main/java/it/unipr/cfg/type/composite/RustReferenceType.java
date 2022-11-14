@@ -1,14 +1,11 @@
 package it.unipr.cfg.type.composite;
 
-import it.unipr.cfg.type.RustType;
-import it.unive.lisa.type.PointerType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.TypeSystem;
-import it.unive.lisa.type.Untyped;
-import it.unive.lisa.util.collections.externalSet.ExternalSet;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
+
+import it.unipr.cfg.type.RustType;
+import it.unive.lisa.type.ReferenceType;
+import it.unive.lisa.type.Type;
 
 /**
  * Builds the Rust reference type.
@@ -16,11 +13,8 @@ import java.util.Set;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustReferenceType implements PointerType, RustType {
+public class RustReferenceType extends ReferenceType implements RustType {
 
-	private ExternalSet<Type> innerTypes;
-
-	private final Type innerType;
 	private final boolean mutable;
 
 	/**
@@ -31,42 +25,20 @@ public class RustReferenceType implements PointerType, RustType {
 	 * @param mutable   the mutability of the reference
 	 */
 	public RustReferenceType(Type innerType, boolean mutable) {
-		this.innerType = Objects.requireNonNull(innerType);
+		super(Collections.singleton(innerType));
 		this.mutable = mutable;
 	}
 
 	@Override
-	public boolean canBeAssignedTo(Type other) {
-		return other instanceof PointerType;
-	}
-
-	@Override
-	public Type commonSupertype(Type other) {
-		return equals(other) ? this : Untyped.INSTANCE;
-	}
-
-	@Override
-	public Set<Type> allInstances(TypeSystem types) {
-		return Collections.singleton(this);
-	}
-
-	@Override
-	public Set<Type> getInnerTypes() {
-		return innerTypes != null ? innerTypes : Collections.singleton(innerType);
+	public String toString() {
+		return "&" + (mutable ? "mut" : "") + getInnerTypes();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-
-		if (innerTypes != null)
-			if (innerTypes.size() == 1)
-				result = prime * result + innerTypes.first().hashCode();
-			else
-				result = prime * result + ((innerTypes == null) ? 0 : innerTypes.hashCode());
-		else
-			result = prime * result + ((innerType == null) ? 0 : innerType.hashCode());
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(mutable);
 		return result;
 	}
 
@@ -74,25 +46,11 @@ public class RustReferenceType implements PointerType, RustType {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof RustReferenceType))
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
 			return false;
 		RustReferenceType other = (RustReferenceType) obj;
-
-		if (innerType == null) {
-			if (other.innerType != null)
-				return false;
-		} else if (!innerType.equals(other.innerType))
-			return false;
-
-		if (mutable != other.mutable)
-			return false;
-
-		return true;
+		return mutable == other.mutable;
 	}
-
-	@Override
-	public String toString() {
-		return "&" + (mutable ? "mut" : "") + innerType;
-	}
-
 }
