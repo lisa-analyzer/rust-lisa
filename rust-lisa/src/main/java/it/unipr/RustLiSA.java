@@ -8,6 +8,7 @@ import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.LiSAFactory;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.MonolithicHeap;
+import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
 import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.value.TypeDomain;
@@ -35,7 +36,7 @@ public class RustLiSA {
 
 		LiSAConfiguration conf = new LiSAConfiguration();
 		conf.setAbstractState(new SimpleAbstractState<>(
-				new MonolithicHeap(),
+				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
 				LiSAFactory.getDefaultFor(TypeDomain.class)))
 				.setJsonOutput(true)

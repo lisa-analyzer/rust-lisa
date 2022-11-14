@@ -28,5 +28,4 @@ public class RustAssignment extends Assignment {
 		// once we have modeled Rust types
 		super(cfg, location, Untyped.INSTANCE, left, right);
 	}
-
 }

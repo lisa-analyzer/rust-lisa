@@ -2,6 +2,7 @@ package it.unipr.cfg.type.composite;
 
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.ArrayType;
+import it.unive.lisa.type.InMemoryType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
@@ -16,7 +17,7 @@ import java.util.Set;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustArrayType implements ArrayType, RustType {
+public class RustArrayType implements ArrayType, RustType, InMemoryType {
 
 	/**
 	 * Collection of all arrays.

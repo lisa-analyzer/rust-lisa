@@ -58,6 +58,8 @@ import it.unipr.cfg.statement.RustUnsafeEnterStatement;
 import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
+import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.utils.RustAccessResolver;
@@ -1429,7 +1431,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression lhs = visitPat(ctx.pat());
 
 			Type type = (ctx.ty() == null ? Untyped.INSTANCE : visitTy(ctx.ty()));
-
+			type = type.isInMemoryType() ? new RustReferenceType(type, false) : type;
+			
 			// TODO do not take into account the attr part for now
 			if (ctx.expr() != null) {
 				Expression rhs = visitExpr(ctx.expr());
@@ -1891,7 +1894,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						locationOf(ctx, filePath),
 						structType,
 						fields.stream()
-								.map(e -> e.getRight())
+								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(), e.getRight()))
 								.collect(Collectors.toList())
 								.toArray(new Expression[0]));
 
@@ -1943,7 +1946,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			if (ctx.expr_list() != null) {
 				List<Expression> exprs = visitExpr_list(ctx.expr_list());
-				return new RustArrayLiteral(currentCfg, locationOf(ctx, filePath), Untyped.INSTANCE,
+				RustArrayType type = new RustArrayType(exprs.get(0).getStaticType(), exprs.size());
+				return new RustArrayLiteral(currentCfg, locationOf(ctx, filePath), type,
 						exprs.toArray(new Expression[0]));
 
 			} else if (ctx.expr() != null) {
