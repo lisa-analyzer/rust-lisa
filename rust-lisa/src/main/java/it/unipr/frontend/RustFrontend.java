@@ -124,6 +124,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 		RustEnumType.all().forEach(program.getTypes()::registerType);
 		RustArrayType.all().forEach(program.getTypes()::registerType);
 		RustTupleType.all().forEach(program.getTypes()::registerType);
+		RustTraitType.all().forEach(program.getTypes()::registerType);
 	}
 
 	/**
