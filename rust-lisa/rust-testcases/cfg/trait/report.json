@@ -1,0 +1,4 @@
+{
+  "warnings" : [ ],
+  "files" : [ "()_rust-testcases_cfg_trait_trait.rs.main().json", "f32_Circle.area().json", "f32_Circle.origin_distance_squared().json", "f32_Circle.perimeter().json" ]
+}

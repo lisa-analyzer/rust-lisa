@@ -1,4 +1,4 @@
-package it.unipr.cfg;
+package it.unipr.cfg.program;
 
 import it.unipr.cfg.expression.RustReturnExpression;
 import it.unipr.cfg.expression.literal.RustUnitLiteral;

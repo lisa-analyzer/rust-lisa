@@ -11,6 +11,7 @@ import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumSimpleVariant;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
@@ -41,6 +42,8 @@ import it.unipr.rust.antlr.RustParser.Field_declContext;
 import it.unipr.rust.antlr.RustParser.Field_decl_listContext;
 import it.unipr.rust.antlr.RustParser.Fn_rtypeContext;
 import it.unipr.rust.antlr.RustParser.IdentContext;
+import it.unipr.rust.antlr.RustParser.Impl_whatContext;
+import it.unipr.rust.antlr.RustParser.RtypeContext;
 import it.unipr.rust.antlr.RustParser.Struct_tailContext;
 import it.unipr.rust.antlr.RustParser.TyContext;
 import it.unipr.rust.antlr.RustParser.Ty_pathContext;
@@ -58,6 +61,7 @@ import it.unive.lisa.type.Untyped;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Type visitor for Rust, managing the parsing of Rust types.
@@ -232,6 +236,8 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		default:
 			if (RustStructType.has(ctx.Ident().getText())) {
 				return RustStructType.lookup(filePath, unit);
+			} else if (RustTraitType.has(ctx.Ident().getText())) {
+				return RustTraitType.lookup(filePath, unit);
 			} else
 				throw new IllegalAccessError("The name of this type was not found");
 		}
@@ -250,6 +256,15 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			types.add(visitTy_sum(tyCtx));
 		}
 		return types;
+	}
+
+	@Override
+	public Type visitRtype(RtypeContext ctx) {
+		// Skipping '!' part
+		if (ctx.ty() != null)
+			return visitTy(ctx.ty());
+
+		return null;
 	}
 
 	@Override
@@ -287,6 +302,28 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			declarations.add(visitField_decl(fdCtx));
 
 		return declarations;
+	}
+
+	@Override
+	public Pair<Type, Type> visitImpl_what(Impl_whatContext ctx) {
+		// TODO These are the remaining rules to parse
+		// impl_what
+		// : '!' ty_sum 'for' ty_sum
+		// | ty_sum 'for' '..'
+		// ;
+
+		if (ctx.ty_sum().size() == 2 && !ctx.children.get(0).getText().equals("!")) {
+			// impl that implements trait
+			Type struct = visitTy_sum(ctx.ty_sum(1));
+			Type trait = visitTy_sum(ctx.ty_sum(0));
+
+			return Pair.of(struct, trait);
+
+		} else if (ctx.ty_sum().size() == 1) {
+			// impl for a struct
+			return Pair.of(visitTy_sum(ctx.ty_sum(0)), null);
+		} else
+			return null;
 	}
 
 	@Override

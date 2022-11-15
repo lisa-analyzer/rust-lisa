@@ -1,5 +1,6 @@
-package it.unipr.cfg.type.composite.enums;
+package it.unipr.cfg.program.unit;
 
+import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.ClassUnit;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.program.cfg.CodeLocation;
@@ -12,19 +13,19 @@ import java.util.HashSet;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class EnumCompilationUnit extends ClassUnit {
+public class RustEnumUnit extends ClassUnit {
 
 	private final Collection<RustEnumVariant> variants;
 
 	/**
-	 * Construct the {@link EnumCompilationUnit} object.
+	 * Construct the {@link RustEnumUnit} object.
 	 * 
 	 * @param location the type of the element in the array
 	 * @param program  the program to which add this ClassUnit
 	 * @param name     the name of the compilation unit
 	 * @param sealed   true if the compilation unit is sealead
 	 */
-	public EnumCompilationUnit(CodeLocation location, Program program, String name, boolean sealed) {
+	public RustEnumUnit(CodeLocation location, Program program, String name, boolean sealed) {
 		super(location, program, name, sealed);
 		variants = new HashSet<>();
 	}

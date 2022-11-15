@@ -1,5 +1,6 @@
 package it.unipr.cfg.type.composite.enums;
 
+import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
@@ -34,7 +35,7 @@ public class RustEnumType implements RustType, UnitType {
 	 * 
 	 * @return the first {@link RustEnumType} inserted of the same kind
 	 */
-	public static RustEnumType lookup(String name, EnumCompilationUnit unit) {
+	public static RustEnumType lookup(String name, RustEnumUnit unit) {
 		return INSTANCES.computeIfAbsent(name, x -> new RustEnumType(name, unit));
 	}
 
@@ -88,7 +89,7 @@ public class RustEnumType implements RustType, UnitType {
 	 * In Rust an enum has its own values.
 	 */
 	private final String name;
-	private final EnumCompilationUnit unit;
+	private final RustEnumUnit unit;
 
 	/**
 	 * Construct the {@link RustEnumType} object. Note that {@code variantNames}
@@ -97,7 +98,7 @@ public class RustEnumType implements RustType, UnitType {
 	 * @param name the name of this enum
 	 * @param unit the compilation unit it belongs to
 	 */
-	public RustEnumType(String name, EnumCompilationUnit unit) {
+	public RustEnumType(String name, RustEnumUnit unit) {
 		this.name = Objects.requireNonNull(name);
 		this.unit = Objects.requireNonNull(unit);
 	}
@@ -177,7 +178,7 @@ public class RustEnumType implements RustType, UnitType {
 	 * 
 	 * @return the compilation unit of this type
 	 */
-	public EnumCompilationUnit getUnit() {
+	public RustEnumUnit getUnit() {
 		return unit;
 	}
 }
