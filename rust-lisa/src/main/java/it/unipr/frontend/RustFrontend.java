@@ -261,7 +261,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 		RustStructType.lookup(name, structUnit);
 
 		List<Global> fields = new RustTypeVisitor(filePath, currentUnit, program).visitStruct_tail(ctx.struct_tail());
-
+		
 		for (Global f : fields)
 			structUnit.addInstanceGlobal(f);
 

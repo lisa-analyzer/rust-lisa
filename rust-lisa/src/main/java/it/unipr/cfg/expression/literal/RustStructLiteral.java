@@ -1,5 +1,9 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import it.unipr.cfg.expression.RustVariableRef;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.type.composite.RustReferenceType;
@@ -24,9 +28,6 @@ import it.unive.lisa.symbolic.heap.HeapAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * Rust struct literal.
