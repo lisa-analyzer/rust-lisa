@@ -13,6 +13,8 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.AccessChild;
+import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.type.Untyped;
 
 /**
@@ -31,9 +33,8 @@ public class RustAccessMemberExpression extends BinaryExpression {
 	 * @param left     the left-hand side of this expression
 	 * @param right    the right-hand side of this expression
 	 */
-	public RustAccessMemberExpression(CFG cfg, CodeLocation location,
-			Expression left, Expression right) {
-		super(cfg, location, ".", Untyped.INSTANCE, left, right);
+	public RustAccessMemberExpression(CFG cfg, CodeLocation location, Expression left, Expression right) {
+		super(cfg, location, ".", right.getStaticType(), left, right);
 	}
 
 	@Override
@@ -42,15 +43,21 @@ public class RustAccessMemberExpression extends BinaryExpression {
 	}
 
 	@Override
-	public <A extends AbstractState<A, H, V, T>,
-			H extends HeapDomain<H>,
-			V extends ValueDomain<V>,
-			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
-					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
-					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
-					throws SemanticException {
-		// TODO too coarse
-		return state.top();
-	}
+	public <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
+			InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
+			SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
+			throws SemanticException {
+		AnalysisState<A, H, V, T> result = state.bottom();
 
+		AnalysisState<A, H, V, T> stateModifiedLeft = state.smallStepSemantics(left, this);
+		for (SymbolicExpression expression : stateModifiedLeft.getComputedExpressions()) {
+			AccessChild accessChild = new AccessChild(getStaticType(),
+					new HeapDereference(getStaticType(), expression, getLocation()), right, getLocation());
+
+			AnalysisState<A, H, V, T> accessedState = stateModifiedLeft.smallStepSemantics(accessChild, this);
+			result = result.lub(accessedState);
+		}
+
+		return result;
+	}
 }

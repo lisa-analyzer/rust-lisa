@@ -76,6 +76,7 @@ public abstract class RustLiSATestExecutor {
 		Path expectedPath = Paths.get(EXPECTED_RESULTS_DIR, folder);
 		Path actualPath = Paths.get(ACTUAL_RESULTS_DIR, folder);
 		Path target = Paths.get(expectedPath.toString(), source);
+		clearTypes();
 		Program program = null;
 		try {
 			program = RustFrontend.processFile(target.toString());
@@ -101,7 +102,6 @@ public abstract class RustLiSATestExecutor {
 		configuration.setJsonOutput(true);
 		LiSA lisa = new LiSA(configuration);
 		try {
-			clearTypes();
 			lisa.run(program);
 		} catch (AnalysisException e) {
 			e.printStackTrace(System.err);

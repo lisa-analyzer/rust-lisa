@@ -5,6 +5,7 @@ import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.Statement;
+import it.unive.lisa.type.InMemoryType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.UnitType;
@@ -21,7 +22,7 @@ import java.util.Set;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustStructType implements UnitType, RustType, RustEnumVariant {
+public class RustStructType implements UnitType, RustType, RustEnumVariant, InMemoryType {
 
 	private static final Map<String, RustStructType> INSTANCES = new HashMap<>();
 
