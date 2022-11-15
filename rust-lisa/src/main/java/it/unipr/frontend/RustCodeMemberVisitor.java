@@ -1254,10 +1254,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		String name = ctx.ident().getText();
 		Expression value = null;
 
-		if (ctx.pat() != null)
+		if (ctx.pat() != null) {
+			value = visitPat(ctx.pat());
 			return new RustAssignment(currentCfg, locationOf(ctx, filePath),
-					new VariableRef(currentCfg, locationOf(ctx, filePath), name), visitPat(ctx.pat()));
-
+					new VariableRef(currentCfg, locationOf(ctx, filePath), name), value.getStaticType(), value);
+		
+		}
 		if (ctx.getChild(3) != null && ctx.getChild(3).getText().equals("mut"))
 			value = new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true);
 		else
@@ -1730,7 +1732,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			currentCfg.addEdge(new TrueEdge(guard, body.getLeft()));
 			currentCfg.addEdge(new FalseEdge(guard, noOp));
 
-			Expression increment = new RustAssignment(currentCfg, locationOf(ctx, filePath), forVariable, nextCall);
+			Expression increment = new RustAssignment(currentCfg, locationOf(ctx, filePath), forVariable, nextCall.getStaticType(), nextCall);
 			// TODO Keep in mind that this is also a function
 			// call to pat.next() which
 			// returns a std::ops::Option which is Some(n) if n
@@ -1894,7 +1896,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						locationOf(ctx, filePath),
 						structType,
 						fields.stream()
-								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(),
+								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(), e.getRight().getStaticType(),
 										e.getRight()))
 								.collect(Collectors.toList())
 								.toArray(new Expression[0]));
@@ -2405,36 +2407,36 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		switch (ctx.getChild(1).getText()) {
 		case "=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, right);
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(), right);
 		case "*=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustMulExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "/=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustDivExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "%=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustModExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "+=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustAddExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "-=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustSubExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "<<=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustLeftShiftExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case ">": // catches only ">" which is separated in the g4 grammar
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustRightShiftExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "&=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustAndBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		case "^=":
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustXorBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		default: // operator "|="
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+			return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 					new RustOrBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 		}
 	}
@@ -2688,33 +2690,33 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			switch (ctx.getChild(1).getText()) {
 			case "=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, right);
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(), right);
 			case "*=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustMulExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "/=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustDivExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "%=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustModExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "+=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustAddExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "<<=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustLeftShiftExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case ">":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustRightShiftExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "&=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustAndBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "^=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustXorBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			case "|=":
-				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr,
+				return new RustAssignment(currentCfg, locationOf(ctx, filePath), rangeExpr, rangeExpr.getStaticType(),
 						new RustOrBitwiseExpression(currentCfg, locationOf(ctx, filePath), rangeExpr, right));
 			}
 		}

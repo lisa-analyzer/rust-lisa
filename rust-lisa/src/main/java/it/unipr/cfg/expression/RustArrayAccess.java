@@ -35,9 +35,7 @@ public class RustArrayAccess extends BinaryExpression {
 	 */
 	public RustArrayAccess(CFG cfg, CodeLocation location, Expression identifier,
 			Expression access) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
-		super(cfg, location, "[]", identifier, access);
+		super(cfg, location, "[]", access.getStaticType(), identifier, access);
 	}
 
 	@Override
