@@ -1,8 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustTupleType;
@@ -26,6 +23,8 @@ import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Rust tuple literal.
@@ -62,7 +61,7 @@ public class RustTupleLiteral extends NaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		
+
 		HeapAllocation allocation = new HeapAllocation(getStaticType(), getLocation());
 		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
 
@@ -77,24 +76,26 @@ public class RustTupleLiteral extends NaryExpression {
 			AnalysisState<A, H, V, T> startingState = allocationState;
 			for (int i = 0; i < getSubExpressions().length; ++i) {
 				Type tupleComponentType = ((RustTupleType) getStaticType()).getTypes().get(i);
-				
+
 				if (tupleComponentType.canBeAssignedTo(getSubExpressions()[i].getStaticType())) {
 					Variable variable = new Variable(tupleComponentType, i + "", getLocation());
 					AccessChild child = new AccessChild(getSubExpressions()[0].getStaticType(), deref, variable,
 							getLocation());
-	
+
 					AnalysisState<A, H, V, T> tmp = result.bottom();
-	
+
 					AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
 					for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions()) {
-	
+
 						for (SymbolicExpression exprParam : params[i]) {
 							tmp = tmp.lub(startingState.assign(childIdentifier, exprParam, this));
 						}
 					}
-	
+
 					startingState = tmp;
-				} else throw new IllegalAccessError("Element " + i + " of the tuple " + getStaticType() + " cannot be found");
+				} else
+					throw new IllegalAccessError(
+							"Element " + i + " of the tuple " + getStaticType() + " cannot be found");
 			}
 
 			result = result.lub(startingState.smallStepSemantics(ref, this));

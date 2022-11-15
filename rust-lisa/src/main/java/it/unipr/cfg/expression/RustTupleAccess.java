@@ -52,16 +52,16 @@ public class RustTupleAccess extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		
+
 		AnalysisState<A, H, V, T> result = state.bottom();
 
 		AnalysisState<A, H, V, T> stateModifiedLeft = state.smallStepSemantics(left, this);
 		for (SymbolicExpression expression : stateModifiedLeft.getComputedExpressions()) {
 			HeapDereference deref = new HeapDereference(getStaticType(), expression, getLocation());
 			AccessChild access = new AccessChild(getStaticType(), deref, right, getLocation());
-			
+
 			AnalysisState<A, H, V, T> tmp = stateModifiedLeft.smallStepSemantics(access, this);
-			
+
 			result = result.lub(tmp);
 		}
 

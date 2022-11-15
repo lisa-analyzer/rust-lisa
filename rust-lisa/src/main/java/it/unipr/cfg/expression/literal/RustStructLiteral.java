@@ -1,9 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.expression.RustVariableRef;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.type.composite.RustReferenceType;
@@ -28,6 +24,9 @@ import it.unive.lisa.symbolic.heap.HeapAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Rust struct literal.
@@ -84,10 +83,11 @@ public class RustStructLiteral extends NaryExpression {
 				String variableName = ((RustVariableRef) assigment.getLeft()).getName();
 
 				Variable variable = new Variable(assigment.getStaticType(), variableName, getLocation());
-				
-				Collection<Global> globals = RustStructType.get(getStaticType().toString()).getUnit().getInstanceGlobals(true);				
+
+				Collection<Global> globals = RustStructType.get(getStaticType().toString()).getUnit()
+						.getInstanceGlobals(true);
 				boolean present = globals.stream().anyMatch(
-						g -> g.getName().equals(variableName) && g.getStaticType().equals(variable.getStaticType()));				
+						g -> g.getName().equals(variableName) && g.getStaticType().equals(variable.getStaticType()));
 				if (present) {
 					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
 							getLocation());

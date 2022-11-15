@@ -20,6 +20,7 @@ public class RustAssignment extends Assignment {
 	 * @param cfg      the {@link CFG} where this expression lies
 	 * @param location the location where this expression is defined
 	 * @param left     the left-hand side of this expression
+	 * @param type     the type of this expression
 	 * @param right    the right-hand side of this expression
 	 */
 	public RustAssignment(CFG cfg, CodeLocation location,
