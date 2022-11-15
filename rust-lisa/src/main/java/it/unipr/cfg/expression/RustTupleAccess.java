@@ -13,6 +13,8 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.AccessChild;
+import it.unive.lisa.symbolic.heap.HeapDereference;
 
 /**
  * Rust tuple access expression (e.g., x.y).
@@ -50,8 +52,20 @@ public class RustTupleAccess extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+		
+		AnalysisState<A, H, V, T> result = state.bottom();
+
+		AnalysisState<A, H, V, T> stateModifiedLeft = state.smallStepSemantics(left, this);
+		for (SymbolicExpression expression : stateModifiedLeft.getComputedExpressions()) {
+			HeapDereference deref = new HeapDereference(getStaticType(), expression, getLocation());
+			AccessChild access = new AccessChild(getStaticType(), deref, right, getLocation());
+			
+			AnalysisState<A, H, V, T> tmp = stateModifiedLeft.smallStepSemantics(access, this);
+			
+			result = result.lub(tmp);
+		}
+
+		return result;
 	}
 
 }
