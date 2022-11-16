@@ -180,4 +180,14 @@ public class RustStructType implements UnitType, RustType, RustEnumVariant, InMe
 		return null;
 	}
 
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
+	}
+	
 }

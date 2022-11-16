@@ -19,9 +19,9 @@ public class RustUsizeType implements NumericType, RustType {
 	private static final RustUsizeType INSTANCE = new RustUsizeType();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustUsizeType getInstance() {
 		return INSTANCE;
@@ -92,6 +92,16 @@ public class RustUsizeType implements NumericType, RustType {
 	@Override
 	public String toString() {
 		return "usize";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return true;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
 	}
 
 }

@@ -19,9 +19,9 @@ public class RustU32Type implements NumericType, RustType {
 	private static final RustU32Type INSTANCE = new RustU32Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustU32Type getInstance() {
 		return INSTANCE;
@@ -92,6 +92,16 @@ public class RustU32Type implements NumericType, RustType {
 	@Override
 	public String toString() {
 		return "u32";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return true;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
 	}
 
 }

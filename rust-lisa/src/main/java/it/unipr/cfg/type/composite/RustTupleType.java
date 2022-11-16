@@ -152,4 +152,14 @@ public class RustTupleType implements RustType, RustEnumVariant {
 		return types;
 	}
 
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
+	}
+
 }

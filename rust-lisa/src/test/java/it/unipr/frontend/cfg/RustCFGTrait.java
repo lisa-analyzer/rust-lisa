@@ -1,9 +1,11 @@
 package it.unipr.frontend.cfg;
 
+import org.junit.Test;
+
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
-import org.junit.Test;
+import it.unive.lisa.LiSAConfiguration.GraphType;
 
 public class RustCFGTrait extends RustLiSATestExecutor {
 
@@ -22,6 +24,7 @@ public class RustCFGTrait extends RustLiSATestExecutor {
 	@Test
 	public void testTrait() throws AnalysisSetupException {
 		LiSAConfiguration conf = CFGTestConfiguration.mkConf();
+		conf.setDumpAnalysis(GraphType.DOT);
 		perform("cfg/trait", "trait.rs", conf);
 	}
 }

@@ -18,9 +18,9 @@ public class RustBooleanType implements BooleanType, RustType {
 	private static final RustBooleanType INSTANCE = new RustBooleanType();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustBooleanType getInstance() {
 		return INSTANCE;
@@ -59,6 +59,16 @@ public class RustBooleanType implements BooleanType, RustType {
 	@Override
 	public String toString() {
 		return "bool";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
 	}
 
 }

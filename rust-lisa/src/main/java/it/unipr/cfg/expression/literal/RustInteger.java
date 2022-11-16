@@ -1,6 +1,6 @@
 package it.unipr.cfg.expression.literal;
 
-import it.unipr.cfg.type.numeric.signed.RustI32Type;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.literal.Literal;
@@ -21,6 +21,6 @@ public class RustInteger extends Literal<Integer> {
 	 * @param value    the integer value
 	 */
 	public RustInteger(CFG cfg, CodeLocation location, Integer value) {
-		super(cfg, location, value, RustI32Type.getInstance());
+		super(cfg, location, value, RustUnconstrainedInt.getInstance());
 	}
 }

@@ -94,4 +94,14 @@ public class RustI32Type implements NumericType, RustType {
 		return "i32";
 	}
 
+	@Override
+	public boolean isIntegerType() {
+		return true;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
+	}
+
 }

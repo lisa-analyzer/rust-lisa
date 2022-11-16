@@ -19,9 +19,9 @@ public class RustF64Type implements NumericType, RustType {
 	private static final RustF64Type INSTANCE = new RustF64Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustF64Type getInstance() {
 		return INSTANCE;
@@ -92,6 +92,16 @@ public class RustF64Type implements NumericType, RustType {
 	@Override
 	public String toString() {
 		return "f64";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return true;
 	}
 
 }

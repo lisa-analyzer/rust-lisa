@@ -19,20 +19,11 @@ public class RustF32Type implements NumericType, RustType {
 	private static final RustF32Type INSTANCE = new RustF32Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustF32Type getInstance() {
-		return INSTANCE;
-	}
-
-	/**
-	 * Yields all instances of this type.
-	 * 
-	 * @return the correct instance based on the type mutability
-	 */
-	public static RustF32Type all() {
 		return INSTANCE;
 	}
 
@@ -101,6 +92,16 @@ public class RustF32Type implements NumericType, RustType {
 	@Override
 	public String toString() {
 		return "f32";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return true;
 	}
 
 }

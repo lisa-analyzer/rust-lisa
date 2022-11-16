@@ -155,4 +155,15 @@ public class RustArrayType implements ArrayType, RustType, InMemoryType {
 		return "[" + contentType.toString() + "; " + length.toString() + "]";
 	}
 
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
+	}
+	
 }

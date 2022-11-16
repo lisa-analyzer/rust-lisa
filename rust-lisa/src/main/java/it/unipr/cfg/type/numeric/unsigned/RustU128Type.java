@@ -21,9 +21,9 @@ public class RustU128Type implements NumericType, RustType {
 	private static final RustU128Type INSTANCE = new RustU128Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustU128Type getInstance() {
 		return INSTANCE;
@@ -94,6 +94,16 @@ public class RustU128Type implements NumericType, RustType {
 	@Override
 	public String toString() {
 		return "u128";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return true;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
 	}
 
 }

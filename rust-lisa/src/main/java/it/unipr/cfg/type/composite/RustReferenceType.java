@@ -52,4 +52,15 @@ public class RustReferenceType extends ReferenceType implements RustType {
 		RustReferenceType other = (RustReferenceType) obj;
 		return mutable == other.mutable;
 	}
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
+	}
+	
 }

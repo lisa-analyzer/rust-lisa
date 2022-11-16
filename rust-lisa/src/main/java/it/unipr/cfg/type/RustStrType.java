@@ -18,9 +18,9 @@ public class RustStrType implements StringType, RustType {
 	private static final RustStrType INSTANCE = new RustStrType();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustStrType getInstance() {
 		return INSTANCE;
@@ -61,6 +61,16 @@ public class RustStrType implements StringType, RustType {
 	@Override
 	public String toString() {
 		return "str";
+	}
+
+	@Override
+	public boolean isIntegerType() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatType() {
+		return false;
 	}
 
 }
