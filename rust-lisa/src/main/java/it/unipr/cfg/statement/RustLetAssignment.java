@@ -1,9 +1,5 @@
 package it.unipr.cfg.statement;
 
-import java.util.Collections;
-import java.util.Map.Entry;
-
-import it.unipr.cfg.expression.literal.RustArrayLiteral;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unive.lisa.analysis.AbstractState;
@@ -18,18 +14,13 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
-import it.unive.lisa.program.cfg.statement.Statement;
-import it.unive.lisa.symbolic.ExpressionVisitor;
 import it.unive.lisa.symbolic.SymbolicExpression;
-import it.unive.lisa.symbolic.heap.AccessChild;
-import it.unive.lisa.symbolic.heap.HeapAllocation;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Constant;
-import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.symbolic.value.operator.binary.TypeConv;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeTokenType;
-import it.unive.lisa.type.Untyped;
+import java.util.Collections;
 
 /**
  * Rust assignment expression (e.g., let x = y).
@@ -57,10 +48,13 @@ public class RustLetAssignment extends BinaryExpression {
 	}
 
 	@Override
-	public <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
-			InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
-			SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
-			throws SemanticException {
+	public <A extends AbstractState<A, H, V, T>,
+			H extends HeapDomain<H>,
+			V extends ValueDomain<V>,
+			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
+					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
+					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
+					throws SemanticException {
 
 		// Temporary remove reference to expose the inner right type
 		SymbolicExpression dereferencedRight = right;
@@ -73,21 +67,22 @@ public class RustLetAssignment extends BinaryExpression {
 		// Switch upon the composite types
 		if (dereferencedRight.getStaticType() instanceof RustArrayType
 				&& left.getStaticType() instanceof RustArrayType) {
-			
+
 			Type rightInnerType = ((RustArrayType) dereferencedRight.getStaticType()).getInnerType();
 			int length = ((RustArrayType) dereferencedRight.getStaticType()).getLength();
 			Type leftInnerType = ((RustArrayType) left.getStaticType()).getInnerType();
 
-			// Get the right common superType (in case the inner type is an unconstrained int or unconstrained float
+			// Get the right common superType (in case the inner type is an
+			// unconstrained int or unconstrained float
 			Type correctRightInnerType = leftInnerType.commonSupertype(rightInnerType);
 			Type correctRightType = new RustArrayType(correctRightInnerType, length);
-			
+
 			// Apply a cast to make sure the types now corresponds
 			Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(correctRightType)),
 					correctRightType, right.getCodeLocation());
 
 			dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(correctRightType, dereferencedRight,
-					typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());			
+					typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
 		}
 
 		for (int i = 0; i < referenceNum; ++i)

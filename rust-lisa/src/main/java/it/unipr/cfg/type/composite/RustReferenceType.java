@@ -1,12 +1,11 @@
 package it.unipr.cfg.type.composite;
 
-import java.util.Collections;
-import java.util.Objects;
-
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.Collections;
+import java.util.Objects;
 
 /**
  * Builds the Rust reference type.
@@ -59,16 +58,16 @@ public class RustReferenceType extends ReferenceType implements RustType {
 	public boolean canBeAssignedTo(Type other) {
 		if (other instanceof Untyped)
 			return true;
-		
+
 		if (!(other instanceof RustReferenceType))
 			return false;
-		
+
 		ReferenceType o = (RustReferenceType) other;
-		
+
 		for (Type type : getInnerTypes())
 			if (!(o.getInnerTypes().stream().anyMatch(otherType -> type.canBeAssignedTo(otherType))))
 				return false;
-	
+
 		return true;
 	}
 
@@ -76,16 +75,16 @@ public class RustReferenceType extends ReferenceType implements RustType {
 	public Type commonSupertype(Type other) {
 		if (other instanceof Untyped)
 			return Untyped.INSTANCE;
-		
+
 		if (!(other instanceof RustReferenceType))
 			return Untyped.INSTANCE;
-		
+
 		ReferenceType o = (RustReferenceType) other;
-		
+
 		for (Type type : getInnerTypes())
 			if (!(o.getInnerTypes().stream().anyMatch(otherType -> type.equals(otherType))))
 				return Untyped.INSTANCE;
-		
+
 		return this;
 	}
 }

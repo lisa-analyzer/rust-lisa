@@ -87,7 +87,9 @@ public class RustStructLiteral extends NaryExpression {
 				Collection<Global> globals = RustStructType.get(getStaticType().toString()).getUnit()
 						.getInstanceGlobals(true);
 				boolean present = globals.stream().anyMatch(
-						g -> g.getName().equals(variableName) && (variable.getStaticType().canBeAssignedTo(g.getStaticType()) || g.getStaticType().canBeAssignedTo(variable.getStaticType())));
+						g -> g.getName().equals(variableName)
+								&& (variable.getStaticType().canBeAssignedTo(g.getStaticType())
+										|| g.getStaticType().canBeAssignedTo(variable.getStaticType())));
 				if (present) {
 					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
 							getLocation());

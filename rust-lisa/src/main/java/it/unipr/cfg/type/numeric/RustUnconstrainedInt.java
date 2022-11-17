@@ -9,10 +9,9 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Unique instance of the Rust integer literal type.
- * 
- * This class is mainly used for literal parsing, since the documentation states
- * that a literal could have an unkown type until it is constrained
+ * Unique instance of the Rust integer literal type. This class is mainly used
+ * for literal parsing, since the documentation states that a literal could have
+ * an unkown type until it is constrained.
  *
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
@@ -22,7 +21,7 @@ public class RustUnconstrainedInt implements NumericType, RustType {
 	private static final RustUnconstrainedInt INSTANCE = new RustUnconstrainedInt();
 
 	/**
-	 * Yields the singleton instance
+	 * Yields the singleton instance.
 	 * 
 	 * @return the singleton instance
 	 */

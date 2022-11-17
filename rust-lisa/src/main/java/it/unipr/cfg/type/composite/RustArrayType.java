@@ -94,7 +94,7 @@ public class RustArrayType implements ArrayType, RustType, InMemoryType {
 				return other;
 		return Untyped.INSTANCE;
 	}
-	
+
 	@Override
 	public Set<Type> allInstances(TypeSystem types) {
 		Set<Type> instances = new HashSet<>();
@@ -154,7 +154,12 @@ public class RustArrayType implements ArrayType, RustType, InMemoryType {
 	public String toString() {
 		return "[" + contentType.toString() + "; " + length.toString() + "]";
 	}
-	
+
+	/**
+	 * Yields the length of this array type.
+	 * 
+	 * @return the length of this type
+	 */
 	public Integer getLength() {
 		return length;
 	}

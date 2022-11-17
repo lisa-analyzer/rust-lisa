@@ -2,20 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -73,7 +59,6 @@ import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
-import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.utils.RustAccessResolver;
@@ -114,6 +99,18 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -177,9 +174,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 * Builds a code member visitor for Rust.
 	 * 
 	 * @param filePath file path of the Rust program to be analyzed
-	 * @param program  reference to the LiSA program that it is currently analyzed
+	 * @param program  reference to the LiSA program that it is currently
+	 *                     analyzed
 	 * @param unit     current compilation unit to which code members should be
-	 *                 added
+	 *                     added
 	 */
 	public RustCodeMemberVisitor(String filePath, Program program, CompilationUnit unit) {
 		this.filePath = filePath;
@@ -680,12 +678,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	/**
-	 * Parses the arguments inside a tt block (e.g. a macro call) and returns them.
+	 * Parses the arguments inside a tt block (e.g. a macro call) and returns
+	 * them.
 	 * 
 	 * @param ctx the context to be used
 	 * 
 	 * @return a {@link List} of {@link Expression} that signifies the macro
-	 *         parameters
+	 *             parameters
 	 */
 	private List<Expression> ttParseArguments(ParserRuleContext ctx) {
 		String context = ctx.getText();
@@ -1070,7 +1069,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				// which are the exact ones that are matched here. The remaining
 				// one uses String but it is checked, but because of that is
 				// treated differently and not here
-				RustEnumLiteral<RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
+				RustEnumLiteral<
+						RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
 
 				boolean fieldMatched = ecu.getVariants().stream()
 						.anyMatch(variant -> literalVariant.isInstanceOf(variant));
@@ -1410,12 +1410,14 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression lhs = visitPat(ctx.pat());
 
 			Type type = (ctx.ty() == null ? Untyped.INSTANCE : visitTy(ctx.ty()));
-			// type = type.isInMemoryType() ? new RustReferenceType(type, false) : type;
+			// type = type.isInMemoryType() ? new RustReferenceType(type, false)
+			// : type;
 
 			// TODO do not take into account the attr part for now
 			if (ctx.expr() != null) {
 				Expression rhs = visitExpr(ctx.expr());
-				if (lhs instanceof RustVariableRef && rhs instanceof RustArrayLiteral && type instanceof RustArrayType) {
+				if (lhs instanceof RustVariableRef && rhs instanceof RustArrayLiteral
+						&& type instanceof RustArrayType) {
 					Type innerType = ((RustArrayType) type).getInnerType();
 					((RustArrayLiteral) rhs).setInnerTypeCastTo(innerType);
 				}
@@ -1510,11 +1512,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 					Expression guardAccumulator = arm.getLeft().get(0).get();
 					/*
-					 * A condition inside a match arm can be a '_' (underscore), which is a
-					 * catch-all. Since the grammar parses the underscore with the same rules that
-					 * uses to parse variable identifiers, here we can check the variable type; if
-					 * it is a VariableRef with identifier as "_", then we are sure that this is a
-					 * catch-all. We substitute it with a RustBoolean true.
+					 * A condition inside a match arm can be a '_' (underscore),
+					 * which is a catch-all. Since the grammar parses the
+					 * underscore with the same rules that uses to parse
+					 * variable identifiers, here we can check the variable
+					 * type; if it is a VariableRef with identifier as "_", then
+					 * we are sure that this is a catch-all. We substitute it
+					 * with a RustBoolean true.
 					 */
 					if (!(guardAccumulator instanceof VariableRef
 							&& ((VariableRef) guardAccumulator).getName().equals("_")))
@@ -2053,7 +2057,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 * @param head the post_expr[_no_struct] part
 	 * @param tail the post_expr_tail
 	 * 
-	 * @return the result of parsing the rule post_expr[_no_struct] post_expr_tail
+	 * @return the result of parsing the rule post_expr[_no_struct]
+	 *             post_expr_tail
 	 */
 	private Expression postExprTailParser(ParserRuleContext ctx, Expression head, RustAccessResolver tail) {
 		if (tail instanceof RustArrayAccessKeeper) {

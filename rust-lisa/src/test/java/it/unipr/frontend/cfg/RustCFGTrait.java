@@ -1,11 +1,10 @@
 package it.unipr.frontend.cfg;
 
-import org.junit.Test;
-
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
 import it.unive.lisa.LiSAConfiguration.GraphType;
+import org.junit.Test;
 
 public class RustCFGTrait extends RustLiSATestExecutor {
 

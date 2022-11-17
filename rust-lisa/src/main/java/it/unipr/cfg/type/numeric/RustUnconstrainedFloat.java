@@ -9,20 +9,19 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Unique instance of the Rust integer literal type.
- * 
- * This class is mainly used for literal parsing, since the documentation states
- * that a literal could have an unkown type until it is constrained
+ * Unique instance of the Rust integer literal type. This class is mainly used
+ * for literal parsing, since the documentation states that a literal could have
+ * an unkown type until it is constrained.
  *
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustUnconstrainedFloat implements NumericType, RustType {
-	
+
 	private static final RustUnconstrainedFloat INSTANCE = new RustUnconstrainedFloat();
 
 	/**
-	 * Yields the singleton instance
+	 * Yields the singleton instance.
 	 * 
 	 * @return the singleton instance
 	 */
@@ -38,18 +37,18 @@ public class RustUnconstrainedFloat implements NumericType, RustType {
 		if (other.isUntyped())
 			return true;
 		if (other.isNumericType())
-			if (!((NumericType)other).isIntegral())
+			if (!((NumericType) other).isIntegral())
 				return true;
-		
+
 		return false;
 	}
 
 	@Override
 	public Type commonSupertype(Type other) {
 		if (other.isNumericType())
-			if (!((NumericType)other).isIntegral())
+			if (!((NumericType) other).isIntegral())
 				return other;
-		
+
 		return Untyped.INSTANCE;
 	}
 

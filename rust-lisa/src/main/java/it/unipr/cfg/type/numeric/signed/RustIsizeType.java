@@ -44,7 +44,8 @@ public class RustIsizeType implements NumericType, RustType {
 			return other;
 		else if (other instanceof RustUnconstrainedInt)
 			return this;
-		else return Untyped.INSTANCE;
+		else
+			return Untyped.INSTANCE;
 	}
 
 	@Override
