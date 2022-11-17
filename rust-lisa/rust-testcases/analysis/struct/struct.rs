@@ -6,7 +6,7 @@ struct PointTwo {
 }
 
 impl PointTwo {
-	fn reverse(self) {
+	fn reverse(&mut self) {
 		let a = self.x;
 		
 		self.x = self.y;
@@ -15,11 +15,9 @@ impl PointTwo {
 }
 
 fn main() {
-	let point_one = PointOne {};
-	let point_two = PointTwo { x : 1, y : 2 };
+	let mut point_one = PointOne {};
+	let mut point_two = PointTwo { x : 1, y : 2 };
 	
 	point_two.x = -3;
 	point_two.y += 1;
-	
-	//point_two.call_me();
 }

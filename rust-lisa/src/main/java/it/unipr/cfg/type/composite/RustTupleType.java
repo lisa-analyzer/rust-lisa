@@ -4,6 +4,7 @@ import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.Statement;
+import it.unive.lisa.type.InMemoryType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustTupleType implements RustType, RustEnumVariant {
+public class RustTupleType implements RustType, RustEnumVariant, InMemoryType {
 
 	/**
 	 * Collection of all parse tuples.
@@ -151,15 +152,4 @@ public class RustTupleType implements RustType, RustEnumVariant {
 	public List<Type> getTypes() {
 		return types;
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

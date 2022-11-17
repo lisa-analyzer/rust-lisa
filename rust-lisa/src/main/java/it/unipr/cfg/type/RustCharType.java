@@ -61,15 +61,4 @@ public class RustCharType implements RustType {
 	public String toString() {
 		return "char";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

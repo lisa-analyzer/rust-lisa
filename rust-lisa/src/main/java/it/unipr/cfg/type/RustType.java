@@ -9,7 +9,4 @@ import it.unive.lisa.type.Type;
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public interface RustType extends Type {
-	
-	public boolean isIntegerType();
-	public boolean isFloatType();
 }

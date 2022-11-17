@@ -177,10 +177,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 * Builds a code member visitor for Rust.
 	 * 
 	 * @param filePath file path of the Rust program to be analyzed
-	 * @param program  reference to the LiSA program that it is currently
-	 *                     analyzed
+	 * @param program  reference to the LiSA program that it is currently analyzed
 	 * @param unit     current compilation unit to which code members should be
-	 *                     added
+	 *                 added
 	 */
 	public RustCodeMemberVisitor(String filePath, Program program, CompilationUnit unit) {
 		this.filePath = filePath;
@@ -227,8 +226,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
 		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
-				decorators.getName(),
-				returnType, new Parameter[0]);
+				decorators.getName(), returnType, new Parameter[0]);
 		factory.setDescriptor(cfgDesc);
 
 		RustCFG rustCFG = factory.produce();
@@ -267,8 +265,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		List<Expression> arguments = visitItem_macro_tail(ctx.item_macro_tail());
 
 		return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
-				macroPath.toString() + "!",
-				RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, arguments.toArray(new Expression[0]));
+				macroPath.toString() + "!", RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
+				arguments.toArray(new Expression[0]));
 	}
 
 	@Override
@@ -418,8 +416,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
 		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
-				decorators.getName(),
-				returnType, new Parameter[0]);
+				decorators.getName(), returnType, new Parameter[0]);
 		factory.setDescriptor(cfgDesc);
 
 		RustCFG rustCFG = factory.produce();
@@ -683,13 +680,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	/**
-	 * Parses the arguments inside a tt block (e.g. a macro call) and returns
-	 * them.
+	 * Parses the arguments inside a tt block (e.g. a macro call) and returns them.
 	 * 
 	 * @param ctx the context to be used
 	 * 
 	 * @return a {@link List} of {@link Expression} that signifies the macro
-	 *             parameters
+	 *         parameters
 	 */
 	private List<Expression> ttParseArguments(ParserRuleContext ctx) {
 		String context = ctx.getText();
@@ -1001,17 +997,11 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			if (ctx.getChild(0) != null && ctx.getChild(0).getText().equals("ref"))
 				if (ctx.getChild(1) != null && ctx.getChild(1).getText().equals("mut"))
-					return new RustRefExpression(
-							currentCfg,
-							locationOf(ctx, filePath),
-							new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true),
-							false);
+					return new RustRefExpression(currentCfg, locationOf(ctx, filePath),
+							new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true), false);
 				else
-					return new RustRefExpression(
-							currentCfg,
-							locationOf(ctx, filePath),
-							new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, false),
-							false);
+					return new RustRefExpression(currentCfg, locationOf(ctx, filePath),
+							new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, false), false);
 			else
 				return var;
 		}
@@ -1023,10 +1013,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 				RustStructType struct = RustStructType.lookup(name.toString(), unit);
 
-				return new RustStructLiteral(
-						currentCfg,
-						locationOf(ctx, filePath),
-						struct,
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), struct,
 						values.toArray(new Expression[0]));
 			}
 
@@ -1052,14 +1039,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						RustEnumType enumType = RustEnumType.get(typeName);
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumTupleLiteral(
-									currentCfg,
-									locationOf(ctx, filePath),
-									new RustMultipleExpression(
-											currentCfg,
-											locationOf(ctx, filePath),
-											lhs.toArray(new Expression[0])),
-									variantName,
-									enumType);
+									currentCfg, locationOf(ctx, filePath), new RustMultipleExpression(currentCfg,
+											locationOf(ctx, filePath), lhs.toArray(new Expression[0])),
+									variantName, enumType);
 						}
 					}
 				}
@@ -1072,14 +1054,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumStructLiteral(
-									currentCfg,
-									locationOf(ctx, filePath),
-									new RustMultipleExpression(
-											currentCfg,
-											locationOf(ctx, filePath),
-											lhs.toArray(new Expression[0])),
-									variantName,
-									enumType);
+									currentCfg, locationOf(ctx, filePath), new RustMultipleExpression(currentCfg,
+											locationOf(ctx, filePath), lhs.toArray(new Expression[0])),
+									variantName, enumType);
 						}
 					}
 				}
@@ -1093,8 +1070,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				// which are the exact ones that are matched here. The remaining
 				// one uses String but it is checked, but because of that is
 				// treated differently and not here
-				RustEnumLiteral<
-						RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
+				RustEnumLiteral<RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
 
 				boolean fieldMatched = ecu.getVariants().stream()
 						.anyMatch(variant -> literalVariant.isInstanceOf(variant));
@@ -1109,8 +1085,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				List<Expression> macroTail = visitMacro_tail(ctx.macro_tail());
 
 				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
-						path.toString() + "!",
-						RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, macroTail.toArray(new Expression[0]));
+						path.toString() + "!", RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
+						macroTail.toArray(new Expression[0]));
 
 			}
 
@@ -1145,11 +1121,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			return visitPat_no_mut(ctx.pat_no_mut());
 		case "&&":
 			if (ctx.getChild(1).getText().equals("mut"))
-				return new RustDoubleRefExpression(currentCfg, locationOf(ctx, filePath),
-						visitPat(ctx.pat()), true);
+				return new RustDoubleRefExpression(currentCfg, locationOf(ctx, filePath), visitPat(ctx.pat()), true);
 
-			return new RustDoubleRefExpression(currentCfg, locationOf(ctx, filePath),
-					visitPat_no_mut(ctx.pat_no_mut()), false);
+			return new RustDoubleRefExpression(currentCfg, locationOf(ctx, filePath), visitPat_no_mut(ctx.pat_no_mut()),
+					false);
 		case "box":
 			return new RustBoxExpression(currentCfg, locationOf(ctx, filePath), visitPat(ctx.pat()));
 		default:
@@ -1435,11 +1410,15 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression lhs = visitPat(ctx.pat());
 
 			Type type = (ctx.ty() == null ? Untyped.INSTANCE : visitTy(ctx.ty()));
-			type = type.isInMemoryType() ? new RustReferenceType(type, false) : type;
+			// type = type.isInMemoryType() ? new RustReferenceType(type, false) : type;
 
 			// TODO do not take into account the attr part for now
 			if (ctx.expr() != null) {
 				Expression rhs = visitExpr(ctx.expr());
+				if (lhs instanceof RustVariableRef && rhs instanceof RustArrayLiteral && type instanceof RustArrayType) {
+					Type innerType = ((RustArrayType) type).getInnerType();
+					((RustArrayLiteral) rhs).setInnerTypeCastTo(innerType);
+				}
 
 				VariableRef var;
 				if (lhs instanceof RustVariableRef) {
@@ -1448,8 +1427,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				} else
 					throw new UnsupportedOperationException("Unsupported translation: " + ctx.getText());
 
-				RustLetAssignment assigment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), type, var,
-						rhs);
+				RustLetAssignment assigment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), var, rhs);
 				currentCfg.addNode(assigment);
 
 				return Pair.of(assigment, assigment);
@@ -1499,26 +1477,20 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			}
 
 			for (int i = 0; i < elseIfGuardList.size() - 1; ++i) {
-				currentCfg.addEdge(
-						new FalseEdge(elseIfGuardList.get(i), elseIfGuardList.get(i + 1)));
+				currentCfg.addEdge(new FalseEdge(elseIfGuardList.get(i), elseIfGuardList.get(i + 1)));
 			}
 
 			if (ctx.children.get(ctx.children.size() - 2).getText().equals("else")) {
 				BlockContext elseBlock = ctx.block().get(ctx.block().size() - 1);
 				Pair<Statement, Statement> parsedElseBlock = visitBlock(elseBlock);
 
-				currentCfg.addEdge(new FalseEdge(
-						elseIfGuardList.get(elseIfGuardList.size() - 1),
-						parsedElseBlock.getLeft()));
+				currentCfg.addEdge(
+						new FalseEdge(elseIfGuardList.get(elseIfGuardList.size() - 1), parsedElseBlock.getLeft()));
 
-				currentCfg.addEdge(new SequentialEdge(
-						parsedElseBlock.getRight(),
-						noOp));
+				currentCfg.addEdge(new SequentialEdge(parsedElseBlock.getRight(), noOp));
 
 			} else {
-				currentCfg.addEdge(new FalseEdge(
-						elseIfGuardList.get(elseIfGuardList.size() - 1),
-						noOp));
+				currentCfg.addEdge(new FalseEdge(elseIfGuardList.get(elseIfGuardList.size() - 1), noOp));
 			}
 
 			firstStmt = elseIfGuardList.get(0);
@@ -1538,13 +1510,11 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 					Expression guardAccumulator = arm.getLeft().get(0).get();
 					/*
-					 * A condition inside a match arm can be a '_' (underscore),
-					 * which is a catch-all. Since the grammar parses the
-					 * underscore with the same rules that uses to parse
-					 * variable identifiers, here we can check the variable
-					 * type; if it is a VariableRef with identifier as "_", then
-					 * we are sure that this is a catch-all. We substitute it
-					 * with a RustBoolean true.
+					 * A condition inside a match arm can be a '_' (underscore), which is a
+					 * catch-all. Since the grammar parses the underscore with the same rules that
+					 * uses to parse variable identifiers, here we can check the variable type; if
+					 * it is a VariableRef with identifier as "_", then we are sure that this is a
+					 * catch-all. We substitute it with a RustBoolean true.
 					 */
 					if (!(guardAccumulator instanceof VariableRef
 							&& ((VariableRef) guardAccumulator).getName().equals("_")))
@@ -1558,8 +1528,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 									&& ((VariableRef) guard.get()).getName().equals("_")) {
 								equality = new RustBoolean(currentCfg, locationOf(ctx, filePath), true);
 							} else {
-								equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath),
-										expression, guard.get());
+								equality = new RustEqualExpression(currentCfg, locationOf(ctx, filePath), expression,
+										guard.get());
 							}
 
 							guardAccumulator = new RustOrExpression(currentCfg, locationOf(ctx, filePath),
@@ -1699,17 +1669,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Pair<Statement, Statement> body = visitBlock_with_inner_attrs(ctx.block_with_inner_attrs());
 
 			VariableRef fresh = new RustVariableRef(currentCfg, locationOf(ctx, filePath), "RUSTLISA_FRESH", false);
-			Expression freshAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), Untyped.INSTANCE,
-					fresh,
-					range);
+			Expression freshAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), fresh, range);
 			currentCfg.addNode(freshAssignment);
 
-			UnresolvedCall nextCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath),
-					CallType.INSTANCE, fresh.getName(), "next",
-					RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, new Expression[0]);
+			UnresolvedCall nextCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE,
+					fresh.getName(), "next", RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, new Expression[0]);
 
-			Expression forVarAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), Untyped.INSTANCE,
-					forVariable,
+			Expression forVarAssignment = new RustLetAssignment(currentCfg, locationOf(ctx, filePath), forVariable,
 					nextCall);
 			// TODO Keep in mind that this is also a function
 			// call to pat.next() which
@@ -1894,23 +1860,14 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.fields() != null) {
 				List<Pair<Expression, Expression>> fields = visitFields(ctx.fields());
 
-				return new RustStructLiteral(
-						currentCfg,
-						locationOf(ctx, filePath),
-						structType,
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType,
 						fields.stream()
 								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(),
-										e.getRight().getStaticType(),
-										e.getRight()))
-								.collect(Collectors.toList())
-								.toArray(new Expression[0]));
+										e.getRight().getStaticType(), e.getRight()))
+								.collect(Collectors.toList()).toArray(new Expression[0]));
 
 			} else // Still a struct parsing but with no fields inside
-				return new RustStructLiteral(
-						currentCfg,
-						locationOf(ctx, filePath),
-						structType,
-						new Expression[0]);
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, new Expression[0]);
 		}
 
 		return visitPrim_expr_no_struct(ctx.prim_expr_no_struct());
@@ -1935,12 +1892,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					exprs.add(0, expr);
 
 					return new RustTupleLiteral(
-							currentCfg,
-							locationOf(ctx, filePath),
-							exprs.stream()
-									.map(e -> e.getStaticType())
-									.collect(Collectors.toList())
-									.toArray(new RustType[0]),
+							currentCfg, locationOf(ctx, filePath), exprs.stream().map(e -> e.getStaticType())
+									.collect(Collectors.toList()).toArray(new RustType[0]),
 							exprs.toArray(new Expression[0]));
 				}
 
@@ -1995,8 +1948,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				List<Expression> macroTail = visitMacro_tail(ctx.macro_tail());
 
 				return new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC, "",
-						path.toString() + "!",
-						RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, macroTail.toArray(new Expression[0]));
+						path.toString() + "!", RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
+						macroTail.toArray(new Expression[0]));
 			}
 			return path;
 		}
@@ -2100,8 +2053,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 * @param head the post_expr[_no_struct] part
 	 * @param tail the post_expr_tail
 	 * 
-	 * @return the result of parsing the rule post_expr[_no_struct]
-	 *             post_expr_tail
+	 * @return the result of parsing the rule post_expr[_no_struct] post_expr_tail
 	 */
 	private Expression postExprTailParser(ParserRuleContext ctx, Expression head, RustAccessResolver tail) {
 		if (tail instanceof RustArrayAccessKeeper) {
@@ -2120,8 +2072,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			parameters.addAll(right.getAccessParameter());
 
 			UnresolvedCall methodCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE, "",
-					right.getMethodName(),
-					RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, parameters.toArray(new Expression[0]));
+					right.getMethodName(), RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
+					parameters.toArray(new Expression[0]));
 			return methodCall;
 
 		} else if (tail instanceof RustAttributeAccessKeeper) {
@@ -2136,8 +2088,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					: head.toString());
 
 			UnresolvedCall functionCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.STATIC,
-					receiverName, targetName,
-					RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE, right.getParameters().toArray(new Expression[0]));
+					receiverName, targetName, RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
+					right.getParameters().toArray(new Expression[0]));
 
 			return functionCall;
 		}

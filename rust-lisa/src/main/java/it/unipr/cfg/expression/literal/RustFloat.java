@@ -9,6 +9,7 @@ import it.unive.lisa.program.cfg.statement.literal.Literal;
  * Rust float literal.
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustFloat extends Literal<Float> {
 

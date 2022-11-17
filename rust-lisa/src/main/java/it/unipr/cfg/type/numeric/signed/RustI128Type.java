@@ -1,6 +1,7 @@
 package it.unipr.cfg.type.numeric.signed;
 
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
@@ -43,7 +44,9 @@ public class RustI128Type implements NumericType, RustType {
 		// https://doc.rust-lang.org/rust-by-example/types/cast.html
 		if (other instanceof RustI128Type)
 			return other;
-		return Untyped.INSTANCE;
+		else if (other instanceof RustUnconstrainedInt)
+			return this;
+		else return Untyped.INSTANCE;
 	}
 
 	@Override
@@ -95,15 +98,4 @@ public class RustI128Type implements NumericType, RustType {
 	public String toString() {
 		return "i128";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return true;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

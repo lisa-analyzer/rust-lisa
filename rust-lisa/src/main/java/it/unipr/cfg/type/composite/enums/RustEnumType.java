@@ -181,15 +181,4 @@ public class RustEnumType implements RustType, UnitType {
 	public RustEnumUnit getUnit() {
 		return unit;
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-	
 }

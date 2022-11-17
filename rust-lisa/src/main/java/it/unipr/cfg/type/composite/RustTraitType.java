@@ -169,15 +169,4 @@ public class RustTraitType implements UnitType, RustType {
 	public int hashCode() {
 		return name.hashCode();
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-	
 }

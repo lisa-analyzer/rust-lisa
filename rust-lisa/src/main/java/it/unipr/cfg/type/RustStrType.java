@@ -62,15 +62,4 @@ public class RustStrType implements StringType, RustType {
 	public String toString() {
 		return "str";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

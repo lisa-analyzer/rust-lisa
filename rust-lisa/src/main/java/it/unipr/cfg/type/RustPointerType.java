@@ -138,15 +138,4 @@ public class RustPointerType implements PointerType, RustType {
 	public Set<Type> getInnerTypes() {
 		return Collections.singleton(innerType);
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

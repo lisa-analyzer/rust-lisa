@@ -60,15 +60,4 @@ public class RustBooleanType implements BooleanType, RustType {
 	public String toString() {
 		return "bool";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

@@ -1,12 +1,14 @@
 package it.unipr.cfg.type.numeric.floating;
 
+import java.util.Collections;
+import java.util.Set;
+
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.Untyped;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Unique instance of the Rust f64 type.
@@ -41,7 +43,9 @@ public class RustF64Type implements NumericType, RustType {
 		// https://doc.rust-lang.org/rust-by-example/types/cast.html
 		if (other instanceof RustF64Type)
 			return other;
-		return Untyped.INSTANCE;
+		else if (other instanceof RustUnconstrainedFloat)
+			return this;
+		else return Untyped.INSTANCE;
 	}
 
 	@Override
@@ -93,15 +97,4 @@ public class RustF64Type implements NumericType, RustType {
 	public String toString() {
 		return "f64";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return true;
-	}
-
 }

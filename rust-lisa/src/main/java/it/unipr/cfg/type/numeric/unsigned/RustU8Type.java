@@ -1,6 +1,7 @@
 package it.unipr.cfg.type.numeric.unsigned;
 
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
@@ -41,7 +42,9 @@ public class RustU8Type implements NumericType, RustType {
 		// https://doc.rust-lang.org/rust-by-example/types/cast.html
 		if (other instanceof RustU8Type)
 			return other;
-		return Untyped.INSTANCE;
+		else if (other instanceof RustUnconstrainedInt)
+			return this;
+		else return Untyped.INSTANCE;
 	}
 
 	@Override
@@ -93,15 +96,4 @@ public class RustU8Type implements NumericType, RustType {
 	public String toString() {
 		return "u8";
 	}
-
-	@Override
-	public boolean isIntegerType() {
-		return true;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

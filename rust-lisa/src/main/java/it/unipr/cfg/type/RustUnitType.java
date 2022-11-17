@@ -60,14 +60,4 @@ public class RustUnitType implements RustType {
 		return "()";
 	}
 
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return false;
-	}
-
 }

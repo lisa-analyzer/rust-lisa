@@ -1,7 +1,7 @@
 fn main() {
-	let point_zero = (0, 0);
-	let point_one = (1, 1);
+	let mut point_zero = (0, 0);
+	let mut point_one = (1, 1);
 	
-	point_two.1 = 42;
-	point_one.2 = 5;
+	point_zero.1 = 42 as i32;
+	point_one.0 = 5;
 }

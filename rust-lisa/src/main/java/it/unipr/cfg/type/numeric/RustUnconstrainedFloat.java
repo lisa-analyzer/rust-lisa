@@ -35,15 +35,21 @@ public class RustUnconstrainedFloat implements NumericType, RustType {
 
 	@Override
 	public boolean canBeAssignedTo(Type other) {
-		return other.isUntyped() || (other.isNumericType() && ((RustType) other).isFloatType());
+		if (other.isUntyped())
+			return true;
+		if (other.isNumericType())
+			if (!((NumericType)other).isIntegral())
+				return true;
+		
+		return false;
 	}
 
 	@Override
 	public Type commonSupertype(Type other) {
-		// Rust cast ought to be explicit by design
-		// https://doc.rust-lang.org/rust-by-example/types/cast.html
-		if (other.isNumericType() && !((RustType) other).isFloatType())
-			return other;
+		if (other.isNumericType())
+			if (!((NumericType)other).isIntegral())
+				return other;
+		
 		return Untyped.INSTANCE;
 	}
 
@@ -80,16 +86,6 @@ public class RustUnconstrainedFloat implements NumericType, RustType {
 	@Override
 	public boolean isIntegral() {
 		return false;
-	}
-
-	@Override
-	public boolean isIntegerType() {
-		return false;
-	}
-
-	@Override
-	public boolean isFloatType() {
-		return true;
 	}
 
 	@Override
