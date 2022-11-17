@@ -22,7 +22,6 @@ public class RustArray extends RustLiSATestExecutor {
 						new ValueEnvironment<>(new Interval()),
 						LiSAFactory.getDefaultFor(TypeDomain.class)))
 				.setSerializeResults(true)
-				.setDumpAnalysis(GraphType.DOT)
 				.setJsonOutput(true);
 
 		perform("analysis/array", "array.rs", conf);
