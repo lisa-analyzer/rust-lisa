@@ -66,7 +66,7 @@ public class RustAndExpression extends BinaryExpression {
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
 									left, right, LogicalAnd.INSTANCE, getLocation()), this));
 			}
-		
+
 		return result;
 	}
 

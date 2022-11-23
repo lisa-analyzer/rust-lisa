@@ -2,6 +2,7 @@ package it.unipr.cfg.statement;
 
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -18,6 +19,7 @@ import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Constant;
 import it.unive.lisa.symbolic.value.operator.binary.TypeConv;
+import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeTokenType;
 import java.util.Collections;
@@ -59,9 +61,23 @@ public class RustLetAssignment extends BinaryExpression {
 		// Temporary remove reference to expose the inner right type
 		SymbolicExpression dereferencedRight = right;
 		int referenceNum = 0;
-		while (dereferencedRight.getDynamicType().isReferenceType()) {
+		while (dereferencedRight.getDynamicType().isReferenceType() && dereferencedRight instanceof HeapReference) {
 			dereferencedRight = ((HeapReference) dereferencedRight).getExpression();
 			referenceNum++;
+		}
+
+		if (dereferencedRight.getDynamicType().isNumericType()) {
+			NumericType rightType = (NumericType) dereferencedRight.getDynamicType();
+			if (dereferencedRight.getStaticType() instanceof RustUnconstrainedInt && rightType.isIntegral()) {
+				Type leftType = left.getStaticType();
+
+				// Apply a cast to make sure the types now corresponds
+				Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(leftType)), leftType,
+						right.getCodeLocation());
+
+				dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(leftType, dereferencedRight,
+						typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
+			}
 		}
 
 		// Switch upon the composite types

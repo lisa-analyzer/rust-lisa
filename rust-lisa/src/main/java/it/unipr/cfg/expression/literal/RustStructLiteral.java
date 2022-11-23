@@ -26,6 +26,7 @@ import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -84,7 +85,13 @@ public class RustStructLiteral extends NaryExpression {
 
 				Variable variable = new Variable(assigment.getStaticType(), variableName, getLocation());
 
-				Collection<Global> globals = RustStructType.get(getStaticType().toString()).getUnit()
+				String structName = getStaticType().toString();
+				if (getStaticType().toString().contains("::")) {
+					String[] names = getStaticType().toString().split(Pattern.quote("::"), -1);
+					structName = names[names.length - 1];
+				}
+
+				Collection<Global> globals = RustStructType.get(structName).getUnit()
 						.getInstanceGlobals(true);
 				boolean present = globals.stream().anyMatch(
 						g -> g.getName().equals(variableName)

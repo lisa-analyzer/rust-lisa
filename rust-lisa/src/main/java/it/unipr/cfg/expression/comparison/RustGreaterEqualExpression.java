@@ -56,15 +56,16 @@ public class RustGreaterEqualExpression extends BinaryExpression {
 		for (Type leftType : left.getRuntimeTypes(types))
 			for (Type rightType : right.getRuntimeTypes(types)) {
 				Type correctType = leftType;
-				if (rightType.isNumericType() && ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
+				if (rightType.isNumericType()
+						&& ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
 					correctType = rightType;
-			
+
 				if (leftType.canBeAssignedTo(correctType) && correctType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
 									left, right, ComparisonGe.INSTANCE, getLocation()), this));
 			}
-		
+
 		return result;
 	}
 
