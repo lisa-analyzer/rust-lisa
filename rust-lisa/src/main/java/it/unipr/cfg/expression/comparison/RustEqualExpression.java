@@ -1,6 +1,8 @@
 package it.unipr.cfg.expression.comparison;
 
 import it.unipr.cfg.type.RustBooleanType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -34,30 +36,31 @@ public class RustEqualExpression extends BinaryExpression {
 	 * @param left     the left-hand side of this expression
 	 * @param right    the right-hand side of this expression
 	 */
-	public RustEqualExpression(CFG cfg, CodeLocation location,
-			Expression left, Expression right) {
+	public RustEqualExpression(CFG cfg, CodeLocation location, Expression left, Expression right) {
 		super(cfg, location, "==", RustBooleanType.getInstance(), left, right);
 	}
 
 	@Override
-	public <A extends AbstractState<A, H, V, T>,
-			H extends HeapDomain<H>,
-			V extends ValueDomain<V>,
-			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
-					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
-					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
-					throws SemanticException {
+	public <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
+			InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
+			SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
+			throws SemanticException {
 		AnalysisState<A, H, V, T> result = state.bottom();
 
 		TypeSystem types = getProgram().getTypes();
 
 		for (Type leftType : left.getRuntimeTypes(types))
-			for (Type rightType : right.getRuntimeTypes(types))
-				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+			for (Type rightType : right.getRuntimeTypes(types)) {
+				Type correctType = leftType;
+				if (rightType.isNumericType()
+						&& ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
+					correctType = rightType;
+
+				if (leftType.canBeAssignedTo(correctType) && correctType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
 									left, right, ComparisonEq.INSTANCE, getLocation()), this));
-
+			}
 		return result;
 	}
 

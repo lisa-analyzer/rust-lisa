@@ -1,6 +1,8 @@
 package it.unipr.cfg.expression.comparison;
 
 import it.unipr.cfg.type.RustBooleanType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -52,12 +54,17 @@ public class RustLessExpression extends BinaryExpression {
 		TypeSystem types = getProgram().getTypes();
 
 		for (Type leftType : left.getRuntimeTypes(types))
-			for (Type rightType : right.getRuntimeTypes(types))
-				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+			for (Type rightType : right.getRuntimeTypes(types)) {
+				Type correctType = leftType;
+				if (rightType.isNumericType() && ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
+						correctType = rightType;
+				
+				if (leftType.canBeAssignedTo(correctType) && correctType.canBeAssignedTo(leftType))
 					result = result
-							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(correctType,
 									left, right, ComparisonLt.INSTANCE, getLocation()), this));
-
+			
+			}
 		return result;
 	}
 

@@ -1,6 +1,8 @@
 package it.unipr.cfg.expression.bitwise;
 
 import it.unipr.cfg.RustTyper;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -34,32 +36,34 @@ public class RustRightShiftExpression extends BinaryExpression {
 	 * @param left     the left-hand side of this expression
 	 * @param right    the right-hand side of this expression
 	 */
-	public RustRightShiftExpression(CFG cfg, CodeLocation location,
-			Expression left, Expression right) {
+	public RustRightShiftExpression(CFG cfg, CodeLocation location, Expression left, Expression right) {
 		// TODO: need to change type of this expression
 		// once we have modeled Rust types
 		super(cfg, location, ">>", RustTyper.resultType(left, right), left, right);
 	}
 
 	@Override
-	public <A extends AbstractState<A, H, V, T>,
-			H extends HeapDomain<H>,
-			V extends ValueDomain<V>,
-			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
-					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
-					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
-					throws SemanticException {
+	public <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
+			InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
+			SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
+			throws SemanticException {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
 
 		TypeSystem types = getProgram().getTypes();
 
 		for (Type leftType : left.getRuntimeTypes(types))
-			for (Type rightType : right.getRuntimeTypes(types))
-				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
+			for (Type rightType : right.getRuntimeTypes(types)) {
+				Type correctType = leftType;
+				if (rightType.isNumericType()
+						&& ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
+					correctType = rightType;
+
+				if (leftType.canBeAssignedTo(correctType) && correctType.canBeAssignedTo(leftType))
 					result = result
 							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
 									left, right, BitwiseShiftRight.INSTANCE, getLocation()), this));
+			}
 
 		return result;
 	}

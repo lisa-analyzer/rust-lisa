@@ -34,19 +34,15 @@ public class RustNotEqualExpression extends BinaryExpression {
 	 * @param left     the left-hand side of this expression
 	 * @param right    the right-hand side of this expression
 	 */
-	public RustNotEqualExpression(CFG cfg, CodeLocation location,
-			Expression left, Expression right) {
+	public RustNotEqualExpression(CFG cfg, CodeLocation location, Expression left, Expression right) {
 		super(cfg, location, "!=", RustBooleanType.getInstance(), left, right);
 	}
 
 	@Override
-	public <A extends AbstractState<A, H, V, T>,
-			H extends HeapDomain<H>,
-			V extends ValueDomain<V>,
-			T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
-					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
-					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
-					throws SemanticException {
+	public <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> AnalysisState<A, H, V, T> binarySemantics(
+			InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
+			SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> expressions)
+			throws SemanticException {
 		AnalysisState<A, H, V, T> result = state.bottom();
 
 		TypeSystem types = getProgram().getTypes();
