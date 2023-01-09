@@ -2,6 +2,20 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -99,18 +113,6 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -1008,12 +1010,19 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.pat() != null) {
 			if (ctx.pat_fields() != null) {
 				Expression name = visitPath(ctx.path());
-				List<Expression> values = visitPat_fields(ctx.pat_fields());
-
+				List<Pair<String, Expression>> fields = visitPat_fields(ctx.pat_fields());
+				
+				List<String> fieldNames = new ArrayList<>();
+				List<Expression> fieldValues = new ArrayList<>();
+				for (Pair<String, Expression> field : fields) {
+					fieldNames.add(field.getLeft());
+					fieldValues.add(field.getRight());
+				}
+				
 				RustStructType struct = RustStructType.lookup(name.toString(), unit);
 
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), struct,
-						values.toArray(new Expression[0]));
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), struct, fieldNames.toArray(new String[0]),
+						fieldValues.toArray(new Expression[0]));
 			}
 
 			// The grammar says there is a bug here, skipping
@@ -1047,14 +1056,17 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 				if (ctx.children.get(1).getText().equals("{")) {
 					if (ctx.pat_fields() != null) {
-						List<Expression> lhs = visitPat_fields(ctx.pat_fields());
-
+						List<Pair<String, Expression>> fields = visitPat_fields(ctx.pat_fields());
+						List<String> fieldNames = new ArrayList<>();
+						for (Pair<String, Expression> field : fields)
+							fieldNames.add(field.getLeft());
+						
 						RustEnumType enumType = RustEnumType.get(typeName);
 
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumStructLiteral(
 									currentCfg, locationOf(ctx, filePath), new RustMultipleExpression(currentCfg,
-											locationOf(ctx, filePath), lhs.toArray(new Expression[0])),
+											locationOf(ctx, filePath), fieldNames.toArray(new Expression[0])),
 									variantName, enumType);
 						}
 					}
@@ -1214,11 +1226,11 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public List<Expression> visitPat_fields(Pat_fieldsContext ctx) {
+	public List<Pair<String, Expression>> visitPat_fields(Pat_fieldsContext ctx) {
 		// TODO Skipping ".." first production
 		// TODO Skipping all the terminal symbols in the second production
 
-		List<Expression> result = new ArrayList<>();
+		List<Pair<String, Expression>> result = new ArrayList<>();
 		for (Pat_fieldContext pfCtx : ctx.pat_field()) {
 			result.add(visitPat_field(pfCtx));
 		}
@@ -1227,16 +1239,15 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Expression visitPat_field(Pat_fieldContext ctx) {
+	public Pair<String, Expression> visitPat_field(Pat_fieldContext ctx) {
 		String name = ctx.ident().getText();
 		Expression value = null;
 
 		if (ctx.pat() != null) {
 			value = visitPat(ctx.pat());
-			return new RustAssignment(currentCfg, locationOf(ctx, filePath),
-					new VariableRef(currentCfg, locationOf(ctx, filePath), name), value.getStaticType(), value);
-
+			return Pair.of(name, value);
 		}
+		
 		if (ctx.getChild(3) != null && ctx.getChild(3).getText().equals("mut"))
 			value = new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true);
 		else
@@ -1251,7 +1262,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.getChild(1) != null && ctx.getChild(1).getText().equals("box"))
 			value = new RustBoxExpression(currentCfg, locationOf(ctx, filePath), value);
 
-		return value;
+		return Pair.of(name, value);
 	}
 
 	@Override
@@ -1410,8 +1421,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			Expression lhs = visitPat(ctx.pat());
 
 			Type type = (ctx.ty() == null ? Untyped.INSTANCE : visitTy(ctx.ty()));
-			// type = type.isInMemoryType() ? new RustReferenceType(type, false)
-			// : type;
 
 			// TODO do not take into account the attr part for now
 			if (ctx.expr() != null) {
@@ -1421,6 +1430,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					Type innerType = ((RustArrayType) type).getInnerType();
 					((RustArrayLiteral) rhs).setInnerTypeCastTo(innerType);
 				}
+				
+				if (type.equals(Untyped.INSTANCE) && !rhs.getStaticType().equals(Untyped.INSTANCE))
+					type = rhs.getStaticType();
 
 				VariableRef var;
 				if (lhs instanceof RustVariableRef) {
@@ -1862,16 +1874,19 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			RustStructType structType = RustStructType.lookup(path.toString(), unit);
 
 			if (ctx.fields() != null) {
-				List<Pair<Expression, Expression>> fields = visitFields(ctx.fields());
+				List<Pair<String, Expression>> fields = visitFields(ctx.fields());
 
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType,
-						fields.stream()
-								.map(e -> new RustAssignment(currentCfg, locationOf(ctx, filePath), e.getLeft(),
-										e.getRight().getStaticType(), e.getRight()))
-								.collect(Collectors.toList()).toArray(new Expression[0]));
+				List<String> fieldNames = new ArrayList<>();
+				List<Expression> fieldValues = new ArrayList<>();
+				for (Pair<String, Expression> field : fields) {
+					fieldNames.add(field.getLeft());
+					fieldValues.add(field.getRight());
+				}
+				
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, fieldNames.toArray(new String[] { }), fieldValues.toArray(new Expression[] { }));
 
 			} else // Still a struct parsing but with no fields inside
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, new Expression[0]);
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, new String[] { }, new Expression[] { });
 		}
 
 		return visitPrim_expr_no_struct(ctx.prim_expr_no_struct());
@@ -2016,9 +2031,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public List<Pair<Expression, Expression>> visitFields(FieldsContext ctx) {
+	public List<Pair<String, Expression>> visitFields(FieldsContext ctx) {
 		// TODO Skipping the first production and struct_update_base
-		List<Pair<Expression, Expression>> fields = new ArrayList<>();
+		List<Pair<String, Expression>> fields = new ArrayList<>();
 		for (FieldContext fctx : ctx.field())
 			fields.add(visitField(fctx));
 
@@ -2032,12 +2047,12 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Pair<Expression, Expression> visitField(FieldContext ctx) {
+	public Pair<String, Expression> visitField(FieldContext ctx) {
 		if (ctx.field_name() != null) {
-			return Pair.of(visitField_name(ctx.field_name()), visitExpr(ctx.expr()));
+			return Pair.of(ctx.field_name().getText(), visitExpr(ctx.expr()));
 		} else {
 			Expression expr = visitIdent(ctx.ident());
-			return Pair.of(expr, expr);
+			return Pair.of(expr.toString(), expr);
 		}
 	}
 
@@ -2084,7 +2099,6 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		} else if (tail instanceof RustAttributeAccessKeeper) {
 			RustAttributeAccessKeeper right = (RustAttributeAccessKeeper) tail;
 			return new RustAccessMemberExpression(currentCfg, locationOf(ctx, filePath), head, right.getExpr());
-
 		} else {
 			RustFunctionCallKeeper right = (RustFunctionCallKeeper) tail;
 
