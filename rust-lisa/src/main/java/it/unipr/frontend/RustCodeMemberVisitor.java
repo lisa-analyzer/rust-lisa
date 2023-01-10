@@ -1057,16 +1057,20 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				if (ctx.children.get(1).getText().equals("{")) {
 					if (ctx.pat_fields() != null) {
 						List<Pair<String, Expression>> fields = visitPat_fields(ctx.pat_fields());
+						
 						List<String> fieldNames = new ArrayList<>();
-						for (Pair<String, Expression> field : fields)
+						List<Expression> fieldValues = new ArrayList<>();
+						for (Pair<String, Expression> field : fields) {
 							fieldNames.add(field.getLeft());
+							fieldValues.add(field.getRight());
+						}
 						
 						RustEnumType enumType = RustEnumType.get(typeName);
 
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumStructLiteral(
-									currentCfg, locationOf(ctx, filePath), new RustMultipleExpression(currentCfg,
-											locationOf(ctx, filePath), fieldNames.toArray(new Expression[0])),
+									currentCfg, locationOf(ctx, filePath), fieldNames.toArray(new String[0]), new RustMultipleExpression(currentCfg,
+											locationOf(ctx, filePath), fieldValues.toArray(new Expression[0])),
 									variantName, enumType);
 						}
 					}
