@@ -1,12 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unive.lisa.analysis.AbstractState;
@@ -23,7 +16,6 @@ import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
-import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.AccessChild;
 import it.unive.lisa.symbolic.heap.HeapAllocation;
@@ -31,6 +23,11 @@ import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Rust struct literal.
@@ -41,16 +38,18 @@ import it.unive.lisa.type.Type;
 public class RustStructLiteral extends NaryExpression {
 
 	private String[] keys;
-	
+
 	/**
 	 * Build the tuple literal.
 	 * 
 	 * @param cfg      the {@link CFG} where this literal lies
 	 * @param location the location where this literal is defined
 	 * @param struct   the struct type of this literal
+	 * @param keys     the keys used to identify fields of this struct literal
 	 * @param values   the values inside the literal
 	 */
-	public RustStructLiteral(CFG cfg, CodeLocation location, RustStructType struct, String[] keys, Expression[] values) {
+	public RustStructLiteral(CFG cfg, CodeLocation location, RustStructType struct, String[] keys,
+			Expression[] values) {
 		super(cfg, location, struct.toString(), struct, values);
 		this.keys = keys;
 	}
@@ -70,13 +69,13 @@ public class RustStructLiteral extends NaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		
+
 		String structName = getStaticType().toString();
 		if (getStaticType().toString().contains("::")) {
 			String[] names = getStaticType().toString().split(Pattern.quote("::"), -1);
 			structName = names[names.length - 1];
 		}
-		
+
 		Collection<Global> globals = RustStructType.get(structName).getUnit().getInstanceGlobals(true);
 
 		HeapAllocation allocation = new HeapAllocation(getStaticType(), getLocation());
@@ -91,20 +90,21 @@ public class RustStructLiteral extends NaryExpression {
 			HeapDereference deref = new HeapDereference(getStaticType(), ref, getLocation());
 
 			AnalysisState<A, H, V, T> startingState = allocationState;
-			
+
 			for (int i = 0; i < this.keys.length; ++i) {
 				Expression expression = getSubExpressions()[i];
 				Type expressionType = expression.getStaticType();
 				String key = this.keys[i];
-							
+
 				Optional<Global> optionalGlobal = globals.stream().filter(
 						g -> key.equals(g.getName())
 								&& (expressionType.canBeAssignedTo(g.getStaticType())
-										|| g.getStaticType().canBeAssignedTo(expressionType))).findFirst();
+										|| g.getStaticType().canBeAssignedTo(expressionType)))
+						.findFirst();
 				if (optionalGlobal.isPresent()) {
 					Global accessedGlobal = optionalGlobal.get();
 					Variable variable = accessedGlobal.toSymbolicVariable(getLocation());
-					
+
 					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
 							getLocation());
 
@@ -120,7 +120,7 @@ public class RustStructLiteral extends NaryExpression {
 					throw new IllegalAccessError("The field " + key + " in struct "
 							+ RustStructType.get(getStaticType().toString()) + " does not exists");
 			}
-			
+
 			result = result.lub(startingState.smallStepSemantics(ref, this));
 		}
 

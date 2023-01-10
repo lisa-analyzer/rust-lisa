@@ -1,10 +1,5 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
@@ -12,6 +7,10 @@ import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Rust enum struct literal.
@@ -29,14 +28,15 @@ public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpressio
 	 * 
 	 * @param cfg         the {@link CFG} where this literal lies
 	 * @param location    the location where this literal is defined
-	 * @param names		  the names of the field in this struct
+	 * @param names       the names of the field in this struct
 	 * @param expressions the values to be used inside the literal. During
 	 *                        destructuring they can be variables, in (almost)
 	 *                        any other case they can be other literals
 	 * @param variantName the name of this variant
 	 * @param enumType    the enum type of this literal
 	 */
-	public RustEnumStructLiteral(CFG cfg, CodeLocation location, String[] names, RustMultipleExpression expressions, String variantName,
+	public RustEnumStructLiteral(CFG cfg, CodeLocation location, String[] names, RustMultipleExpression expressions,
+			String variantName,
 			RustEnumType enumType) {
 		super(cfg, location, expressions, enumType);
 		this.names = names;
@@ -55,7 +55,7 @@ public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpressio
 
 			Set<String> globalSet = structUnit.getInstanceGlobals(false).stream().map(g -> g.getName())
 					.collect(Collectors.toSet());
-			
+
 			return globalSet.equals(new HashSet<String>(Arrays.asList(names)));
 		}
 		return false;

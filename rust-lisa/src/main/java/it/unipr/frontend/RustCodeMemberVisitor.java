@@ -2,20 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -113,6 +99,18 @@ import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -1011,17 +1009,18 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.pat_fields() != null) {
 				Expression name = visitPath(ctx.path());
 				List<Pair<String, Expression>> fields = visitPat_fields(ctx.pat_fields());
-				
+
 				List<String> fieldNames = new ArrayList<>();
 				List<Expression> fieldValues = new ArrayList<>();
 				for (Pair<String, Expression> field : fields) {
 					fieldNames.add(field.getLeft());
 					fieldValues.add(field.getRight());
 				}
-				
+
 				RustStructType struct = RustStructType.lookup(name.toString(), unit);
 
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), struct, fieldNames.toArray(new String[0]),
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), struct,
+						fieldNames.toArray(new String[0]),
 						fieldValues.toArray(new Expression[0]));
 			}
 
@@ -1057,19 +1056,20 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				if (ctx.children.get(1).getText().equals("{")) {
 					if (ctx.pat_fields() != null) {
 						List<Pair<String, Expression>> fields = visitPat_fields(ctx.pat_fields());
-						
+
 						List<String> fieldNames = new ArrayList<>();
 						List<Expression> fieldValues = new ArrayList<>();
 						for (Pair<String, Expression> field : fields) {
 							fieldNames.add(field.getLeft());
 							fieldValues.add(field.getRight());
 						}
-						
+
 						RustEnumType enumType = RustEnumType.get(typeName);
 
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumStructLiteral(
-									currentCfg, locationOf(ctx, filePath), fieldNames.toArray(new String[0]), new RustMultipleExpression(currentCfg,
+									currentCfg, locationOf(ctx, filePath), fieldNames.toArray(new String[0]),
+									new RustMultipleExpression(currentCfg,
 											locationOf(ctx, filePath), fieldValues.toArray(new Expression[0])),
 									variantName, enumType);
 						}
@@ -1251,7 +1251,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			value = visitPat(ctx.pat());
 			return Pair.of(name, value);
 		}
-		
+
 		if (ctx.getChild(3) != null && ctx.getChild(3).getText().equals("mut"))
 			value = new RustVariableRef(currentCfg, locationOf(ctx, filePath), name, true);
 		else
@@ -1434,7 +1434,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					Type innerType = ((RustArrayType) type).getInnerType();
 					((RustArrayLiteral) rhs).setInnerTypeCastTo(innerType);
 				}
-				
+
 				if (type.equals(Untyped.INSTANCE) && !rhs.getStaticType().equals(Untyped.INSTANCE))
 					type = rhs.getStaticType();
 
@@ -1886,11 +1886,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 					fieldNames.add(field.getLeft());
 					fieldValues.add(field.getRight());
 				}
-				
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, fieldNames.toArray(new String[] { }), fieldValues.toArray(new Expression[] { }));
+
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType,
+						fieldNames.toArray(new String[] {}), fieldValues.toArray(new Expression[] {}));
 
 			} else // Still a struct parsing but with no fields inside
-				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, new String[] { }, new Expression[] { });
+				return new RustStructLiteral(currentCfg, locationOf(ctx, filePath), structType, new String[] {},
+						new Expression[] {});
 		}
 
 		return visitPrim_expr_no_struct(ctx.prim_expr_no_struct());
