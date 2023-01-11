@@ -41,8 +41,8 @@ dependencies {
     
     antlr 'org.antlr:antlr4:4.8-1'
     
-    implementation 'io.github.lisa-analyzer:lisa-sdk:0.1b6'
-	implementation 'io.github.lisa-analyzer:lisa-core:0.1b6'
+    implementation 'io.github.lisa-analyzer:lisa-sdk:0.1b7'
+	implementation 'io.github.lisa-analyzer:lisa-core:0.1b7'
 }
 
 generateGrammarSource {

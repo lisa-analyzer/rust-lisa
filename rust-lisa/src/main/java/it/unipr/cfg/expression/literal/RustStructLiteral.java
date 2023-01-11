@@ -98,8 +98,7 @@ public class RustStructLiteral extends NaryExpression {
 
 				Optional<Global> optionalGlobal = globals.stream().filter(
 						g -> key.equals(g.getName())
-								&& (expressionType.canBeAssignedTo(g.getStaticType())
-										|| g.getStaticType().canBeAssignedTo(expressionType)))
+								&& (expressionType.equals(g.getStaticType())))
 						.findFirst();
 				if (optionalGlobal.isPresent()) {
 					Global accessedGlobal = optionalGlobal.get();

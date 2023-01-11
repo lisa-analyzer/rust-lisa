@@ -1,11 +1,11 @@
 package it.unipr.cfg.type.composite;
 
+import java.util.Objects;
+
 import it.unipr.cfg.type.RustType;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.Collections;
-import java.util.Objects;
 
 /**
  * Builds the Rust reference type.
@@ -25,13 +25,13 @@ public class RustReferenceType extends ReferenceType implements RustType {
 	 * @param mutable   the mutability of the reference
 	 */
 	public RustReferenceType(Type innerType, boolean mutable) {
-		super(Collections.singleton(innerType));
+		super(innerType);
 		this.mutable = mutable;
 	}
 
 	@Override
 	public String toString() {
-		return "&" + (mutable ? "mut" : "") + getInnerTypes();
+		return "&" + (mutable ? "mut" : "") + getInnerType();
 	}
 
 	@Override
@@ -64,11 +64,8 @@ public class RustReferenceType extends ReferenceType implements RustType {
 
 		ReferenceType o = (RustReferenceType) other;
 
-		for (Type type : getInnerTypes())
-			if (!(o.getInnerTypes().stream().anyMatch(otherType -> type.canBeAssignedTo(otherType))))
-				return false;
-
-		return true;
+		//TODO: equals or canBeAssigned?
+		return getInnerType().equals(o.getInnerType());	
 	}
 
 	@Override
@@ -81,10 +78,6 @@ public class RustReferenceType extends ReferenceType implements RustType {
 
 		ReferenceType o = (RustReferenceType) other;
 
-		for (Type type : getInnerTypes())
-			if (!(o.getInnerTypes().stream().anyMatch(otherType -> type.equals(otherType))))
-				return Untyped.INSTANCE;
-
-		return this;
+		return getInnerType().equals(o.getInnerType()) ? this : Untyped.INSTANCE;
 	}
 }

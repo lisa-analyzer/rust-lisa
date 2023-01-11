@@ -58,53 +58,53 @@ public class RustLetAssignment extends BinaryExpression {
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
 					throws SemanticException {
 
-		// Temporary remove reference to expose the inner right type
-		SymbolicExpression dereferencedRight = right;
-		int referenceNum = 0;
-		while (dereferencedRight.getDynamicType().isReferenceType() && dereferencedRight instanceof HeapReference) {
-			dereferencedRight = ((HeapReference) dereferencedRight).getExpression();
-			referenceNum++;
-		}
+//		// Temporary remove reference to expose the inner right type
+//		SymbolicExpression dereferencedRight = right;
+//		int referenceNum = 0;
+//		while (dereferencedRight.getDynamicType().isReferenceType() && dereferencedRight instanceof HeapReference) {
+//			dereferencedRight = ((HeapReference) dereferencedRight).getExpression();
+//			referenceNum++;
+//		}
+//
+//		if (dereferencedRight.getDynamicType().isNumericType()) {
+//			NumericType rightType = (NumericType) dereferencedRight.getDynamicType();
+//			if (dereferencedRight.getStaticType() instanceof RustUnconstrainedInt && rightType.isIntegral()) {
+//				Type leftType = left.getStaticType();
+//
+//				// Apply a cast to make sure the types now corresponds
+//				Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(leftType)), leftType,
+//						right.getCodeLocation());
+//
+//				dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(leftType, dereferencedRight,
+//						typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
+//			}
+//		}
+//
+//		// Switch upon the composite types
+//		if (dereferencedRight.getStaticType() instanceof RustArrayType
+//				&& left.getStaticType() instanceof RustArrayType) {
+//
+//			Type rightInnerType = ((RustArrayType) dereferencedRight.getStaticType()).getInnerType();
+//			int length = ((RustArrayType) dereferencedRight.getStaticType()).getLength();
+//			Type leftInnerType = ((RustArrayType) left.getStaticType()).getInnerType();
+//
+//			// Get the right common superType (in case the inner type is an
+//			// unconstrained int or unconstrained float
+//			Type correctRightInnerType = leftInnerType.commonSupertype(rightInnerType);
+//			Type correctRightType = new RustArrayType(correctRightInnerType, length);
+//
+//			// Apply a cast to make sure the types now corresponds
+//			Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(correctRightType)),
+//					correctRightType, right.getCodeLocation());
+//
+//			dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(correctRightType, dereferencedRight,
+//					typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
+//		}
+//
+//		for (int i = 0; i < referenceNum; ++i)
+//			dereferencedRight = new HeapReference(dereferencedRight.getStaticType(), dereferencedRight,
+//					right.getCodeLocation());
 
-		if (dereferencedRight.getDynamicType().isNumericType()) {
-			NumericType rightType = (NumericType) dereferencedRight.getDynamicType();
-			if (dereferencedRight.getStaticType() instanceof RustUnconstrainedInt && rightType.isIntegral()) {
-				Type leftType = left.getStaticType();
-
-				// Apply a cast to make sure the types now corresponds
-				Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(leftType)), leftType,
-						right.getCodeLocation());
-
-				dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(leftType, dereferencedRight,
-						typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
-			}
-		}
-
-		// Switch upon the composite types
-		if (dereferencedRight.getStaticType() instanceof RustArrayType
-				&& left.getStaticType() instanceof RustArrayType) {
-
-			Type rightInnerType = ((RustArrayType) dereferencedRight.getStaticType()).getInnerType();
-			int length = ((RustArrayType) dereferencedRight.getStaticType()).getLength();
-			Type leftInnerType = ((RustArrayType) left.getStaticType()).getInnerType();
-
-			// Get the right common superType (in case the inner type is an
-			// unconstrained int or unconstrained float
-			Type correctRightInnerType = leftInnerType.commonSupertype(rightInnerType);
-			Type correctRightType = new RustArrayType(correctRightInnerType, length);
-
-			// Apply a cast to make sure the types now corresponds
-			Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(correctRightType)),
-					correctRightType, right.getCodeLocation());
-
-			dereferencedRight = new it.unive.lisa.symbolic.value.BinaryExpression(correctRightType, dereferencedRight,
-					typeCast, TypeConv.INSTANCE, dereferencedRight.getCodeLocation());
-		}
-
-		for (int i = 0; i < referenceNum; ++i)
-			dereferencedRight = new HeapReference(dereferencedRight.getStaticType(), dereferencedRight,
-					right.getCodeLocation());
-
-		return state.assign(left, dereferencedRight, this);
+		return state.assign(left, right, this);
 	}
 }

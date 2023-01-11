@@ -34,14 +34,14 @@ public class RustLiSA {
 		Program program = RustFrontend.processFile(args[0]);
 
 		LiSAConfiguration conf = new LiSAConfiguration();
-		conf.setAbstractState(new SimpleAbstractState<>(
+		conf.abstractState  = new SimpleAbstractState<>(
 				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
-				LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setJsonOutput(true)
-				.setSerializeResults(true)
-				.setDumpAnalysis(GraphType.HTML)
-				.setWorkdir("output");
+				LiSAFactory.getDefaultFor(TypeDomain.class));
+		conf.serializeResults = true;
+		conf.analysisGraphs = GraphType.HTML;
+		conf.workdir = "output";
+		conf.jsonOutput = true;
 
 		LiSA lisa = new LiSA(conf);
 		lisa.run(program);
