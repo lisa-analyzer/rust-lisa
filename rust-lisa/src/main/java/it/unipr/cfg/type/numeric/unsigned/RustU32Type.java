@@ -1,6 +1,7 @@
 package it.unipr.cfg.type.numeric.unsigned;
 
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
@@ -19,9 +20,9 @@ public class RustU32Type implements NumericType, RustType {
 	private static final RustU32Type INSTANCE = new RustU32Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustU32Type getInstance() {
 		return INSTANCE;
@@ -41,7 +42,10 @@ public class RustU32Type implements NumericType, RustType {
 		// https://doc.rust-lang.org/rust-by-example/types/cast.html
 		if (other instanceof RustU32Type)
 			return other;
-		return Untyped.INSTANCE;
+		else if (other instanceof RustUnconstrainedInt)
+			return this;
+		else
+			return Untyped.INSTANCE;
 	}
 
 	@Override
@@ -93,5 +97,4 @@ public class RustU32Type implements NumericType, RustType {
 	public String toString() {
 		return "u32";
 	}
-
 }

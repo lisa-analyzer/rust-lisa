@@ -17,9 +17,9 @@ public class RustUnitType implements RustType {
 	private static final RustUnitType INSTANCE = new RustUnitType();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustUnitType getInstance() {
 		return INSTANCE;

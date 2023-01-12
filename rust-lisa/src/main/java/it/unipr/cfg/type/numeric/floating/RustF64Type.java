@@ -1,6 +1,7 @@
 package it.unipr.cfg.type.numeric.floating;
 
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
@@ -19,9 +20,9 @@ public class RustF64Type implements NumericType, RustType {
 	private static final RustF64Type INSTANCE = new RustF64Type();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustF64Type getInstance() {
 		return INSTANCE;
@@ -41,7 +42,10 @@ public class RustF64Type implements NumericType, RustType {
 		// https://doc.rust-lang.org/rust-by-example/types/cast.html
 		if (other instanceof RustF64Type)
 			return other;
-		return Untyped.INSTANCE;
+		else if (other instanceof RustUnconstrainedFloat)
+			return this;
+		else
+			return Untyped.INSTANCE;
 	}
 
 	@Override
@@ -93,5 +97,4 @@ public class RustF64Type implements NumericType, RustType {
 	public String toString() {
 		return "f64";
 	}
-
 }

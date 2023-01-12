@@ -135,8 +135,7 @@ public class RustPointerType implements PointerType, RustType {
 	}
 
 	@Override
-	public Set<Type> getInnerTypes() {
-		return Collections.singleton(innerType);
+	public Type getInnerType() {
+		return innerType;
 	}
-
 }

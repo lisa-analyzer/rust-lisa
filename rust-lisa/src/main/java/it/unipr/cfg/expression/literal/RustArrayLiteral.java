@@ -1,5 +1,9 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+
+import it.unipr.cfg.RustTyper;
+import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -14,8 +18,13 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.AccessChild;
+import it.unive.lisa.symbolic.heap.HeapDereference;
+import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
+import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
-import java.util.Arrays;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Rust array literal.
@@ -24,6 +33,8 @@ import java.util.Arrays;
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustArrayLiteral extends NaryExpression {
+
+	private Type innerTypeCastTo;
 
 	/**
 	 * Build the array literal.
@@ -35,6 +46,7 @@ public class RustArrayLiteral extends NaryExpression {
 	 */
 	public RustArrayLiteral(CFG cfg, CodeLocation location, Type staticType, Expression... values) {
 		super(cfg, location, "[]", staticType, values);
+		innerTypeCastTo = staticType;
 	}
 
 	@Override
@@ -50,8 +62,47 @@ public class RustArrayLiteral extends NaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation(), true);
+		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
+
+		ExpressionSet<SymbolicExpression> containerExprs = allocationState.getComputedExpressions();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+		for (SymbolicExpression container : containerExprs) {
+			HeapReference ref = new HeapReference(new RustReferenceType(getStaticType(), false), container,
+					getLocation());
+			HeapDereference deref = new HeapDereference(getStaticType(), ref, getLocation());
+
+			AnalysisState<A, H, V, T> startingState = allocationState;
+			for (int i = 0; i < getSubExpressions().length; ++i) {
+				Variable variable = new Variable(Untyped.INSTANCE, i + "", getLocation());
+				AccessChild child = new AccessChild(getSubExpressions()[0].getStaticType(), deref, variable,
+						getLocation());
+
+				AnalysisState<A, H, V, T> tmp = result.bottom();
+
+				AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
+				for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions())
+					for (SymbolicExpression exprParam : params[i])
+						tmp = tmp.lub(startingState.assign(childIdentifier, RustTyper.type(exprParam, innerTypeCastTo),
+								this));
+
+				startingState = tmp;
+			}
+
+			result = result.lub(startingState.smallStepSemantics(ref, this));
+		}
+
+		return result;
 	}
 
+	/**
+	 * Sets the type to which cast the inner type to.
+	 * 
+	 * @param innerTypeCastTo the type to cast to
+	 */
+	public void setInnerTypeCastTo(Type innerTypeCastTo) {
+		this.innerTypeCastTo = innerTypeCastTo;
+	}
 }

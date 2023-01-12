@@ -1,6 +1,7 @@
 package it.unipr.cfg.expression.literal;
 
 import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -16,6 +17,12 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.AccessChild;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
+import it.unive.lisa.symbolic.heap.HeapDereference;
+import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.value.Variable;
+import it.unive.lisa.type.Type;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -54,8 +61,43 @@ public class RustTupleLiteral extends NaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation());
+		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
+
+		ExpressionSet<SymbolicExpression> containerExprs = allocationState.getComputedExpressions();
+
+		AnalysisState<A, H, V, T> result = state.bottom();
+		for (SymbolicExpression container : containerExprs) {
+			HeapReference ref = new HeapReference(new RustReferenceType(getStaticType(), false), container,
+					getLocation());
+			HeapDereference deref = new HeapDereference(getStaticType(), ref, getLocation());
+
+			AnalysisState<A, H, V, T> startingState = allocationState;
+			for (int i = 0; i < getSubExpressions().length; ++i) {
+				Type tupleComponentType = ((RustTupleType) getStaticType()).getTypes().get(i);
+
+				if (tupleComponentType.canBeAssignedTo(getSubExpressions()[i].getStaticType())) {
+					Variable variable = new Variable(tupleComponentType, i + "", getLocation());
+					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
+							getLocation());
+					AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
+					
+					AnalysisState<A, H, V, T> tmp = state.bottom();
+					for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions())
+						for (SymbolicExpression exprParam : params[i])
+							tmp = tmp.lub(startingState.assign(childIdentifier, exprParam, this));
+
+					startingState = tmp;
+				} else
+					throw new IllegalAccessError(
+							"Element " + i + " of the tuple " + getStaticType() + " cannot be found");
+			}
+
+			result = result.lub(startingState.smallStepSemantics(ref, this));
+		}
+
+		return result;
 	}
 
 }

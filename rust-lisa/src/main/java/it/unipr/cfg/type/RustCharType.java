@@ -17,9 +17,9 @@ public class RustCharType implements RustType {
 	private static final RustCharType INSTANCE = new RustCharType();
 
 	/**
-	 * Yields the singleton instance based on mutability.
+	 * Yields the singleton instance.
 	 * 
-	 * @return the correct instance based on the type mutability
+	 * @return the singleton instance
 	 */
 	public static RustCharType getInstance() {
 		return INSTANCE;
@@ -61,5 +61,4 @@ public class RustCharType implements RustType {
 	public String toString() {
 		return "char";
 	}
-
 }

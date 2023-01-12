@@ -1,6 +1,6 @@
 package it.unipr.cfg.expression.literal;
 
-import it.unipr.cfg.type.numeric.floating.RustF64Type;
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.literal.Literal;
@@ -9,6 +9,7 @@ import it.unive.lisa.program.cfg.statement.literal.Literal;
  * Rust float literal.
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
+ * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public class RustFloat extends Literal<Float> {
 
@@ -20,6 +21,6 @@ public class RustFloat extends Literal<Float> {
 	 * @param value    the float value
 	 */
 	public RustFloat(CFG cfg, CodeLocation location, Float value) {
-		super(cfg, location, value, RustF64Type.getInstance());
+		super(cfg, location, value, RustUnconstrainedFloat.getInstance());
 	}
 }

@@ -34,8 +34,7 @@ public class RustNotEqualExpression extends BinaryExpression {
 	 * @param left     the left-hand side of this expression
 	 * @param right    the right-hand side of this expression
 	 */
-	public RustNotEqualExpression(CFG cfg, CodeLocation location,
-			Expression left, Expression right) {
+	public RustNotEqualExpression(CFG cfg, CodeLocation location, Expression left, Expression right) {
 		super(cfg, location, "!=", RustBooleanType.getInstance(), left, right);
 	}
 

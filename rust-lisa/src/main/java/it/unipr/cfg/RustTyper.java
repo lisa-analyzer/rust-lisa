@@ -1,8 +1,17 @@
 package it.unipr.cfg;
 
+import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
+import it.unipr.cfg.type.numeric.signed.RustI32Type;
 import it.unive.lisa.program.cfg.statement.Expression;
+import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.BinaryExpression;
+import it.unive.lisa.symbolic.value.Constant;
+import it.unive.lisa.symbolic.value.operator.binary.TypeConv;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeTokenType;
 import it.unive.lisa.type.Untyped;
+import java.util.Collections;
 
 /**
  * Used to statically infer the type of a expression given the types of the
@@ -42,5 +51,29 @@ public class RustTyper {
 			return Untyped.INSTANCE;
 
 		return expr.getStaticType();
+	}
+
+	/**
+	 * Types an expression: if it is unconstrained (int or float), then this
+	 * method returns it as correctly typed.
+	 * 
+	 * @param symbolicExpression the expression to type
+	 * @param type               the type to cast to
+	 * 
+	 * @return the typed expression
+	 */
+	public static SymbolicExpression type(SymbolicExpression symbolicExpression, Type type) {
+		if (symbolicExpression.getDynamicType() instanceof RustUnconstrainedInt
+				|| symbolicExpression.getDynamicType() instanceof RustUnconstrainedFloat) {
+
+			Type correctType = type.commonSupertype(symbolicExpression.getDynamicType());
+			Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(correctType)), correctType,
+					symbolicExpression.getCodeLocation());
+
+			return new BinaryExpression(RustI32Type.getInstance(), symbolicExpression, typeCast, TypeConv.INSTANCE,
+					symbolicExpression.getCodeLocation());
+
+		} else
+			return symbolicExpression;
 	}
 }
