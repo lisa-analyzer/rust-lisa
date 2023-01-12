@@ -18,7 +18,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.AccessChild;
-import it.unive.lisa.symbolic.heap.HeapAllocation;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.Variable;
@@ -78,7 +78,7 @@ public class RustStructLiteral extends NaryExpression {
 
 		Collection<Global> globals = RustStructType.get(structName).getUnit().getInstanceGlobals(true);
 
-		HeapAllocation allocation = new HeapAllocation(getStaticType(), getLocation());
+		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation(), true);
 		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
 
 		ExpressionSet<SymbolicExpression> containers = allocationState.getComputedExpressions();
@@ -86,7 +86,7 @@ public class RustStructLiteral extends NaryExpression {
 		AnalysisState<A, H, V, T> result = state.bottom();
 		for (SymbolicExpression container : containers) {
 			HeapReference ref = new HeapReference(new RustReferenceType(getStaticType(), false), container,
-					getLocation()); // TODO: check if taking the ref is useful
+					getLocation());
 			HeapDereference deref = new HeapDereference(getStaticType(), ref, getLocation());
 
 			AnalysisState<A, H, V, T> startingState = allocationState;
@@ -98,7 +98,8 @@ public class RustStructLiteral extends NaryExpression {
 
 				Optional<Global> optionalGlobal = globals.stream().filter(
 						g -> key.equals(g.getName())
-								&& (expressionType.equals(g.getStaticType())))
+								&& (expressionType.canBeAssignedTo(g.getStaticType())
+										|| g.getStaticType().canBeAssignedTo(expressionType)))
 						.findFirst();
 				if (optionalGlobal.isPresent()) {
 					Global accessedGlobal = optionalGlobal.get();
@@ -108,7 +109,7 @@ public class RustStructLiteral extends NaryExpression {
 							getLocation());
 
 					AnalysisState<A, H, V, T> tmp = result.bottom();
-
+ 
 					AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
 					for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions())
 						for (SymbolicExpression exprParam : params[i])

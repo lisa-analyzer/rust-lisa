@@ -3,7 +3,6 @@ package it.unipr.frontend.analysis;
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
-import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.LiSAFactory;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
@@ -16,14 +15,13 @@ public class RustStruct extends RustLiSATestExecutor {
 
 	@Test
 	public void testStruct() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration()
-				.setAbstractState(new SimpleAbstractState<>(
-						new PointBasedHeap(),
-						new ValueEnvironment<>(new Interval()),
-						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setSerializeResults(true)
-				.setJsonOutput(true)
-				.setDumpAnalysis(GraphType.DOT);
+		LiSAConfiguration conf = new LiSAConfiguration();
+		conf.abstractState = new SimpleAbstractState<>(
+				new PointBasedHeap(),
+				new ValueEnvironment<>(new Interval()),
+				LiSAFactory.getDefaultFor(TypeDomain.class));
+		conf.serializeResults = true;
+		conf.jsonOutput = true;
 
 		perform("analysis/struct", "struct.rs", conf);
 	}

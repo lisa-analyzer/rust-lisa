@@ -1,11 +1,11 @@
 package it.unipr;
 
+import static it.unive.lisa.LiSAFactory.getDefaultFor;
 import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
 import it.unive.lisa.LiSAConfiguration.GraphType;
-import it.unive.lisa.LiSAFactory;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
@@ -37,7 +37,7 @@ public class RustLiSA {
 		conf.abstractState  = new SimpleAbstractState<>(
 				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
-				LiSAFactory.getDefaultFor(TypeDomain.class));
+				getDefaultFor(TypeDomain.class));
 		conf.serializeResults = true;
 		conf.analysisGraphs = GraphType.HTML;
 		conf.workdir = "output";

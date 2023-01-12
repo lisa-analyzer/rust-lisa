@@ -1,5 +1,7 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+
 import it.unipr.cfg.RustTyper;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
@@ -17,13 +19,12 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.AccessChild;
-import it.unive.lisa.symbolic.heap.HeapAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.Arrays;
 
 /**
  * Rust array literal.
@@ -62,7 +63,7 @@ public class RustArrayLiteral extends NaryExpression {
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
 
-		HeapAllocation allocation = new HeapAllocation(getStaticType(), getLocation());
+		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation(), true);
 		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
 
 		ExpressionSet<SymbolicExpression> containerExprs = allocationState.getComputedExpressions();

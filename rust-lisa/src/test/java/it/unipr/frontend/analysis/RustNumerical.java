@@ -15,13 +15,13 @@ public class RustNumerical extends RustLiSATestExecutor {
 
 	@Test
 	public void testNumerical() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration()
-				.setAbstractState(new SimpleAbstractState<>(
-						new MonolithicHeap(),
-						new ValueEnvironment<>(new Interval()),
-						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setSerializeResults(true)
-				.setJsonOutput(true);
+		LiSAConfiguration conf = new LiSAConfiguration();
+		conf.abstractState = new SimpleAbstractState<>(
+				new MonolithicHeap(),
+				new ValueEnvironment<>(new Interval()),
+				LiSAFactory.getDefaultFor(TypeDomain.class));
+		conf.serializeResults = true;
+		conf.jsonOutput = true;
 
 		perform("analysis/numerical", "numerical.rs", conf);
 	}

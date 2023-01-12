@@ -15,13 +15,13 @@ public class RustArray extends RustLiSATestExecutor {
 
 	@Test
 	public void testArray() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration()
-				.setAbstractState(new SimpleAbstractState<>(
+		LiSAConfiguration conf = new LiSAConfiguration();
+		conf.abstractState = new SimpleAbstractState<>(
 						new FieldSensitivePointBasedHeap(),
 						new ValueEnvironment<>(new Interval()),
-						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setSerializeResults(true)
-				.setJsonOutput(true);
+						LiSAFactory.getDefaultFor(TypeDomain.class));
+		conf.serializeResults = true;
+		conf.jsonOutput = true;
 
 		perform("analysis/array", "array.rs", conf);
 	}

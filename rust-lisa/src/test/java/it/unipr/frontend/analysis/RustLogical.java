@@ -15,13 +15,13 @@ public class RustLogical extends RustLiSATestExecutor {
 
 	@Test
 	public void testLogical() throws AnalysisSetupException {
-		LiSAConfiguration conf = new LiSAConfiguration()
-				.setAbstractState(new SimpleAbstractState<>(
-						new MonolithicHeap(),
-						new ValueEnvironment<>(new Interval()),
-						LiSAFactory.getDefaultFor(TypeDomain.class)))
-				.setSerializeResults(true)
-				.setJsonOutput(true);
+		LiSAConfiguration conf = new LiSAConfiguration();
+		conf.abstractState = new SimpleAbstractState<>(
+				new MonolithicHeap(),
+				new ValueEnvironment<>(new Interval()),
+				LiSAFactory.getDefaultFor(TypeDomain.class));
+		conf.serializeResults = true;
+		conf.jsonOutput = true;
 
 		perform("analysis/logical", "logical.rs", conf);
 	}
