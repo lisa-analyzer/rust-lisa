@@ -1,0 +1,1 @@
+{"name":"() rust-testcases/cfg/mutable-variable-declaration/mutable-variable-declaration.rs::main()","description":null,"nodes":[{"id":0,"subNodes":[1,2],"text":"let mut _x : unconstrained int = 42"},{"id":1,"text":"mut _x"},{"id":2,"text":"42"},{"id":3,"text":"ret"}],"edges":[{"sourceId":0,"destId":3,"kind":"SequentialEdge"}],"descriptions":[]}

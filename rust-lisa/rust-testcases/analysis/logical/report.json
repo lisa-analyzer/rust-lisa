@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_analysis_logical_logical.rs.main().json" ]
+  "files" : [ "()_rust-testcases_analysis_logical_logical.rs.main().json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "21ms",
+    "end" : "2023-01-13T09:32:28.480+01:00",
+    "expressions" : "50",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-13T09:32:28.459+01:00",
+    "statements" : "16",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/analysis/logical"
+  }
 }

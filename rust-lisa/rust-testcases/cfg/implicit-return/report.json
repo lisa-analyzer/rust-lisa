@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_implicit-return_implicit-return.rs.main().json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func1().json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func2().json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func3().json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func4().json" ]
+  "files" : [ "()_rust-testcases_cfg_implicit-return_implicit-return.rs.main()_cfg.json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func1()_cfg.json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func2()_cfg.json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func3()_cfg.json", "i32_rust-testcases_cfg_implicit-return_implicit-return.rs.func4()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "5",
+    "duration" : "68ms",
+    "end" : "2023-01-13T09:10:21.884+01:00",
+    "expressions" : "26",
+    "files" : "5",
+    "globals" : "0",
+    "members" : "5",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:21.816+01:00",
+    "statements" : "16",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/implicit-return"
+  }
 }

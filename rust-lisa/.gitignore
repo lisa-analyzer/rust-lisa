@@ -47,3 +47,6 @@ diagrams/
 # tests
 rust-outputs/
 /bin/
+
+# Standalone execution
+output/

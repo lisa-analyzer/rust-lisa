@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.main().json", "i32_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.difficult_fn().json", "i32_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.times2().json" ]
+  "files" : [ "()_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.main()_cfg.json", "i32_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.difficult_fn()_cfg.json", "i32_rust-testcases_cfg_unsafe-fn_unsafe-fn.rs.times2()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "3",
+    "duration" : "47ms",
+    "end" : "2023-01-13T09:10:23.561+01:00",
+    "expressions" : "13",
+    "files" : "3",
+    "globals" : "0",
+    "members" : "3",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:23.514+01:00",
+    "statements" : "9",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/unsafe-fn"
+  }
 }

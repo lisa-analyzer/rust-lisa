@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_PointTwo.reverse().json", "()_rust-testcases_analysis_struct_struct.rs.main().json" ]
+  "files" : [ "()_PointTwo.reverse().json", "()_rust-testcases_analysis_struct_struct.rs.main().json", "report.json" ],
+  "info" : {
+    "cfgs" : "2",
+    "duration" : "75ms",
+    "end" : "2023-01-13T09:30:22.210+01:00",
+    "expressions" : "35",
+    "files" : "2",
+    "globals" : "2",
+    "members" : "2",
+    "programs" : "1",
+    "start" : "2023-01-13T09:30:22.135+01:00",
+    "statements" : "9",
+    "units" : "3",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/analysis/struct"
+  }
 }

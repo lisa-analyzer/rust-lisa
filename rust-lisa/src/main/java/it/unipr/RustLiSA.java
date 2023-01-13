@@ -1,6 +1,7 @@
 package it.unipr;
 
-import static it.unive.lisa.LiSAFactory.getDefaultFor;
+import java.io.IOException;
+
 import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
@@ -8,11 +9,13 @@ import it.unive.lisa.LiSAConfiguration;
 import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
+import it.unive.lisa.analysis.nonrelational.value.TypeEnvironment;
 import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
 import it.unive.lisa.analysis.numeric.Interval;
-import it.unive.lisa.analysis.value.TypeDomain;
+import it.unive.lisa.analysis.types.InferredTypes;
+import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
+import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
 import it.unive.lisa.program.Program;
-import java.io.IOException;
 
 /**
  * RustLiSA static analyzer build upon LiSA.
@@ -37,9 +40,11 @@ public class RustLiSA {
 		conf.abstractState  = new SimpleAbstractState<>(
 				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
-				getDefaultFor(TypeDomain.class));
+				new TypeEnvironment<>(new InferredTypes()));
 		conf.serializeResults = true;
 		conf.analysisGraphs = GraphType.HTML;
+		conf.callGraph = new RTACallGraph();
+		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.workdir = "output";
 		conf.jsonOutput = true;
 

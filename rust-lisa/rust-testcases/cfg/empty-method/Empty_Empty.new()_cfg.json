@@ -1,0 +1,1 @@
+{"name":"Empty Empty::new()","description":null,"nodes":[{"id":0,"subNodes":[1],"text":"return Empty{}"},{"id":1,"text":"Empty{}"}],"edges":[],"descriptions":[]}

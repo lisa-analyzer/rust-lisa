@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_simple-if-let_simple-if-let.rs.main().json" ]
+  "files" : [ "()_rust-testcases_cfg_simple-if-let_simple-if-let.rs.main()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "28ms",
+    "end" : "2023-01-13T09:10:23.384+01:00",
+    "expressions" : "28",
+    "files" : "1",
+    "globals" : "2",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:23.356+01:00",
+    "statements" : "13",
+    "units" : "3",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/simple-if-let"
+  }
 }

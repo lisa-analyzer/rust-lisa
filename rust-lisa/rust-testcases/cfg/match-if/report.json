@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_match-if_match-if.rs.main().json" ]
+  "files" : [ "()_rust-testcases_cfg_match-if_match-if.rs.main()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "10ms",
+    "end" : "2023-01-13T09:10:21.020+01:00",
+    "expressions" : "15",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:21.010+01:00",
+    "statements" : "6",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/match-if"
+  }
 }

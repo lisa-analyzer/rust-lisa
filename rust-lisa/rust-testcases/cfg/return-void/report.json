@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_return-void_return-void.rs.func0().json", "()_rust-testcases_cfg_return-void_return-void.rs.func1().json", "()_rust-testcases_cfg_return-void_return-void.rs.func10().json", "()_rust-testcases_cfg_return-void_return-void.rs.func11().json", "()_rust-testcases_cfg_return-void_return-void.rs.func12().json", "()_rust-testcases_cfg_return-void_return-void.rs.func2().json", "()_rust-testcases_cfg_return-void_return-void.rs.func3().json", "()_rust-testcases_cfg_return-void_return-void.rs.func4().json", "()_rust-testcases_cfg_return-void_return-void.rs.func5().json", "()_rust-testcases_cfg_return-void_return-void.rs.func6().json", "()_rust-testcases_cfg_return-void_return-void.rs.func7().json", "()_rust-testcases_cfg_return-void_return-void.rs.func8().json", "()_rust-testcases_cfg_return-void_return-void.rs.func9().json", "()_rust-testcases_cfg_return-void_return-void.rs.main().json" ]
+  "files" : [ "()_rust-testcases_cfg_return-void_return-void.rs.func0()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func1()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func10()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func11()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func12()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func2()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func3()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func4()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func5()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func6()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func7()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func8()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.func9()_cfg.json", "()_rust-testcases_cfg_return-void_return-void.rs.main()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "14",
+    "duration" : "154ms",
+    "end" : "2023-01-13T09:10:22.254+01:00",
+    "expressions" : "66",
+    "files" : "14",
+    "globals" : "0",
+    "members" : "14",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:22.100+01:00",
+    "statements" : "42",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/return-void"
+  }
 }

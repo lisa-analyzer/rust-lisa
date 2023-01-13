@@ -1,0 +1,1 @@
+{"name":"() Number::zero()","description":null,"nodes":[{"id":0,"subNodes":[1,2],"text":"let _x : unconstrained int = 2"},{"id":1,"text":"_x"},{"id":2,"text":"2"},{"id":3,"text":"ret"}],"edges":[{"sourceId":0,"destId":3,"kind":"SequentialEdge"}],"descriptions":[]}

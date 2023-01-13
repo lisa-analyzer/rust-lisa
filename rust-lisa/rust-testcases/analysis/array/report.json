@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "i32_rust-testcases_analysis_array_array.rs.main().json" ]
+  "files" : [ "i32_rust-testcases_analysis_array_array.rs.main().json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "201ms",
+    "end" : "2023-01-13T09:30:21.615+01:00",
+    "expressions" : "32",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-13T09:30:21.414+01:00",
+    "statements" : "9",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/analysis/array"
+  }
 }

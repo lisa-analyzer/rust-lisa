@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_Number.zero().json", "()_rust-testcases_cfg_struct-parsing_struct-parsing.rs.main().json" ]
+  "files" : [ "()_Number.zero()_cfg.json", "()_rust-testcases_cfg_struct-parsing_struct-parsing.rs.main()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "2",
+    "duration" : "23ms",
+    "end" : "2023-01-13T09:10:19.947+01:00",
+    "expressions" : "15",
+    "files" : "2",
+    "globals" : "1",
+    "members" : "2",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:19.924+01:00",
+    "statements" : "8",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/struct-parsing"
+  }
 }

@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_rectangle_rectangle.rs.main().json", "rust-testcases_cfg_rectangle_rectangle.rs_Rect.new().json", "usize_Rect.area().json", "usize_Rect.perim().json" ]
+  "files" : [ "()_rust-testcases_cfg_rectangle_rectangle.rs.main()_cfg.json", "Rect_Rect.new()_cfg.json", "report.json", "usize_Rect.area()_cfg.json", "usize_Rect.perim()_cfg.json" ],
+  "info" : {
+    "cfgs" : "4",
+    "duration" : "25ms",
+    "end" : "2023-01-13T09:10:23.303+01:00",
+    "expressions" : "31",
+    "files" : "4",
+    "globals" : "2",
+    "members" : "4",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:23.278+01:00",
+    "statements" : "7",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/rectangle"
+  }
 }

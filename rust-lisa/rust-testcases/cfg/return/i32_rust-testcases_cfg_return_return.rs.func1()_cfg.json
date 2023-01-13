@@ -1,0 +1,1 @@
+{"name":"i32 rust-testcases/cfg/return/return.rs::func1()","description":null,"nodes":[{"id":0,"subNodes":[1],"text":"return 3"},{"id":1,"text":"3"}],"edges":[],"descriptions":[]}

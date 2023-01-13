@@ -1,0 +1,1 @@
+{"name":"i32 Number::get()","description":null,"nodes":[{"id":0,"subNodes":[1],"text":"return self.n"},{"id":1,"subNodes":[2,3],"text":"self.n"},{"id":2,"text":"self"},{"id":3,"text":"n"}],"edges":[],"descriptions":[]}

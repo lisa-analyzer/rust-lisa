@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_expr-match_expr-match.rs.main().json" ]
+  "files" : [ "()_rust-testcases_cfg_expr-match_expr-match.rs.main()_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "26ms",
+    "end" : "2023-01-13T09:10:21.447+01:00",
+    "expressions" : "17",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-13T09:10:21.421+01:00",
+    "statements" : "10",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/expr-match"
+  }
 }

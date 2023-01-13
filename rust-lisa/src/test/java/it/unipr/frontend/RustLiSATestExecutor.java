@@ -1,24 +1,7 @@
 package it.unipr.frontend;
 
-import static it.unive.lisa.outputs.compare.JsonReportComparer.compare;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import it.unipr.cfg.type.composite.RustArrayType;
-import it.unipr.cfg.type.composite.RustStructType;
-import it.unipr.cfg.type.composite.RustTupleType;
-import it.unipr.cfg.type.composite.enums.RustEnumType;
-import it.unive.lisa.AnalysisException;
-import it.unive.lisa.LiSA;
-import it.unive.lisa.LiSAConfiguration;
-import it.unive.lisa.outputs.compare.JsonReportComparer;
-import it.unive.lisa.outputs.compare.JsonReportComparer.DiffReporter;
-import it.unive.lisa.outputs.compare.JsonReportComparer.REPORTED_COMPONENT;
-import it.unive.lisa.outputs.compare.JsonReportComparer.REPORT_TYPE;
-import it.unive.lisa.outputs.json.JsonReport;
-import it.unive.lisa.outputs.json.JsonReport.JsonWarning;
-import it.unive.lisa.program.Program;
-import it.unive.lisa.util.file.FileManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +13,22 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.HashSet;
-import org.apache.commons.io.FileUtils;
+
+import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.RustTupleType;
+import it.unipr.cfg.type.composite.enums.RustEnumType;
+import it.unive.lisa.AnalysisException;
+import it.unive.lisa.LiSA;
+import it.unive.lisa.LiSAConfiguration;
+import it.unive.lisa.imp.ParsingException;
+import it.unive.lisa.outputs.compare.JsonReportComparer;
+import it.unive.lisa.outputs.compare.JsonReportComparer.DiffReporter;
+import it.unive.lisa.outputs.compare.JsonReportComparer.REPORTED_COMPONENT;
+import it.unive.lisa.outputs.compare.JsonReportComparer.REPORT_TYPE;
+import it.unive.lisa.outputs.json.JsonReport;
+import it.unive.lisa.program.Program;
+import it.unive.lisa.util.file.FileManager;
 
 public abstract class RustLiSATestExecutor {
 

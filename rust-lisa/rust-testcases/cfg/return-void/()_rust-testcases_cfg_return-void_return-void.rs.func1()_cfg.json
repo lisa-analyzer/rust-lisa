@@ -1,0 +1,1 @@
+{"name":"() rust-testcases/cfg/return-void/return-void.rs::func1()","description":null,"nodes":[{"id":0,"subNodes":[1,2],"text":"let _x : unconstrained int = 6"},{"id":1,"text":"_x"},{"id":2,"text":"6"},{"id":3,"text":"ret"}],"edges":[{"sourceId":0,"destId":3,"kind":"SequentialEdge"}],"descriptions":[]}
