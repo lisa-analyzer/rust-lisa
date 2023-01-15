@@ -28,7 +28,7 @@ public class RustTuple extends RustLiSATestExecutor {
 		conf.callGraph = new RTACallGraph();
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.jsonOutput = true;
-
+		
 		perform("analysis/tuple", "tuple.rs", conf);
 	}
 }

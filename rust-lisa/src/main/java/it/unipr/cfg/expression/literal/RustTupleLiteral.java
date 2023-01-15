@@ -1,5 +1,8 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustTupleType;
@@ -18,13 +21,11 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.AccessChild;
-import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * Rust tuple literal.
@@ -43,7 +44,7 @@ public class RustTupleLiteral extends NaryExpression {
 	 * @param values   the values inside the literal
 	 */
 	public RustTupleLiteral(CFG cfg, CodeLocation location, RustType[] types, Expression[] values) {
-		super(cfg, location, "()", new RustTupleType(Arrays.asList(types)), values);
+		super(cfg, location, "()", RustTupleType.lookup(new RustTupleType(Arrays.asList(types))), values);
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class RustTupleLiteral extends NaryExpression {
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
 
-		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation());
+		MemoryAllocation allocation = new MemoryAllocation(getStaticType(), getLocation(), true);
 		AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(allocation, this);
 
 		ExpressionSet<SymbolicExpression> containerExprs = allocationState.getComputedExpressions();
@@ -76,7 +77,7 @@ public class RustTupleLiteral extends NaryExpression {
 			AnalysisState<A, H, V, T> startingState = allocationState;
 			for (int i = 0; i < getSubExpressions().length; ++i) {
 				Type tupleComponentType = ((RustTupleType) getStaticType()).getTypes().get(i);
-
+				
 				if (tupleComponentType.canBeAssignedTo(getSubExpressions()[i].getStaticType())) {
 					Variable variable = new Variable(tupleComponentType, i + "", getLocation());
 					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
