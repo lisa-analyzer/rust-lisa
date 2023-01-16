@@ -1,9 +1,7 @@
 package it.unipr.cfg.statement;
 
 import it.unipr.cfg.type.RustUnitType;
-import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustReferenceType;
-import it.unipr.cfg.type.composite.RustTupleType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -18,7 +16,7 @@ import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.Variable;
-import it.unive.lisa.type.Type;
+import java.util.Collections;
 
 /**
  * Rust assignment expression (e.g., let x = y).
@@ -53,13 +51,10 @@ public class RustLetAssignment extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
 					throws SemanticException {
-
 		if (left instanceof Variable
-				&& (left.getStaticType() instanceof RustTupleType || left.getStaticType() instanceof RustArrayType)) {
-			Variable var = (Variable) left;
-			Type newLeftType = new RustReferenceType(left.getStaticType(), false);
-			left = new Variable(newLeftType, var.getName(), var.getAnnotations(), var.getCodeLocation());
-			state.smallStepSemantics(left, this);
+				&& left.getStaticType().isInMemoryType()) {
+			if (left.hasRuntimeTypes())
+				left.setRuntimeTypes(Collections.singleton(new RustReferenceType(left.getStaticType(), false)));
 		}
 
 		return state.assign(left, right, this);
