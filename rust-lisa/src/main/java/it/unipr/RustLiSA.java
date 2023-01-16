@@ -1,7 +1,5 @@
 package it.unipr;
 
-import java.io.IOException;
-
 import it.unipr.frontend.RustFrontend;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
@@ -16,6 +14,7 @@ import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
 import it.unive.lisa.program.Program;
+import java.io.IOException;
 
 /**
  * RustLiSA static analyzer build upon LiSA.
@@ -37,7 +36,7 @@ public class RustLiSA {
 		Program program = RustFrontend.processFile(args[0]);
 
 		LiSAConfiguration conf = new LiSAConfiguration();
-		conf.abstractState  = new SimpleAbstractState<>(
+		conf.abstractState = new SimpleAbstractState<>(
 				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
 				new TypeEnvironment<>(new InferredTypes()));

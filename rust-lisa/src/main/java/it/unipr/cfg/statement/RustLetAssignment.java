@@ -53,14 +53,15 @@ public class RustLetAssignment extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
 					throws SemanticException {
-		
-		if (left instanceof Variable && (left.getStaticType() instanceof RustTupleType || left.getStaticType() instanceof RustArrayType)) {
+
+		if (left instanceof Variable
+				&& (left.getStaticType() instanceof RustTupleType || left.getStaticType() instanceof RustArrayType)) {
 			Variable var = (Variable) left;
 			Type newLeftType = new RustReferenceType(left.getStaticType(), false);
 			left = new Variable(newLeftType, var.getName(), var.getAnnotations(), var.getCodeLocation());
 			state.smallStepSemantics(left, this);
 		}
-		
+
 		return state.assign(left, right, this);
 	}
 }

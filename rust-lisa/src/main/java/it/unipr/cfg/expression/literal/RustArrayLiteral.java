@@ -1,7 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-
 import it.unipr.cfg.RustTyper;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
@@ -25,6 +23,7 @@ import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.Arrays;
 
 /**
  * Rust array literal.

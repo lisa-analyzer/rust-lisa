@@ -1,7 +1,5 @@
 package it.unipr.frontend.analysis;
 
-import org.junit.Test;
-
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
@@ -13,6 +11,7 @@ import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
+import org.junit.Test;
 
 public class RustArray extends RustLiSATestExecutor {
 

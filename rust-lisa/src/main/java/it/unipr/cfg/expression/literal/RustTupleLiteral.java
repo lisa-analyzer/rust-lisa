@@ -1,8 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustTupleType;
@@ -26,6 +23,8 @@ import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Rust tuple literal.
@@ -77,13 +76,13 @@ public class RustTupleLiteral extends NaryExpression {
 			AnalysisState<A, H, V, T> startingState = allocationState;
 			for (int i = 0; i < getSubExpressions().length; ++i) {
 				Type tupleComponentType = ((RustTupleType) getStaticType()).getTypes().get(i);
-				
+
 				if (tupleComponentType.canBeAssignedTo(getSubExpressions()[i].getStaticType())) {
 					Variable variable = new Variable(tupleComponentType, i + "", getLocation());
 					AccessChild child = new AccessChild(getSubExpressions()[i].getStaticType(), deref, variable,
 							getLocation());
 					AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
-					
+
 					AnalysisState<A, H, V, T> tmp = state.bottom();
 					for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions())
 						for (SymbolicExpression exprParam : params[i])

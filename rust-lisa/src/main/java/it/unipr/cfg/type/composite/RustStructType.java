@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Builds the Rust struct type.
@@ -104,19 +105,29 @@ public class RustStructType implements UnitType, RustType, RustEnumVariant, InMe
 
 	@Override
 	public boolean canBeAssignedTo(Type other) {
+		Collection<RustTraitType> ancestors = getUnit().getImmediateAncestors().stream()
+				.map(t -> RustTraitType.get(t.getName())).collect(Collectors.toSet());
+
 		if (other instanceof RustStructType) {
 			RustStructType o = (RustStructType) other;
 			return (name.equals(o.name) && unit.equals(o.unit));
+		} else if (ancestors.contains(other)) {
+			return true;
 		}
 		return other instanceof Untyped;
 	}
 
 	@Override
 	public Type commonSupertype(Type other) {
+		Collection<RustTraitType> ancestors = getUnit().getImmediateAncestors().stream()
+				.map(t -> RustTraitType.get(t.getName())).collect(Collectors.toSet());
+
 		if (other instanceof RustStructType) {
 			RustStructType o = (RustStructType) other;
 			if (name.equals(o.name) && unit.equals(o.unit))
 				return o;
+		} else if (ancestors.contains(other)) {
+			return other;
 		}
 		return Untyped.INSTANCE;
 	}

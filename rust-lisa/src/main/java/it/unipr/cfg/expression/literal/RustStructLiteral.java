@@ -18,9 +18,9 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.heap.AccessChild;
-import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.Type;
 import java.util.Arrays;
@@ -109,7 +109,7 @@ public class RustStructLiteral extends NaryExpression {
 							getLocation());
 
 					AnalysisState<A, H, V, T> tmp = result.bottom();
- 
+
 					AnalysisState<A, H, V, T> accessedChildState = startingState.smallStepSemantics(child, this);
 					for (SymbolicExpression childIdentifier : accessedChildState.getComputedExpressions())
 						for (SymbolicExpression exprParam : params[i])

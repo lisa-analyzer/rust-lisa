@@ -1,7 +1,7 @@
 package it.unipr.cfg.type.composite;
 
+import it.unipr.cfg.program.unit.RustTraitUnit;
 import it.unipr.cfg.type.RustType;
-import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.UnitType;
@@ -28,12 +28,12 @@ public class RustTraitType implements UnitType, RustType {
 	 * representing the given {@code unit}.
 	 * 
 	 * @param name the name of the trait type
-	 * @param unit the unit underlying this type
+	 * @param unit the {@link RustTraitUnit} underlying this type
 	 * 
 	 * @return the unique instance of {@link RustTraitType} representing the
 	 *             trait type with the given name
 	 */
-	public static RustTraitType lookup(String name, CompilationUnit unit) {
+	public static RustTraitType lookup(String name, RustTraitUnit unit) {
 		return INSTANCES.computeIfAbsent(name, x -> new RustTraitType(name, unit));
 	}
 
@@ -84,16 +84,16 @@ public class RustTraitType implements UnitType, RustType {
 	}
 
 	private final String name;
-	private final CompilationUnit unit;
+	private final RustTraitUnit unit;
 
 	/**
 	 * Builds the trait type.
 	 * 
 	 * @param name  the name of the trait type
-	 * @param unit  the compilation unit of the trait type
+	 * @param unit  the unit {@link RustTraitUnit} of the trait type
 	 * @param types an ordered list of types inside the trait
 	 */
-	private RustTraitType(String name, CompilationUnit unit) {
+	private RustTraitType(String name, RustTraitUnit unit) {
 		this.name = name;
 		this.unit = unit;
 	}
@@ -126,7 +126,7 @@ public class RustTraitType implements UnitType, RustType {
 	}
 
 	@Override
-	public CompilationUnit getUnit() {
+	public RustTraitUnit getUnit() {
 		return unit;
 	}
 

@@ -2,6 +2,7 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import it.unipr.cfg.program.unit.RustTraitUnit;
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -237,7 +238,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			if (RustStructType.has(ctx.Ident().getText())) {
 				return RustStructType.lookup(ctx.Ident().getText(), unit);
 			} else if (RustTraitType.has(ctx.Ident().getText())) {
-				return RustTraitType.lookup(ctx.Ident().getText(), unit);
+				return RustTraitType.lookup(ctx.Ident().getText(), (RustTraitUnit) unit);
 			} else
 				throw new IllegalAccessError("The name of this type was not found");
 		}
@@ -315,7 +316,7 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		if (ctx.ty_sum().size() == 2 && !ctx.children.get(0).getText().equals("!")) {
 			// impl that implements trait
 			Type struct = visitTy_sum(ctx.ty_sum(1));
-			Type trait = visitTy_sum(ctx.ty_sum(0));
+			Type trait = RustTraitType.get(ctx.ty_sum(0).getText());
 
 			return Pair.of(struct, trait);
 

@@ -1,7 +1,5 @@
 package it.unipr.frontend.analysis;
 
-import org.junit.Test;
-
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
@@ -13,13 +11,14 @@ import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
+import org.junit.Test;
 
 public class RustTuple extends RustLiSATestExecutor {
 
 	@Test
 	public void testTuple() throws AnalysisSetupException {
 		LiSAConfiguration conf = new LiSAConfiguration();
-		
+
 		conf.abstractState = new SimpleAbstractState<>(
 				new PointBasedHeap(),
 				new ValueEnvironment<>(new Interval()),
@@ -28,7 +27,7 @@ public class RustTuple extends RustLiSATestExecutor {
 		conf.callGraph = new RTACallGraph();
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.jsonOutput = true;
-		
+
 		perform("analysis/tuple", "tuple.rs", conf);
 	}
 }

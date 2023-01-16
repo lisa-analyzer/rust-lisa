@@ -210,7 +210,7 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 				structName = structAndTraitName[1];
 
 			RustStructType struct = RustStructType.get(structName);
-			Pair<Type, Type> structAndTrait = new RustTypeVisitor(filePath, currentUnit, program)
+			Pair<Type, Type> structAndTrait = new RustTypeVisitor(filePath, struct.getUnit(), program)
 					.visitImpl_what(ctx.impl_block().impl_what());
 
 			CompilationUnit structUnit = struct.getUnit();
@@ -292,14 +292,14 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 		RustTraitUnit traitUnit = new RustTraitUnit(locationOf(ctx, filePath), program, name,
 				ctx.getChild(0).getText().equals("unsafe"));
 
+		RustTraitType.lookup(name, traitUnit);
+
 		List<CodeMember> fnDefinitions = new ArrayList<>();
 		for (Trait_itemContext traitItemCtx : ctx.trait_item())
 			fnDefinitions.add(new RustCodeMemberVisitor(filePath, program, traitUnit).visitTrait_item(traitItemCtx));
 
 		for (CodeMember definition : fnDefinitions)
 			traitUnit.addInstanceCodeMember(definition);
-
-		RustTraitType.lookup(name, traitUnit);
 
 		return null;
 	}

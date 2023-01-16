@@ -13,14 +13,14 @@ import it.unive.lisa.type.Type;
 public class RustParameter extends Parameter {
 
 	private boolean mutable;
-	
+
 	/**
 	 * Builds the parameter.
 	 * 
-	 * @param location	  the code location of this parameter
-	 * @param name		  the name of this parameter
-	 * @param staticType  the type of this parameter
-	 * @param mutable	  the mutability of this parameter
+	 * @param location   the code location of this parameter
+	 * @param name       the name of this parameter
+	 * @param staticType the type of this parameter
+	 * @param mutable    the mutability of this parameter
 	 */
 	public RustParameter(CodeLocation location, String name, Type staticType, boolean mutable) {
 		super(location, name, staticType);

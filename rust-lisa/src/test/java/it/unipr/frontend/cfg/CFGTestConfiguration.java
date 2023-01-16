@@ -12,14 +12,14 @@ class CFGTestConfiguration {
 	static LiSAConfiguration mkConf() throws AnalysisSetupException {
 		LiSAConfiguration conf = new LiSAConfiguration();
 		conf.abstractState = new SimpleAbstractState<>(
-						new MonolithicHeap(),
-						new NoOpValues(),
-						new NoOpTypes());
+				new MonolithicHeap(),
+				new NoOpValues(),
+				new NoOpTypes());
 		conf.callGraph = new RTACallGraph();
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.jsonOutput = true;
 		conf.serializeInputs = true;
-		
+
 		return conf;
 	}
 }
