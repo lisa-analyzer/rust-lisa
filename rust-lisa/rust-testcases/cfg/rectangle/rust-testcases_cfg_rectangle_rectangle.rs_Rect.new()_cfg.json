@@ -1,1 +1,0 @@
-{"name":"rust-testcases/cfg/rectangle/rectangle.rs Rect::new()","description":null,"nodes":[{"id":0,"subNodes":[1],"text":"return Rect{width, height}"},{"id":1,"subNodes":[2,3],"text":"Rect{width, height}"},{"id":2,"text":"width"},{"id":3,"text":"height"}],"edges":[],"descriptions":[]}

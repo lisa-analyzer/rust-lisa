@@ -1,0 +1,1 @@
+{"name":"i32 rust-testcases/cfg/unsafe-fn/unsafe-fn.rs::times2(i32 a)","description":null,"nodes":[{"id":0,"subNodes":[1],"text":"return *(a, 2)"},{"id":1,"subNodes":[2,3],"text":"*(a, 2)"},{"id":2,"text":"a"},{"id":3,"text":"2"}],"edges":[],"descriptions":[]}

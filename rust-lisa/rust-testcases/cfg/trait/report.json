@@ -1,4 +1,33 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_cfg_trait_trait.rs.main().json", "f32_Circle.area().json", "f32_Circle.origin_distance_squared().json", "f32_Circle.perimeter().json" ]
+  "files" : [ "()_rust-testcases_cfg_trait_trait.rs.main()_cfg.json", "f32_Circle.area(untyped_self)_cfg.json", "f32_Circle.origin_distance_squared(untyped_self)_cfg.json", "f32_Circle.perimeter(untyped_self)_cfg.json", "report.json" ],
+  "info" : {
+    "cfgs" : "4",
+    "duration" : "823ms",
+    "end" : "2023-01-16T12:24:17.521+01:00",
+    "expressions" : "45",
+    "files" : "4",
+    "globals" : "3",
+    "members" : "4",
+    "programs" : "1",
+    "start" : "2023-01-16T12:24:16.698+01:00",
+    "statements" : "8",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "true",
+    "serializeResults" : "false",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/cfg/trait"
+  }
 }

@@ -27,11 +27,11 @@ public class RustTraitType implements UnitType, RustType {
 	 * {@link RustTraitType} representing a trait with the given {@code name},
 	 * representing the given {@code unit}.
 	 * 
-	 * @param name the name of the struct type
+	 * @param name the name of the trait type
 	 * @param unit the unit underlying this type
 	 * 
 	 * @return the unique instance of {@link RustTraitType} representing the
-	 *             struct type with the given name
+	 *             trait type with the given name
 	 */
 	public static RustTraitType lookup(String name, CompilationUnit unit) {
 		return INSTANCES.computeIfAbsent(name, x -> new RustTraitType(name, unit));
@@ -40,11 +40,11 @@ public class RustTraitType implements UnitType, RustType {
 	/**
 	 * Retrieve a single instance of a Rust trait.
 	 * 
-	 * @param name the name of the struct
+	 * @param name the name of the trait
 	 * 
-	 * @return all instances of a Rust struct types
+	 * @return all instances of a Rust trait types
 	 * 
-	 * @throws IllegalArgumentException if there is no struct with such name
+	 * @throws IllegalArgumentException if there is no trait with such name
 	 */
 	public static RustTraitType get(String name) {
 		if (INSTANCES.get(name) == null)
@@ -60,20 +60,20 @@ public class RustTraitType implements UnitType, RustType {
 	}
 
 	/**
-	 * Checks whether a struct type named {@code name} has been already built.
+	 * Checks whether a trait type named {@code name} has been already built.
 	 * 
-	 * @param name the name of the struct type
+	 * @param name the name of the trait type
 	 * 
-	 * @return whether a struct type named {@code name} has been already built.
+	 * @return whether a trait type named {@code name} has been already built.
 	 */
 	public static boolean has(String name) {
 		return INSTANCES.containsKey(name);
 	}
 
 	/**
-	 * Yields all instances of Rust struct types.
+	 * Yields all instances of Rust trait types.
 	 * 
-	 * @return all instances of a Rust struct types
+	 * @return all instances of a Rust trait types
 	 */
 	public static Collection<Type> all() {
 		Collection<Type> result = new HashSet<>();
@@ -87,11 +87,11 @@ public class RustTraitType implements UnitType, RustType {
 	private final CompilationUnit unit;
 
 	/**
-	 * Builds the struct type.
+	 * Builds the trait type.
 	 * 
-	 * @param name  the name of the struct type
-	 * @param unit  the compilation unit of the struct type
-	 * @param types an ordered list of types inside the struct
+	 * @param name  the name of the trait type
+	 * @param unit  the compilation unit of the trait type
+	 * @param types an ordered list of types inside the trait
 	 */
 	private RustTraitType(String name, CompilationUnit unit) {
 		this.name = name;

@@ -51,6 +51,7 @@ import it.unipr.cfg.expression.numeric.RustMulExpression;
 import it.unipr.cfg.expression.numeric.RustSubExpression;
 import it.unipr.cfg.program.RustCFG;
 import it.unipr.cfg.program.RustCodeMememberDescriptor;
+import it.unipr.cfg.program.RustParameter;
 import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.statement.RustLetAssignment;
@@ -59,6 +60,7 @@ import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.utils.RustAccessResolver;
@@ -223,8 +225,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
+		List<RustParameter> parameters = new ArrayList<>();
+		if (ctx.param_list() != null)
+			parameters = visitParam_list(ctx.param_list());
+		Parameter[] parametersArray = parameters.toArray(new Parameter[0]);
+		
 		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
-				decorators.getName(), returnType, new Parameter[0]);
+				decorators.getName(), returnType, parametersArray);
 		factory.setDescriptor(cfgDesc);
 
 		RustCFG rustCFG = factory.produce();
@@ -412,9 +419,18 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		Type returnType = RustUnitType.getInstance();
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
+		
+		List<RustParameter> parameters = new ArrayList<>();
+		if (ctx.method_param_list() != null)
+			parameters = visitMethod_param_list(ctx.method_param_list());
+		Parameter[] parametersArray = parameters.toArray(new Parameter[0]);
+		
+		boolean isInstance = false;
+		if (parameters.size() > 0 && parameters.get(0) != null && parameters.get(0).getName().equals("self"))
+			isInstance = true;
 
-		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, false,
-				decorators.getName(), returnType, new Parameter[0]);
+		CodeMemberDescriptor cfgDesc = new CodeMemberDescriptor(locationOf(ctx, filePath), unit, isInstance,
+				decorators.getName(), returnType, parametersArray);
 		factory.setDescriptor(cfgDesc);
 
 		RustCFG rustCFG = factory.produce();
@@ -432,15 +448,17 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public CodeMember visitTrait_method_decl(Trait_method_declContext ctx) {
 		RustFunctionDecoratorKeeper head = visitFn_head(ctx.fn_head());
 
-		List<Parameter> parameters = ctx.trait_method_param_list() == null ? new ArrayList<>()
-				: visitTrait_method_param_list(ctx.trait_method_param_list());
-
-		Parameter[] parametersArray = parameters.toArray(new Parameter[] {});
-		Type returnType = ctx.rtype() != null ? new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype())
-				: RustUnitType.getInstance();
-
+		List<Parameter> parameters = new ArrayList<>();
+		if (ctx.trait_method_param_list() != null)
+			parameters = visitTrait_method_param_list(ctx.trait_method_param_list());
+		Parameter[] parametersArray = parameters.toArray(new Parameter[0]);
+		
+		Type returnType = RustUnitType.getInstance();
+		if (ctx.rtype() != null)
+			returnType = new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype());
+		
 		boolean isInstance = false;
-		if (parameters.get(0) != null && parameters.get(0).getName().equals("self"))
+		if (parameters.size() > 0 && parameters.get(0) != null && parameters.get(0).getName().equals("self"))
 			isInstance = true;
 
 		CodeMemberDescriptor descriptor = new RustCodeMememberDescriptor(locationOf(ctx, filePath), unit, isInstance,
@@ -488,11 +506,32 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Parameter visitParam(ParamContext ctx) {
-		Expression expression = visitPat(ctx.pat());
+	public RustParameter visitParam(ParamContext ctx) {	
 		Type type = visitParam_ty(ctx.param_ty());
-
-		return new Parameter(locationOf(ctx, filePath), expression.toString(), type);
+		
+		boolean mutability = false;
+		String name = "_";
+		if (ctx.pat().pat_no_mut() != null) {
+			Pat_no_mutContext textTokens = ctx.pat().pat_no_mut();
+			for (int i = 0; i < textTokens.getChildCount(); ++i) {
+				if (textTokens.getChild(i).getText().equals("ref") || textTokens.getChild(i).getText().equals("&")) {
+					if (textTokens.getChild(i + 1).getText().equals("mut")) {
+						type = new RustReferenceType(type, true);
+						i++;
+					} else {
+						type = new RustReferenceType(type, false);
+					}
+				} else {
+					name = textTokens.getChild(i).getText();
+					break;
+				}
+			}
+		} else {
+			mutability = true;
+			name = ctx.pat().ident().getText();
+		}
+		
+		return new RustParameter(locationOf(ctx, filePath), name, type, mutability);
 	}
 
 	@Override
@@ -502,9 +541,13 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitParam_list(Param_listContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<RustParameter> visitParam_list(Param_listContext ctx) {
+		List<RustParameter> parameters = new ArrayList<>();
+
+		for (ParamContext pCtx : ctx.param())
+			parameters.add(visitParam(pCtx));
+
+		return parameters;
 	}
 
 	@Override
@@ -520,20 +563,22 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Parameter visitSelf_param(Self_paramContext ctx) {
+	public RustParameter visitSelf_param(Self_paramContext ctx) {
 		// TODO Skipping Lifetime? in the second production
-
-		// TODO as of now, mutability in params requires more infrastructure
-
+		
+		boolean mutability = false;
+		if (ctx.getChild(0).getText().equals("mut"))
+			mutability = true;
+		
 		Type type = ctx.ty_sum() != null ? new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum())
 				: Untyped.INSTANCE;
 
-		return new Parameter(locationOf(ctx, filePath), "self", type);
+		return new RustParameter(locationOf(ctx, filePath), "self", type, mutability);
 	}
 
 	@Override
-	public List<Parameter> visitMethod_param_list(Method_param_listContext ctx) {
-		List<Parameter> parameters = new ArrayList<>();
+	public List<RustParameter> visitMethod_param_list(Method_param_listContext ctx) {
+		List<RustParameter> parameters = new ArrayList<>();
 
 		if (ctx.self_param() != null) {
 			parameters.add(visitSelf_param(ctx.self_param()));
