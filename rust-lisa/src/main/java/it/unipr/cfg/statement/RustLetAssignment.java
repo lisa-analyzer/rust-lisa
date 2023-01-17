@@ -16,6 +16,8 @@ import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.Variable;
+import it.unive.lisa.type.ReferenceType;
+
 import java.util.Collections;
 
 /**
@@ -51,10 +53,9 @@ public class RustLetAssignment extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
 					throws SemanticException {
-		if (left instanceof Variable
-				&& left.getStaticType().isInMemoryType()) {
+		if (left instanceof Variable && left.getStaticType().isInMemoryType()) {
 			if (left.hasRuntimeTypes())
-				left.setRuntimeTypes(Collections.singleton(new RustReferenceType(left.getStaticType(), false)));
+				left.setRuntimeTypes(Collections.singleton(new ReferenceType(left.getStaticType())));
 		}
 
 		return state.assign(left, right, this);

@@ -1,0 +1,33 @@
+{
+  "warnings" : [ ],
+  "files" : [ "()_rust-testcases_interprocedural_sum_sum.rs.main().json", "i32_rust-testcases_interprocedural_sum_sum.rs.id(i32_x)_708178580.json", "i32_rust-testcases_interprocedural_sum_sum.rs.sum(i32_x,_i32_y)_-579253136.json", "report.json" ],
+  "info" : {
+    "cfgs" : "3",
+    "duration" : "637ms",
+    "end" : "2023-01-17T09:32:55.732+01:00",
+    "expressions" : "9",
+    "files" : "3",
+    "globals" : "0",
+    "members" : "3",
+    "programs" : "1",
+    "start" : "2023-01-17T09:32:55.095+01:00",
+    "statements" : "4",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/interprocedural/sum"
+  }
+}

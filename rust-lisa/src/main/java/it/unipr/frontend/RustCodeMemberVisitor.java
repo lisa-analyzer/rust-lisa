@@ -243,6 +243,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		currentCfg.getEntrypoints().add(block.getLeft());
 
 		rustCFG.finalize(ctx);
+		
+		if (cfgDesc.getName().equals("main"))
+			program.getEntryPoints().add(rustCFG);
 
 		return rustCFG;
 	}
