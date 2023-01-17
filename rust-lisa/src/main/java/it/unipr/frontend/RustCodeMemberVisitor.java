@@ -101,6 +101,7 @@ import it.unive.lisa.program.cfg.statement.call.Call.CallType;
 import it.unive.lisa.program.cfg.statement.call.UnresolvedCall;
 import it.unive.lisa.program.cfg.statement.global.AccessGlobal;
 import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
+import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
 import java.util.ArrayList;
@@ -226,7 +227,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		Type returnType = RustUnitType.getInstance();
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
-
+		
+		if (returnType.isInMemoryType())
+			returnType = new ReferenceType(returnType);
+		
 		List<RustParameter> parameters = new ArrayList<>();
 		if (ctx.param_list() != null)
 			parameters = visitParam_list(ctx.param_list());
@@ -425,6 +429,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
 
+		if (returnType.isInMemoryType())
+			returnType = new ReferenceType(returnType);
+		
 		List<RustParameter> parameters = new ArrayList<>();
 		if (ctx.method_param_list() != null)
 			parameters = visitMethod_param_list(ctx.method_param_list());
@@ -2161,7 +2168,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			List<Expression> parameters = new ArrayList<>();
 			parameters.add(head);
 			parameters.addAll(right.getAccessParameter());
-
+			
 			UnresolvedCall methodCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE, "",
 					right.getMethodName(), RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
 					parameters.toArray(new Expression[0]));

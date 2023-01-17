@@ -5,7 +5,6 @@ import org.junit.Test;
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
-import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.TypeEnvironment;
@@ -42,5 +41,12 @@ public class Interprocedural extends RustLiSATestExecutor {
 		LiSAConfiguration conf = mkConf();
 	
 		perform("interprocedural/rectangle", "rectangle.rs", conf);
+	}
+	
+	@Test
+	public void testGeometry() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+
+		perform("interprocedural/geometry", "geometry.rs", conf);
 	}
 }

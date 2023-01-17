@@ -1,7 +1,8 @@
 package it.unipr.cfg.expression.literal;
 
+import java.util.Arrays;
+
 import it.unipr.cfg.RustTyper;
-import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -21,9 +22,9 @@ import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
+import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.Arrays;
 
 /**
  * Rust array literal.
@@ -69,7 +70,7 @@ public class RustArrayLiteral extends NaryExpression {
 
 		AnalysisState<A, H, V, T> result = state.bottom();
 		for (SymbolicExpression container : containerExprs) {
-			HeapReference ref = new HeapReference(new RustReferenceType(getStaticType(), false), container,
+			HeapReference ref = new HeapReference(new ReferenceType(getStaticType()), container,
 					getLocation());
 			HeapDereference deref = new HeapDereference(getStaticType(), ref, getLocation());
 

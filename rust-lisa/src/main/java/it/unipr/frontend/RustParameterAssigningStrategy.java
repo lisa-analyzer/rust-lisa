@@ -1,10 +1,7 @@
 package it.unipr.frontend;
 
-import java.util.Collections;
-
 import org.apache.commons.lang3.tuple.Pair;
 
-import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
