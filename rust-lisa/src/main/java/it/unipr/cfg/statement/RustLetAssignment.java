@@ -1,7 +1,5 @@
 package it.unipr.cfg.statement;
 
-import java.util.Collections;
-
 import it.unipr.cfg.type.RustUnitType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -18,6 +16,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
+import java.util.Collections;
 
 /**
  * Rust assignment expression (e.g., let x = y).
@@ -52,7 +51,7 @@ public class RustLetAssignment extends BinaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression left, SymbolicExpression right, StatementStore<A, H, V, T> statementStore)
 					throws SemanticException {
-		
+
 		if (left instanceof Variable && left.getStaticType().isInMemoryType()) {
 			if (left.hasRuntimeTypes())
 				left.setRuntimeTypes(Collections.singleton(new ReferenceType(left.getStaticType())));

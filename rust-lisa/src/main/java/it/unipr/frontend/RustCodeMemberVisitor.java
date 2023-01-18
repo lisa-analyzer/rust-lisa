@@ -227,10 +227,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		Type returnType = RustUnitType.getInstance();
 		if (ctx.fn_rtype() != null)
 			returnType = new RustTypeVisitor(filePath, unit, program).visitFn_rtype(ctx.fn_rtype());
-		
+
 		if (returnType.isInMemoryType())
 			returnType = new ReferenceType(returnType);
-		
+
 		List<RustParameter> parameters = new ArrayList<>();
 		if (ctx.param_list() != null)
 			parameters = visitParam_list(ctx.param_list());
@@ -247,7 +247,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		currentCfg.getEntrypoints().add(block.getLeft());
 
 		rustCFG.finalize(ctx);
-		
+
 		if (cfgDesc.getName().equals("main"))
 			program.getEntryPoints().add(rustCFG);
 
@@ -431,7 +431,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		if (returnType.isInMemoryType())
 			returnType = new ReferenceType(returnType);
-		
+
 		List<RustParameter> parameters = new ArrayList<>();
 		if (ctx.method_param_list() != null)
 			parameters = visitMethod_param_list(ctx.method_param_list());
@@ -2168,7 +2168,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			List<Expression> parameters = new ArrayList<>();
 			parameters.add(head);
 			parameters.addAll(right.getAccessParameter());
-			
+
 			UnresolvedCall methodCall = new UnresolvedCall(currentCfg, locationOf(ctx, filePath), CallType.INSTANCE, "",
 					right.getMethodName(), RustFrontend.EVALUATION_ORDER, Untyped.INSTANCE,
 					parameters.toArray(new Expression[0]));

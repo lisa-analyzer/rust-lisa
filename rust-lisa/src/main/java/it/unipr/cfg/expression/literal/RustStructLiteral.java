@@ -1,11 +1,5 @@
 package it.unipr.cfg.expression.literal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -29,6 +23,11 @@ import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Rust struct literal.

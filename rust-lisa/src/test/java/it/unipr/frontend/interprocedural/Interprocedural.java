@@ -1,7 +1,5 @@
 package it.unipr.frontend.interprocedural;
 
-import org.junit.Test;
-
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
@@ -14,6 +12,7 @@ import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ContextBasedAnalysis;
 import it.unive.lisa.interprocedural.RecursionFreeToken;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
+import org.junit.Test;
 
 public class Interprocedural extends RustLiSATestExecutor {
 	private LiSAConfiguration mkConf() {
@@ -28,25 +27,33 @@ public class Interprocedural extends RustLiSATestExecutor {
 		conf.jsonOutput = true;
 		return conf;
 	}
-	
+
 	@Test
 	public void testSum() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-	
+
 		perform("interprocedural/sum", "sum.rs", conf);
 	}
-	
+
 	@Test
 	public void testRectangle() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-	
+
 		perform("interprocedural/rectangle", "rectangle.rs", conf);
 	}
-	
+
 	@Test
 	public void testGeometry() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
 
 		perform("interprocedural/geometry", "geometry.rs", conf);
 	}
+
+	@Test
+	public void testBook() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+
+		perform("interprocedural/book", "book.rs", conf);
+	}
+
 }

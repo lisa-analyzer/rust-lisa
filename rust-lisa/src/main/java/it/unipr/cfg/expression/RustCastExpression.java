@@ -13,7 +13,11 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.value.Constant;
+import it.unive.lisa.symbolic.value.operator.binary.TypeCast;
 import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeTokenType;
+import java.util.Collections;
 
 /**
  * Rust type cast expression (e.g., x as Type).
@@ -31,10 +35,7 @@ public class RustCastExpression extends UnaryExpression {
 	 * @param type     the type to cast to
 	 * @param expr     the expression to apply the cast
 	 */
-	public RustCastExpression(CFG cfg, CodeLocation location, Type type,
-			Expression expr) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
+	public RustCastExpression(CFG cfg, CodeLocation location, Type type, Expression expr) {
 		super(cfg, location, "as", type, expr);
 	}
 
@@ -50,8 +51,13 @@ public class RustCastExpression extends UnaryExpression {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> unarySemantics(
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		Constant typeCast = new Constant(new TypeTokenType(Collections.singleton(getStaticType())), getStaticType(),
+				expr.getCodeLocation());
+
+		SymbolicExpression castExpr = new it.unive.lisa.symbolic.value.BinaryExpression(getStaticType(), expr, typeCast,
+				TypeCast.INSTANCE, this.getLocation());
+		return state.smallStepSemantics(castExpr, this);
 	}
 
 }
