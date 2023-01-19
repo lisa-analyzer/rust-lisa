@@ -1,7 +1,5 @@
 package it.unipr.frontend;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -21,6 +19,7 @@ import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.OutOfScopeIdentifier;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Implementation of the parameter assigning strategy for Rust.
@@ -48,7 +47,7 @@ public class RustParameterAssigningStrategy implements ParameterAssigningStrateg
 					StatementStore<A, H, V, T> expressions, Parameter[] formals,
 					ExpressionSet<SymbolicExpression>[] actuals)
 					throws SemanticException {
-				
+
 		// forget actuals that are Variables and does not have RustReferenceType
 		for (int i = 0; i < formals.length; ++i)
 			if (!(formals[i].getStaticType() instanceof RustReferenceType))
@@ -56,7 +55,7 @@ public class RustParameterAssigningStrategy implements ParameterAssigningStrateg
 					for (SymbolicExpression actualElement : actualSet)
 						if (actualElement instanceof OutOfScopeIdentifier)
 							callState = callState.lub(callState.forgetIdentifier((OutOfScopeIdentifier) actualElement));
-				
+
 		// if it is an instance call, we need check the first parameter
 		// that corresponds to the callee of the instance call
 		if (call.getCallType() == CallType.INSTANCE) {

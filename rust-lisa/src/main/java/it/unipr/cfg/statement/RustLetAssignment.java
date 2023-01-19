@@ -1,7 +1,5 @@
 package it.unipr.cfg.statement;
 
-import java.util.Collections;
-
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
@@ -19,6 +17,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
+import java.util.Collections;
 
 /**
  * Rust assignment expression (e.g., let x = y).
@@ -57,11 +56,12 @@ public class RustLetAssignment extends BinaryExpression {
 		if (left instanceof Variable && left.getStaticType().isInMemoryType())
 			if (left.hasRuntimeTypes())
 				left.setRuntimeTypes(Collections.singleton(new ReferenceType(left.getStaticType())));
-		
-		// forget identifiers that are Variables, are not have RustReferenceType and are 
+
+		// forget identifiers that are Variables, are not have RustReferenceType
+		// and are
 		if (!(right.getStaticType() instanceof RustReferenceType) && right instanceof Variable)
 			return state.assign(left, right, this).forgetIdentifier((Variable) right);
-		
+
 		return state.assign(left, right, this);
 	}
 }

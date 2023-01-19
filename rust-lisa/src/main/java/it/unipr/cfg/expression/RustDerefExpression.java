@@ -32,8 +32,8 @@ public class RustDerefExpression extends UnaryExpression {
 	 * @param expr     the inner
 	 */
 	public RustDerefExpression(CFG cfg, CodeLocation location, Expression expr) {
-		super(cfg, location, "*", expr.getStaticType().equals(Untyped.INSTANCE) ? Untyped.INSTANCE :
-				((PointerType) expr.getStaticType()).getInnerType(), expr);
+		super(cfg, location, "*", expr.getStaticType().equals(Untyped.INSTANCE) ? Untyped.INSTANCE
+				: ((PointerType) expr.getStaticType()).getInnerType(), expr);
 	}
 
 	@Override
