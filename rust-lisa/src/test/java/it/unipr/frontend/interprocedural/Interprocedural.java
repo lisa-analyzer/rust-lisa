@@ -50,10 +50,10 @@ public class Interprocedural extends RustLiSATestExecutor {
 	}
 
 	@Test
-	public void testBook() throws AnalysisSetupException {
+	public void testBookMethods() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
 
-		perform("interprocedural/book", "book.rs", conf);
+		perform("interprocedural/book-methods", "book-methods.rs", conf);
 	}
 
 	@Test
