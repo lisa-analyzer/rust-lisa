@@ -1,12 +1,12 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
+import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.type.Type;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustEnumTupleLiteral extends RustEnumLiteral<RustMultipleExpression> {
+public class RustEnumTupleLiteral extends RustEnumLiteral<NaryExpression> {
 
 	private String variantName;
 
@@ -31,9 +31,9 @@ public class RustEnumTupleLiteral extends RustEnumLiteral<RustMultipleExpression
 	 * @param variantName the name of this variant
 	 * @param enumType    the enum type of this literal
 	 */
-	public RustEnumTupleLiteral(CFG cfg, CodeLocation location, RustMultipleExpression expressions, String variantName,
+	public RustEnumTupleLiteral(CFG cfg, CodeLocation location, Expression[] expressions, String variantName,
 			RustEnumType enumType) {
-		super(cfg, location, expressions, enumType);
+		super(cfg, location, new RustMultipleExpression(cfg, location, expressions), enumType);
 		this.variantName = variantName;
 	}
 

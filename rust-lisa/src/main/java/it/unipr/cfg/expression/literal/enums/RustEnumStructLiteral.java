@@ -1,12 +1,14 @@
 package it.unipr.cfg.expression.literal.enums;
 
-import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unive.lisa.program.CompilationUnit;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
+import it.unive.lisa.program.cfg.statement.Expression;
+import it.unive.lisa.program.cfg.statement.NaryExpression;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpression> {
+public class RustEnumStructLiteral extends RustEnumLiteral<NaryExpression> {
 
 	private String variantName;
 	private String[] names;
@@ -35,10 +37,10 @@ public class RustEnumStructLiteral extends RustEnumLiteral<RustMultipleExpressio
 	 * @param variantName the name of this variant
 	 * @param enumType    the enum type of this literal
 	 */
-	public RustEnumStructLiteral(CFG cfg, CodeLocation location, String[] names, RustMultipleExpression expressions,
+	public RustEnumStructLiteral(CFG cfg, CodeLocation location, String[] names, Expression[] expressions,
 			String variantName,
 			RustEnumType enumType) {
-		super(cfg, location, expressions, enumType);
+		super(cfg, location, new RustMultipleExpression(cfg, location, expressions), enumType);
 		this.names = names;
 		this.variantName = variantName;
 	}

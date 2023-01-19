@@ -9,7 +9,6 @@ import it.unipr.cfg.expression.RustCastExpression;
 import it.unipr.cfg.expression.RustDerefExpression;
 import it.unipr.cfg.expression.RustDestructuringExpression;
 import it.unipr.cfg.expression.RustDoubleRefExpression;
-import it.unipr.cfg.expression.RustMultipleExpression;
 import it.unipr.cfg.expression.RustRangeExpression;
 import it.unipr.cfg.expression.RustRangeFromExpression;
 import it.unipr.cfg.expression.RustRefExpression;
@@ -94,6 +93,7 @@ import it.unive.lisa.program.cfg.edge.FalseEdge;
 import it.unive.lisa.program.cfg.edge.SequentialEdge;
 import it.unive.lisa.program.cfg.edge.TrueEdge;
 import it.unive.lisa.program.cfg.statement.Expression;
+import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.program.cfg.statement.NoOp;
 import it.unive.lisa.program.cfg.statement.Statement;
 import it.unive.lisa.program.cfg.statement.VariableRef;
@@ -1117,10 +1117,8 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 						RustEnumType enumType = RustEnumType.get(typeName);
 						if (RustEnumType.has(typeName)) {
-							result = new RustEnumTupleLiteral(
-									currentCfg, locationOf(ctx, filePath), new RustMultipleExpression(currentCfg,
-											locationOf(ctx, filePath), lhs.toArray(new Expression[0])),
-									variantName, enumType);
+							result = new RustEnumTupleLiteral(currentCfg, locationOf(ctx, filePath),
+									lhs.toArray(new Expression[0]), variantName, enumType);
 						}
 					}
 				}
@@ -1141,9 +1139,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 						if (RustEnumType.has(typeName)) {
 							result = new RustEnumStructLiteral(
 									currentCfg, locationOf(ctx, filePath), fieldNames.toArray(new String[0]),
-									new RustMultipleExpression(currentCfg,
-											locationOf(ctx, filePath), fieldValues.toArray(new Expression[0])),
-									variantName, enumType);
+									fieldValues.toArray(new Expression[0]), variantName, enumType);
 						}
 					}
 				}
@@ -1153,12 +1149,11 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 				RustEnumUnit ecu = ((RustEnumType) type).getUnit();
 				@SuppressWarnings("unchecked")
 				// This cast is safe because there are 3 types of
-				// RustEnumLiteral, two of them use RustMultipleExpression,
+				// RustEnumLiteral, two of them use NaryExpression,
 				// which are the exact ones that are matched here. The remaining
 				// one uses String but it is checked, but because of that is
 				// treated differently and not here
-				RustEnumLiteral<
-						RustMultipleExpression> literalVariant = (RustEnumLiteral<RustMultipleExpression>) result;
+				RustEnumLiteral<NaryExpression> literalVariant = (RustEnumLiteral<NaryExpression>) result;
 
 				boolean fieldMatched = ecu.getVariants().stream()
 						.anyMatch(variant -> literalVariant.isInstanceOf(variant));

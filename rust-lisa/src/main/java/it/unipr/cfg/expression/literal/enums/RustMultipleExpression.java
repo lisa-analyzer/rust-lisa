@@ -1,4 +1,4 @@
-package it.unipr.cfg.expression;
+package it.unipr.cfg.expression.literal.enums;
 
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -20,10 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Rust multiple expression separated by a comma (e.g.: a, b, c ).
  * 
+ * This class has a package visibility because it should not be used by other class but only by {@link RustEnumTupleLiteral} and {@link RustEnumStructLiteral}
+ * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustMultipleExpression extends NaryExpression {
+class RustMultipleExpression extends NaryExpression {
 
 	/**
 	 * Build the multiple name resolution.
