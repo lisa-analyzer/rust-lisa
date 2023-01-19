@@ -1,17 +1,17 @@
 {
   "warnings" : [ ],
-  "files" : [ "()_rust-testcases_interprocedural_geometry_geometry.rs.main().json", "Rectangle__Rectangle.new(i32_x,_i32_y,_i32_width,_i32_height)_1035775220.json", "i32_Circle.area(&Circle_self)_921202878.json", "i32_Circle.area(&Circle_self)_949859898.json", "i32_Circle.perimeter(&Circle_self)_892598713.json", "i32_Circle.perimeter(&Circle_self)_949915636.json", "i32_Rectangle.area(&Rectangle_self)_1064379385.json", "i32_Rectangle.perimeter(&Rectangle_self)_1064435123.json", "i32_Square.area(&Square_self)_1007118200.json", "i32_Square.perimeter(&Square_self)_1007173938.json", "report.json" ],
+  "files" : [ "()_rust-testcases_interprocedural_geometry_geometry.rs.main().json", "Rectangle__Rectangle.new(i32_x,_i32_y,_i32_width,_i32_height)_1064404371.json", "i32_Circle.area(&Circle_self)_921202878.json", "i32_Circle.area(&Circle_self)_949859898.json", "i32_Circle.perimeter(&Circle_self)_892598713.json", "i32_Circle.perimeter(&Circle_self)_949915636.json", "i32_Rectangle.area(&Rectangle_self)_1093008536.json", "i32_Rectangle.perimeter(&Rectangle_self)_1093064274.json", "i32_Square.area(&Square_self)_1007118200.json", "i32_Square.perimeter(&Square_self)_1007173938.json", "report.json" ],
   "info" : {
     "cfgs" : "8",
-    "duration" : "1s 362ms",
-    "end" : "2023-01-17T17:29:38.722+01:00",
-    "expressions" : "89",
+    "duration" : "1s 326ms",
+    "end" : "2023-01-19T14:45:59.612+01:00",
+    "expressions" : "91",
     "files" : "10",
     "globals" : "10",
     "members" : "8",
     "programs" : "1",
-    "start" : "2023-01-17T17:29:37.360+01:00",
-    "statements" : "16",
+    "start" : "2023-01-19T14:45:58.286+01:00",
+    "statements" : "17",
     "units" : "4",
     "version" : "0.1b7",
     "warnings" : "0"

@@ -72,6 +72,7 @@ fn main() {
 	let _circle_asp = c.area() + c.perimeter();
 	let s = Square {x : 1, y : 1, l : 1};
 	let _square_asp = s.area() + s.perimeter();
+	let s1 = s;
 	let r = Rectangle::new(1, 1, 1, 1);
 	let _rectangle_asp = r.area() + r.perimeter();
 }
