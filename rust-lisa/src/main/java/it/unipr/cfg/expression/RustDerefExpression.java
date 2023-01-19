@@ -14,6 +14,7 @@ import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.type.PointerType;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Rust unary deref expression (e.g., *x).
@@ -31,7 +32,8 @@ public class RustDerefExpression extends UnaryExpression {
 	 * @param expr     the inner
 	 */
 	public RustDerefExpression(CFG cfg, CodeLocation location, Expression expr) {
-		super(cfg, location, "*", ((PointerType) expr.getStaticType()).getInnerType(), expr);
+		super(cfg, location, "*", expr.getStaticType().equals(Untyped.INSTANCE) ? Untyped.INSTANCE :
+				((PointerType) expr.getStaticType()).getInnerType(), expr);
 	}
 
 	@Override
