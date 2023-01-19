@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 class RustMultipleExpression extends NaryExpression {
 
+	private ExpressionSet<SymbolicExpression>[] symbolicExpressions;
+
 	/**
 	 * Build the multiple name resolution.
 	 * 
@@ -44,6 +46,17 @@ class RustMultipleExpression extends NaryExpression {
 		return StringUtils.join(Arrays.asList(getSubExpressions()), ",");
 	}
 
+	/**
+	 * Yields the symbolic expression computed by the semantics. Note that this
+	 * function will lead a null values if it is being called before
+	 * expressionSemantics.
+	 * 
+	 * @return an array of sets of symbolic expressions
+	 */
+	public ExpressionSet<SymbolicExpression>[] getSymbolicExpression() {
+		return symbolicExpressions;
+	}
+
 	@Override
 	public <A extends AbstractState<A, H, V, T>,
 			H extends HeapDomain<H>,
@@ -52,8 +65,10 @@ class RustMultipleExpression extends NaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					ExpressionSet<SymbolicExpression>[] params, StatementStore<A, H, V, T> expressions)
 					throws SemanticException {
-		// TODO too coarse
-		return state.top();
+
+		symbolicExpressions = params;
+
+		return state;
 	}
 
 }

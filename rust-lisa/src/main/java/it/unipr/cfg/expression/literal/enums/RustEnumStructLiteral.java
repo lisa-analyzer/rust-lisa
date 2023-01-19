@@ -1,14 +1,26 @@
 package it.unipr.cfg.expression.literal.enums;
 
+import it.unipr.cfg.expression.literal.RustStructLiteral;
+import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
+import it.unive.lisa.analysis.AbstractState;
+import it.unive.lisa.analysis.AnalysisState;
+import it.unive.lisa.analysis.SemanticException;
+import it.unive.lisa.analysis.StatementStore;
+import it.unive.lisa.analysis.heap.HeapDomain;
+import it.unive.lisa.analysis.value.TypeDomain;
+import it.unive.lisa.analysis.value.ValueDomain;
+import it.unive.lisa.interprocedural.InterproceduralAnalysis;
 import it.unive.lisa.program.CompilationUnit;
+import it.unive.lisa.program.Global;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,5 +72,45 @@ public class RustEnumStructLiteral extends RustEnumLiteral<NaryExpression> {
 			return globalSet.equals(new HashSet<String>(Arrays.asList(names)));
 		}
 		return false;
+	}
+
+	@Override
+	public <A extends AbstractState<A, H, V, T>,
+			H extends HeapDomain<H>,
+			V extends ValueDomain<V>,
+			T extends TypeDomain<T>> AnalysisState<A, H, V, T> semantics(
+					AnalysisState<A, H, V, T> entryState, InterproceduralAnalysis<A, H, V, T> interprocedural,
+					StatementStore<A, H, V, T> expressions) throws SemanticException {
+
+		// Find a collection of valid struct inside the unit
+		RustEnumUnit enumUnit = RustEnumType.get(getStaticType().toString()).getUnit();
+		Collection<RustEnumVariant> validStructs = new HashSet<>();
+		for (RustEnumVariant variant : enumUnit.getVariants()) {
+			if (variant instanceof RustStructType) {
+				RustStructType structType = (RustStructType) variant;
+				Collection<Global> structGlobals = structType.getUnit().getInstanceGlobals(false);
+
+				// Check that each type in the expression canBeAssignedTo the
+				// corresponding type in the struct
+				for (int i = 0; i < names.length; ++i) {
+					Expression subExpr = getValue().getSubExpressions()[i];
+					String key = names[i];
+					if (!structGlobals.stream().anyMatch(
+							g -> subExpr.getStaticType().canBeAssignedTo(g.getStaticType()) && key.equals(g.getName())))
+						validStructs.add(variant);
+				}
+			}
+		}
+
+		AnalysisState<A, H, V, T> result = entryState;
+		for (RustEnumVariant struct : validStructs) {
+			AnalysisState<A, H, V, T> structState = RustStructLiteral.semantic(getLocation(), this,
+					(RustStructType) struct, interprocedural, entryState, names, getValue().getSubExpressions(),
+					((RustMultipleExpression) getValue()).getSymbolicExpression(), expressions);
+
+			result = result.lub(structState);
+		}
+
+		return result;
 	}
 }

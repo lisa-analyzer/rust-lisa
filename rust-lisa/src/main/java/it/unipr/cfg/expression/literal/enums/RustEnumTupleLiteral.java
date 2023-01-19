@@ -1,13 +1,25 @@
 package it.unipr.cfg.expression.literal.enums;
 
+import it.unipr.cfg.expression.literal.RustTupleLiteral;
+import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
+import it.unive.lisa.analysis.AbstractState;
+import it.unive.lisa.analysis.AnalysisState;
+import it.unive.lisa.analysis.SemanticException;
+import it.unive.lisa.analysis.StatementStore;
+import it.unive.lisa.analysis.heap.HeapDomain;
+import it.unive.lisa.analysis.value.TypeDomain;
+import it.unive.lisa.analysis.value.ValueDomain;
+import it.unive.lisa.interprocedural.InterproceduralAnalysis;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.NaryExpression;
 import it.unive.lisa.type.Type;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -21,7 +33,7 @@ public class RustEnumTupleLiteral extends RustEnumLiteral<NaryExpression> {
 	private String variantName;
 
 	/**
-	 * Build the enum struct literal.
+	 * Build the enum tuple literal.
 	 * 
 	 * @param cfg         the {@link CFG} where this literal lies
 	 * @param location    the location where this literal is defined
@@ -54,5 +66,44 @@ public class RustEnumTupleLiteral extends RustEnumLiteral<NaryExpression> {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public <A extends AbstractState<A, H, V, T>,
+			H extends HeapDomain<H>,
+			V extends ValueDomain<V>,
+			T extends TypeDomain<T>> AnalysisState<A, H, V, T> semantics(
+					AnalysisState<A, H, V, T> entryState, InterproceduralAnalysis<A, H, V, T> interprocedural,
+					StatementStore<A, H, V, T> expressions) throws SemanticException {
+
+		// Find a collection of valid tuples inside the unit
+		RustEnumUnit unit = RustEnumType.get(getStaticType().toString()).getUnit();
+		Collection<RustEnumVariant> validTuples = new HashSet<>();
+		for (RustEnumVariant variant : unit.getVariants()) {
+			if (variant instanceof RustTupleType) {
+				RustTupleType candidate = (RustTupleType) variant;
+
+				// Check that each type in the expression canBeAssignedTo the
+				// corresponding type in the tuple
+				for (int i = 0; i < candidate.getTypes().size(); ++i) {
+					Type t = candidate.getTypes().get(i);
+					Expression expr = getValue().getSubExpressions()[i];
+					if (!(expr.getStaticType().canBeAssignedTo(t)))
+						validTuples.add(candidate);
+				}
+			}
+		}
+
+		AnalysisState<A, H, V, T> result = entryState;
+		for (RustEnumVariant tuple : validTuples) {
+			AnalysisState<A, H, V, T> tupleState = RustTupleLiteral.semantic(getLocation(), this,
+					(RustTupleType) tuple, interprocedural, entryState,
+					getValue().getSubExpressions(), ((RustMultipleExpression) getValue()).getSymbolicExpression(),
+					expressions);
+
+			result = result.lub(tupleState);
+		}
+
+		return result;
 	}
 }
