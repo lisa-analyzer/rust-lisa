@@ -1,0 +1,33 @@
+{
+  "warnings" : [ ],
+  "files" : [ "()_rust-testcases_interprocedural_book_book.rs.main().json", "bool_Rectangle.can_hold(&Rectangle_self,_&Rectangle_other)_-59575823.json", "report.json" ],
+  "info" : {
+    "cfgs" : "3",
+    "duration" : "1s 507ms",
+    "end" : "2023-01-19T10:31:19.248+01:00",
+    "expressions" : "44",
+    "files" : "2",
+    "globals" : "2",
+    "members" : "3",
+    "programs" : "1",
+    "start" : "2023-01-19T10:31:17.741+01:00",
+    "statements" : "8",
+    "units" : "2",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/interprocedural/book"
+  }
+}

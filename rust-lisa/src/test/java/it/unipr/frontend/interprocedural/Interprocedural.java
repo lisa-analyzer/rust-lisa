@@ -1,5 +1,7 @@
 package it.unipr.frontend.interprocedural;
 
+import org.junit.Test;
+
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
@@ -12,7 +14,6 @@ import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ContextBasedAnalysis;
 import it.unive.lisa.interprocedural.RecursionFreeToken;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
-import org.junit.Test;
 
 public class Interprocedural extends RustLiSATestExecutor {
 	private LiSAConfiguration mkConf() {
