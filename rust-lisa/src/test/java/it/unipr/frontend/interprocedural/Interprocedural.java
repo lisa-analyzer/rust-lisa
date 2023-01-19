@@ -56,5 +56,12 @@ public class Interprocedural extends RustLiSATestExecutor {
 
 		perform("interprocedural/book", "book.rs", conf);
 	}
+	
+	@Test
+	public void testParameterPassage() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+
+		perform("interprocedural/parameter-passage", "parameter-passage.rs", conf);
+	}
 
 }
