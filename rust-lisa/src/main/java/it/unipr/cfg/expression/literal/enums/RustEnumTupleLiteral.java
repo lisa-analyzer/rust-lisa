@@ -94,11 +94,12 @@ public class RustEnumTupleLiteral extends RustEnumLiteral<NaryExpression> {
 			}
 		}
 
-		AnalysisState<A, H, V, T> result = entryState;
+		RustMultipleExpression inner = (RustMultipleExpression) getValue();
+		AnalysisState<A, H, V, T> result = entryState.lub(inner.semantics(entryState, interprocedural, expressions));
 		for (RustEnumVariant tuple : validTuples) {
 			AnalysisState<A, H, V, T> tupleState = RustTupleLiteral.semantic(getLocation(), this,
 					(RustTupleType) tuple, interprocedural, entryState,
-					getValue().getSubExpressions(), ((RustMultipleExpression) getValue()).getSymbolicExpression(),
+					getValue().getSubExpressions(), inner.getSymbolicExpression(),
 					expressions);
 
 			result = result.lub(tupleState);

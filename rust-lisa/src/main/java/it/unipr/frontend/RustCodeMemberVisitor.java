@@ -760,6 +760,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 */
 	private List<Expression> ttParseArguments(ParserRuleContext ctx) {
 		String context = ctx.getText();
+		// TODO this split is wonky in the way it works. For instance, it can split correctly some strings e.g. ("results = {}", a) but sot others e.g. ("clicked at x={}, y={}.", x, y). 
 		String[] args = context.substring(1, context.length() - 1).split(",");
 
 		List<Expression> expressions = new ArrayList<>();

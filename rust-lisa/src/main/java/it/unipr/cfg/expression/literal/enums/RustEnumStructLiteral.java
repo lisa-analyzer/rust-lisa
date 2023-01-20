@@ -102,11 +102,12 @@ public class RustEnumStructLiteral extends RustEnumLiteral<NaryExpression> {
 			}
 		}
 
-		AnalysisState<A, H, V, T> result = entryState;
+		RustMultipleExpression inner = (RustMultipleExpression) getValue();
+		AnalysisState<A, H, V, T> result = entryState.lub(inner.semantics(entryState, interprocedural, expressions));
 		for (RustEnumVariant struct : validStructs) {
 			AnalysisState<A, H, V, T> structState = RustStructLiteral.semantic(getLocation(), this,
-					(RustStructType) struct, interprocedural, entryState, names, getValue().getSubExpressions(),
-					((RustMultipleExpression) getValue()).getSymbolicExpression(), expressions);
+					(RustStructType) struct, interprocedural, entryState, names, inner.getSubExpressions(),
+					inner.getSymbolicExpression(), expressions);
 
 			result = result.lub(structState);
 		}

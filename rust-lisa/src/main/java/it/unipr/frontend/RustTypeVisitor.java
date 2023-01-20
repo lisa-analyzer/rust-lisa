@@ -2,7 +2,12 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import it.unipr.cfg.program.unit.RustTraitUnit;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -15,6 +20,7 @@ import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumSimpleVariant;
+import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
 import it.unipr.cfg.type.numeric.floating.RustF32Type;
 import it.unipr.cfg.type.numeric.floating.RustF64Type;
@@ -59,10 +65,6 @@ import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Type visitor for Rust, managing the parsing of Rust types.
@@ -236,11 +238,13 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 			return RustCharType.getInstance();
 		default:
 			if (RustStructType.has(ctx.Ident().getText())) {
-				return RustStructType.lookup(ctx.Ident().getText(), unit);
+				return RustStructType.get(ctx.Ident().getText());
 			} else if (RustTraitType.has(ctx.Ident().getText())) {
-				return RustTraitType.lookup(ctx.Ident().getText(), (RustTraitUnit) unit);
+				return RustTraitType.get(ctx.Ident().getText());
+			} else if (RustEnumType.has(ctx.Ident().getText())) {
+				return RustEnumType.get(ctx.Ident().getText());
 			} else
-				throw new IllegalAccessError("The name of this type was not found");
+				throw new IllegalAccessError("Unable to find \"" + ctx.Ident().getText() + "\" type");
 		}
 	}
 
