@@ -63,7 +63,6 @@ public class RustReferenceType extends ReferenceType implements RustType {
 
 		ReferenceType o = (RustReferenceType) other;
 
-		// TODO: equals or canBeAssigned?
 		return getInnerType().canBeAssignedTo(o.getInnerType());
 	}
 

@@ -1,0 +1,33 @@
+{
+  "warnings" : [ ],
+  "files" : [ "()_rust-testcases_interprocedural_paper1_paper1.rs.main().json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "546ms",
+    "end" : "2023-01-23T10:44:37.156+01:00",
+    "expressions" : "6",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-01-23T10:44:36.610+01:00",
+    "statements" : "3",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/interprocedural/paper1"
+  }
+}

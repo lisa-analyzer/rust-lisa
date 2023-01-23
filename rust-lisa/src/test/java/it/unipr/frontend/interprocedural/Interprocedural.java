@@ -5,6 +5,7 @@ import org.junit.Test;
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
+import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.TypeEnvironment;
@@ -69,5 +70,27 @@ public class Interprocedural extends RustLiSATestExecutor {
 		LiSAConfiguration conf = mkConf();
 		
 		perform("interprocedural/book-enums", "book-enums.rs", conf);
+	}
+	
+	@Test
+	public void testPaper1() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+		
+		perform("interprocedural/paper1", "paper1.rs", conf);
+	}
+	
+	@Test
+	public void testPaper2() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+		conf.analysisGraphs = GraphType.DOT;
+		
+		perform("interprocedural/paper2", "paper2.rs", conf);
+	}
+	
+	@Test
+	public void testPaper3() throws AnalysisSetupException {
+		LiSAConfiguration conf = mkConf();
+		
+		perform("interprocedural/paper3", "paper3.rs", conf);
 	}
 }

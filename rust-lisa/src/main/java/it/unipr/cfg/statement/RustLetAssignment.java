@@ -58,7 +58,7 @@ public class RustLetAssignment extends BinaryExpression {
 				left.setRuntimeTypes(Collections.singleton(new ReferenceType(left.getStaticType())));
 
 		// forget identifiers that are Variables, are not have RustReferenceType
-		// and are
+		// and are the rhs of an assignment
 		if (!(right.getStaticType() instanceof RustReferenceType) && right instanceof Variable)
 			return state.assign(left, right, this).forgetIdentifier((Variable) right);
 

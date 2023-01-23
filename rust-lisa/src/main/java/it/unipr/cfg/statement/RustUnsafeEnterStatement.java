@@ -55,7 +55,7 @@ public class RustUnsafeEnterStatement extends Statement {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> semantics(
 					AnalysisState<A, H, V, T> entryState, InterproceduralAnalysis<A, H, V, T> interprocedural,
 					StatementStore<A, H, V, T> expressions) throws SemanticException {
-		// TODO Too coarse for now
+
 		return entryState.smallStepSemantics(new Skip(getLocation()), this);
 	}
 }
