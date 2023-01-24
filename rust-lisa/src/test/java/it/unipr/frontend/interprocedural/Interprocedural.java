@@ -3,6 +3,7 @@ package it.unipr.frontend.interprocedural;
 import org.junit.Test;
 
 import it.unipr.frontend.RustLiSATestExecutor;
+import it.unipr.frontend.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
 import it.unive.lisa.LiSAConfiguration.GraphType;
@@ -27,6 +28,7 @@ public class Interprocedural extends RustLiSATestExecutor {
 		conf.callGraph = new RTACallGraph();
 		conf.interproceduralAnalysis = new ContextBasedAnalysis<>(RecursionFreeToken.getSingleton());
 		conf.jsonOutput = true;
+		conf.openCallPolicy = RustReturnTopPolicy.INSTANCE;
 		return conf;
 	}
 
@@ -83,14 +85,14 @@ public class Interprocedural extends RustLiSATestExecutor {
 	public void testPaper2() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
 		conf.analysisGraphs = GraphType.DOT;
-		
+
 		perform("interprocedural/paper2", "paper2.rs", conf);
 	}
 	
 	@Test
 	public void testPaper3() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-		
+
 		perform("interprocedural/paper3", "paper3.rs", conf);
 	}
 }

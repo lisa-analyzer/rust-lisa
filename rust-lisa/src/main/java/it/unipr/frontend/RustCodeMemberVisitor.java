@@ -2,6 +2,20 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -60,6 +74,7 @@ import it.unipr.cfg.statement.RustUnsafeExitStatement;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustForeignType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTraitType;
@@ -85,6 +100,7 @@ import it.unive.lisa.program.Program;
 import it.unive.lisa.program.Unit;
 import it.unive.lisa.program.cfg.AbstractCodeMember;
 import it.unive.lisa.program.cfg.CFG;
+import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.CodeMember;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.Parameter;
@@ -104,18 +120,6 @@ import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -395,14 +399,36 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitForeign_item(Foreign_itemContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public Void visitForeign_item(Foreign_itemContext ctx) {
+		if (ctx.foreign_item_tail() != null) {
+			visitForeign_item_tail(ctx.foreign_item_tail());
+			
+			return null;
+		} else throw new UnsupportedOperationException("As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
 	}
 
 	@Override
-	public Object visitForeign_item_tail(Foreign_item_tailContext ctx) {
-		// TODO Auto-generated method stub
+	public Void visitForeign_item_tail(Foreign_item_tailContext ctx) {
+		if (ctx.foreign_fn_decl() != null) {
+			CodeMemberDescriptor foreignSignature = visitForeign_fn_decl(ctx.foreign_fn_decl());
+			
+			unit.addCodeMember(new AbstractCodeMember(foreignSignature));
+		} else if (ctx.children.get(0).getText().equals("static")) {
+			
+			// TODO: figure out how to insert mutable in Globals
+			boolean mutable = false;
+			if (ctx.children.get(1).getText().equals("mut"))
+				mutable = true;
+			
+			Type type = new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum());
+			unit.addGlobal(new Global(locationOf(ctx, filePath), unit, ctx.ident().getText(), true, type));
+		} else if (ctx.children.get(0).getText().equals("type")) {
+			RustForeignType foreignType = new RustForeignType(ctx.ident().getText());
+			RustForeignType.lookup(ctx.ident().getText(), foreignType);
+			
+		} else 
+			throw new UnsupportedOperationException("As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
+		
 		return null;
 	}
 
@@ -491,9 +517,27 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitForeign_fn_decl(Foreign_fn_declContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public CodeMemberDescriptor visitForeign_fn_decl(Foreign_fn_declContext ctx) {
+		// TODO: parse where_clause?
+		
+		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
+
+		Type returnType = RustUnitType.getInstance();
+		if (ctx.rtype() != null)
+			returnType = new RustTypeVisitor(filePath, unit, program).visitRtype(ctx.rtype());
+
+		if (returnType.isInMemoryType())
+			returnType = new ReferenceType(returnType);
+
+		List<RustParameter> parameters = new ArrayList<>();
+		if (ctx.variadic_param_list() != null)
+			parameters = visitVariadic_param_list(ctx.variadic_param_list());
+		Parameter[] parametersArray = parameters.toArray(new Parameter[0]);
+		
+		CodeMemberDescriptor cfgDesc = new RustCodeMememberDescriptor(locationOf(ctx, filePath), unit, false,
+				decorators.getName(), returnType, decorators.isUnsafe(), parametersArray);
+		
+		return cfgDesc;
 	}
 
 	@Override
@@ -563,9 +607,14 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	}
 
 	@Override
-	public Object visitVariadic_param_list(Variadic_param_listContext ctx) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<RustParameter> visitVariadic_param_list(Variadic_param_listContext ctx) {
+		// TODO: not parsing the varaidic part: (',' '...')? ','?
+		List<RustParameter> parameters = new ArrayList<>();
+
+		for (ParamContext pCtx : ctx.param())
+			parameters.add(visitParam(pCtx));
+
+		return parameters;
 	}
 
 	@Override

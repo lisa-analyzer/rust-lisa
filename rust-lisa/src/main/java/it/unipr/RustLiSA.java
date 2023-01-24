@@ -1,6 +1,7 @@
 package it.unipr;
 
 import it.unipr.frontend.RustFrontend;
+import it.unipr.frontend.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
@@ -46,6 +47,7 @@ public class RustLiSA {
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.workdir = "output";
 		conf.jsonOutput = true;
+		conf.openCallPolicy = RustReturnTopPolicy.INSTANCE;
 
 		LiSA lisa = new LiSA(conf);
 		lisa.run(program);

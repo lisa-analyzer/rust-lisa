@@ -15,6 +15,7 @@ import it.unipr.cfg.type.RustStrType;
 import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustForeignType;
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTraitType;
@@ -124,21 +125,21 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 		case "[":
 			Type arrayType = visitTy_sum(ctx.ty_sum());
 
-			if (ctx.expr() != null) {
+			if (ctx.expr() != null) { // array declaration
 				RustArrayType array = new RustArrayType(arrayType, getConstantValue(ctx.expr()));
 				return RustArrayType.lookup(array);
 			}
 
-		case "&":
+		case "&":			
 			// TODO Ignoring lifetimes for now
-			if (ctx.getChild(2) != null && ctx.getChild(2).getText().equals("mut"))
+			if (ctx.getChild(1) != null && ctx.getChild(1).getText().equals("mut"))
 				mutable = true;
 
 			return new RustReferenceType(visitTy(ctx.ty()), mutable);
 
 		case "&&":
 			// TODO Ignoring lifetimes for now
-			if (ctx.getChild(2).getText().equals("mut"))
+			if (ctx.getChild(1).getText().equals("mut"))
 				mutable = true;
 
 			return new RustReferenceType(new RustReferenceType(visitTy(ctx.ty()), mutable), false);
@@ -243,6 +244,8 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 				return RustTraitType.get(ctx.Ident().getText());
 			} else if (RustEnumType.has(ctx.Ident().getText())) {
 				return RustEnumType.get(ctx.Ident().getText());
+			} else if (RustForeignType.has(ctx.Ident().getText())) {
+				return RustForeignType.get(ctx.Ident().getText());
 			} else
 				throw new IllegalAccessError("Unable to find \"" + ctx.Ident().getText() + "\" type");
 		}
