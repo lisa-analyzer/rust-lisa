@@ -1,15 +1,14 @@
 package it.unipr.cfg.type.composite;
 
+import it.unipr.cfg.type.RustType;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import it.unipr.cfg.type.RustType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.TypeSystem;
-import it.unive.lisa.type.Untyped;
 
 /**
  * Builds the a foreign type for Rust.
@@ -19,13 +18,14 @@ import it.unive.lisa.type.Untyped;
  */
 public class RustForeignType implements RustType {
 	private static final Map<String, RustForeignType> INSTANCES = new HashMap<>();
-	
+
 	/**
 	 * Yields a unique instance (either an existing one or a fresh one) of
 	 * {@link RustForeingType} representing a foreign type with the given
 	 * {@code name}.
 	 * 
 	 * @param name the name of the foreign type
+	 * @param type the foreign type
 	 * 
 	 * @return the unique instance of {@link RustStructType} representing the
 	 *             foreign type with the given name
@@ -33,7 +33,7 @@ public class RustForeignType implements RustType {
 	public static RustForeignType lookup(String name, RustForeignType type) {
 		return INSTANCES.computeIfAbsent(name, x -> new RustForeignType(name));
 	}
-	
+
 	/**
 	 * Retrieve a single instance of a Rust foreign types.
 	 * 
@@ -48,7 +48,7 @@ public class RustForeignType implements RustType {
 			throw new IllegalArgumentException("There is no foreign type with name " + name);
 		return INSTANCES.get(name);
 	}
-	
+
 	/**
 	 * Checks whether a foreign type named {@code name} has been already built.
 	 * 
@@ -79,23 +79,28 @@ public class RustForeignType implements RustType {
 		}
 		return result;
 	}
-	
+
 	private final String name;
-	
+
+	/**
+	 * Construct the {@link RustForeignType} object.
+	 * 
+	 * @param name the type of the element in the array
+	 */
 	public RustForeignType(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public Type commonSupertype(Type other) {
 		return (other.toString().equals(name)) ? other : Untyped.INSTANCE;
 	}
-	
+
 	@Override
 	public boolean canBeAssignedTo(Type other) {
 		return (other.toString().equals(name));
 	}
-	
+
 	@Override
 	public Set<Type> allInstances(TypeSystem types) {
 		Set<Type> instances = new HashSet<>();
@@ -103,7 +108,7 @@ public class RustForeignType implements RustType {
 			instances.add(in);
 		return instances;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;

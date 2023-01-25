@@ -2,18 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-
 import it.unipr.cfg.program.unit.RustEnumUnit;
 import it.unipr.cfg.program.unit.RustTraitUnit;
 import it.unipr.cfg.type.RustBooleanType;
@@ -65,6 +53,16 @@ import it.unive.lisa.program.cfg.CodeMember;
 import it.unive.lisa.program.cfg.statement.evaluation.EvaluationOrder;
 import it.unive.lisa.program.cfg.statement.evaluation.LeftToRightEvaluation;
 import it.unive.lisa.type.Type;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * The Rust front-end for LiSA.
@@ -199,14 +197,15 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 	@Override
 	public Void visitItem(ItemContext ctx) {
 		if (ctx.extern_mod() != null) {
-			// As of now we are parsing only FFI and external variables, leaving behind external crates
+			// As of now we are parsing only FFI and external variables, leaving
+			// behind external crates
 			AbstractClassUnit externUnit = new AbstractClassUnit(locationOf(ctx, filePath), program, "extern", false);
 			for (Foreign_itemContext fi : ctx.extern_mod().foreign_item())
 				new RustCodeMemberVisitor(filePath, program, externUnit).visitForeign_item(fi);
-			
+
 			currentUnit.addAncestor(externUnit);
 		}
-		
+
 		if (ctx.pub_item() != null)
 			visitPub_item(ctx.pub_item());
 

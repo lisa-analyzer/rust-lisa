@@ -1,12 +1,9 @@
 package it.unipr.frontend.interprocedural;
 
-import org.junit.Test;
-
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unipr.frontend.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
-import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.TypeEnvironment;
@@ -14,8 +11,10 @@ import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
 import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ContextBasedAnalysis;
+import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
 import it.unive.lisa.interprocedural.RecursionFreeToken;
 import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
+import org.junit.Test;
 
 public class Interprocedural extends RustLiSATestExecutor {
 	private LiSAConfiguration mkConf() {
@@ -66,32 +65,32 @@ public class Interprocedural extends RustLiSATestExecutor {
 
 		perform("interprocedural/parameter-passage", "parameter-passage.rs", conf);
 	}
-	
+
 	@Test
 	public void testBookEnums() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-		
+
 		perform("interprocedural/book-enums", "book-enums.rs", conf);
 	}
-	
+
 	@Test
 	public void testPaper1() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-		
+
 		perform("interprocedural/paper1", "paper1.rs", conf);
 	}
-	
+
 	@Test
 	public void testPaper2() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
-		conf.analysisGraphs = GraphType.DOT;
 
 		perform("interprocedural/paper2", "paper2.rs", conf);
 	}
-	
+
 	@Test
 	public void testPaper3() throws AnalysisSetupException {
 		LiSAConfiguration conf = mkConf();
+		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 
 		perform("interprocedural/paper3", "paper3.rs", conf);
 	}

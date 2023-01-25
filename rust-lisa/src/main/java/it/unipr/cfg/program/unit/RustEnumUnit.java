@@ -20,7 +20,8 @@ public class RustEnumUnit extends ClassUnit {
 	/**
 	 * Construct the {@link RustEnumUnit} object.
 	 * 
-	 * @param location the type of the element in the array
+	 * @param location the location where the enum is define within the source
+	 *                     file
 	 * @param program  the program to which add this ClassUnit
 	 * @param name     the name of the compilation unit
 	 * @param sealed   true if the compilation unit is sealead

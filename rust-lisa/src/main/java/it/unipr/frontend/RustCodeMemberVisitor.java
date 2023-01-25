@@ -2,20 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import it.unipr.cfg.expression.RustAccessMemberExpression;
 import it.unipr.cfg.expression.RustArrayAccess;
 import it.unipr.cfg.expression.RustBoxExpression;
@@ -71,7 +57,6 @@ import it.unipr.cfg.statement.RustAssignment;
 import it.unipr.cfg.statement.RustLetAssignment;
 import it.unipr.cfg.statement.RustUnsafeEnterStatement;
 import it.unipr.cfg.statement.RustUnsafeExitStatement;
-import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustForeignType;
@@ -100,7 +85,6 @@ import it.unive.lisa.program.Program;
 import it.unive.lisa.program.Unit;
 import it.unive.lisa.program.cfg.AbstractCodeMember;
 import it.unive.lisa.program.cfg.CFG;
-import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.CodeMember;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.Parameter;
@@ -120,6 +104,18 @@ import it.unive.lisa.program.cfg.statement.literal.NullLiteral;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /**
  * Code member visitor for Rust.
@@ -402,33 +398,36 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	public Void visitForeign_item(Foreign_itemContext ctx) {
 		if (ctx.foreign_item_tail() != null) {
 			visitForeign_item_tail(ctx.foreign_item_tail());
-			
+
 			return null;
-		} else throw new UnsupportedOperationException("As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
+		} else
+			throw new UnsupportedOperationException(
+					"As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
 	}
 
 	@Override
 	public Void visitForeign_item_tail(Foreign_item_tailContext ctx) {
 		if (ctx.foreign_fn_decl() != null) {
 			CodeMemberDescriptor foreignSignature = visitForeign_fn_decl(ctx.foreign_fn_decl());
-			
+
 			unit.addCodeMember(new AbstractCodeMember(foreignSignature));
 		} else if (ctx.children.get(0).getText().equals("static")) {
-			
+
 			// TODO: figure out how to insert mutable in Globals
 			boolean mutable = false;
 			if (ctx.children.get(1).getText().equals("mut"))
 				mutable = true;
-			
+
 			Type type = new RustTypeVisitor(filePath, unit, program).visitTy_sum(ctx.ty_sum());
 			unit.addGlobal(new Global(locationOf(ctx, filePath), unit, ctx.ident().getText(), true, type));
 		} else if (ctx.children.get(0).getText().equals("type")) {
 			RustForeignType foreignType = new RustForeignType(ctx.ident().getText());
 			RustForeignType.lookup(ctx.ident().getText(), foreignType);
-			
-		} else 
-			throw new UnsupportedOperationException("As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
-		
+
+		} else
+			throw new UnsupportedOperationException(
+					"As of now, this frontend supports only foreign function interfaces and nothing more. Unsable to parse this program");
+
 		return null;
 	}
 
@@ -519,7 +518,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	@Override
 	public CodeMemberDescriptor visitForeign_fn_decl(Foreign_fn_declContext ctx) {
 		// TODO: parse where_clause?
-		
+
 		RustFunctionDecoratorKeeper decorators = visitFn_head(ctx.fn_head());
 
 		Type returnType = RustUnitType.getInstance();
@@ -533,10 +532,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.variadic_param_list() != null)
 			parameters = visitVariadic_param_list(ctx.variadic_param_list());
 		Parameter[] parametersArray = parameters.toArray(new Parameter[0]);
-		
+
 		CodeMemberDescriptor cfgDesc = new RustCodeMememberDescriptor(locationOf(ctx, filePath), unit, false,
 				decorators.getName(), returnType, decorators.isUnsafe(), parametersArray);
-		
+
 		return cfgDesc;
 	}
 
@@ -809,7 +808,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 	 */
 	private List<Expression> ttParseArguments(ParserRuleContext ctx) {
 		String context = ctx.getText();
-		// TODO this split is wonky in the way it works. For instance, it can split correctly some strings e.g. ("results = {}", a) but sot others e.g. ("clicked at x={}, y={}.", x, y). 
+		// TODO this split is wonky in the way it works. For instance, it can
+		// split correctly some strings e.g. ("results = {}", a) but sot others
+		// e.g. ("clicked at x={}, y={}.", x, y).
 		String[] args = context.substring(1, context.length() - 1).split(",");
 
 		List<Expression> expressions = new ArrayList<>();
@@ -859,9 +860,10 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			if (child instanceof RustVariableRef) {
 				Global global = new Global(locationOf(ctx, filePath), program, child.toString(), true);
-				// TODO check if the toString is enough or it need something
-				// else
 				Unit unit = program.getUnit(parent.toString());
+
+				if (unit == null)
+					throw new IllegalAccessError("Unable to find unit: " + parent.toString());
 
 				return new AccessGlobal(currentCfg, locationOf(ctx, filePath), unit, global);
 			}
@@ -2035,7 +2037,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 					return new RustTupleLiteral(
 							currentCfg, locationOf(ctx, filePath), exprs.stream().map(e -> e.getStaticType())
-									.collect(Collectors.toList()).toArray(new RustType[0]),
+									.collect(Collectors.toList()).toArray(new Type[0]),
 							exprs.toArray(new Expression[0]));
 				}
 

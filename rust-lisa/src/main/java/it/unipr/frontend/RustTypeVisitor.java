@@ -2,12 +2,6 @@ package it.unipr.frontend;
 
 import static it.unipr.frontend.RustFrontendUtilities.locationOf;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import it.unipr.cfg.type.RustBooleanType;
 import it.unipr.cfg.type.RustCharType;
 import it.unipr.cfg.type.RustPointerType;
@@ -17,6 +11,7 @@ import it.unipr.cfg.type.RustUnitType;
 import it.unipr.cfg.type.composite.RustArrayType;
 import it.unipr.cfg.type.composite.RustForeignType;
 import it.unipr.cfg.type.composite.RustReferenceType;
+import it.unipr.cfg.type.composite.RustSliceType;
 import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
@@ -66,6 +61,10 @@ import it.unive.lisa.program.Global;
 import it.unive.lisa.program.Program;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Type visitor for Rust, managing the parsing of Rust types.
@@ -130,10 +129,16 @@ public class RustTypeVisitor extends RustBaseVisitor<Object> {
 				return RustArrayType.lookup(array);
 			}
 
-		case "&":			
+		case "&":
 			// TODO Ignoring lifetimes for now
 			if (ctx.getChild(1) != null && ctx.getChild(1).getText().equals("mut"))
 				mutable = true;
+
+			// slice type
+			if (ctx.ty().ty_sum() != null && ctx.ty().getChild(0).getText().equals("[")) {
+				Type innerType = visitTy_sum(ctx.ty().ty_sum());
+				return new RustSliceType(innerType, mutable);
+			}
 
 			return new RustReferenceType(visitTy(ctx.ty()), mutable);
 
