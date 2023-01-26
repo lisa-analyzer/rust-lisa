@@ -1,8 +1,8 @@
 package it.unipr.cfg.expression.comparison;
 
-import it.unipr.cfg.type.RustBooleanType;
-import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
-import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
+import it.unipr.cfg.type.numeric.floating.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.integer.RustUnconstrainedInt;
+import it.unipr.cfg.type.primitive.RustBooleanType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;

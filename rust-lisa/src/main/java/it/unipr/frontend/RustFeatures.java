@@ -1,5 +1,7 @@
 package it.unipr.frontend;
 
+import it.unipr.frontend.interprocedural.RustParameterAssigningStrategy;
+import it.unipr.frontend.interprocedural.RustParameterMatchingStrategy;
 import it.unive.lisa.program.language.LanguageFeatures;
 import it.unive.lisa.program.language.hierarchytraversal.HierarcyTraversalStrategy;
 import it.unive.lisa.program.language.hierarchytraversal.SingleInheritanceTraversalStrategy;

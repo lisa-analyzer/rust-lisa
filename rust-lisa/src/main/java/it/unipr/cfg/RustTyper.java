@@ -1,8 +1,8 @@
 package it.unipr.cfg;
 
-import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
-import it.unipr.cfg.type.numeric.RustUnconstrainedInt;
-import it.unipr.cfg.type.numeric.signed.RustI32Type;
+import it.unipr.cfg.type.numeric.floating.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.integer.RustUnconstrainedInt;
+import it.unipr.cfg.type.numeric.integer.signed.RustI32Type;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.symbolic.value.BinaryExpression;

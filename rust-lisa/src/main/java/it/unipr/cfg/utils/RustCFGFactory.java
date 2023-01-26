@@ -1,6 +1,7 @@
 package it.unipr.cfg.utils;
 
-import it.unipr.cfg.program.RustCFG;
+import it.unipr.cfg.program.cfg.RustCFG;
+import it.unipr.cfg.utils.keeper.RustFunctionDecoratorKeeper;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 
 /**

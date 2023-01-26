@@ -1,7 +1,7 @@
 package it.unipr;
 
 import it.unipr.frontend.RustFrontend;
-import it.unipr.frontend.RustReturnTopPolicy;
+import it.unipr.frontend.interprocedural.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;

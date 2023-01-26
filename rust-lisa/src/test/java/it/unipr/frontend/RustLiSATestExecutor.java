@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import it.unipr.cfg.type.composite.RustArrayType;
+import it.unipr.cfg.type.composite.RustForeignType;
 import it.unipr.cfg.type.composite.RustStructType;
+import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
 import it.unive.lisa.AnalysisException;
@@ -43,6 +45,8 @@ public abstract class RustLiSATestExecutor {
 		RustArrayType.clearAll();
 		RustTupleType.clearAll();
 		RustEnumType.clearAll();
+		RustTraitType.clearAll();
+		RustForeignType.clearAll();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package it.unipr.cfg.type.composite.enums;
 
 import it.unipr.cfg.program.unit.RustEnumUnit;
-import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;
 import it.unive.lisa.type.UnitType;

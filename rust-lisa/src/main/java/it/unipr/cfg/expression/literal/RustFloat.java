@@ -1,6 +1,6 @@
 package it.unipr.cfg.expression.literal;
 
-import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.floating.RustUnconstrainedFloat;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.literal.Literal;

@@ -1,8 +1,8 @@
 package it.unipr.frontend;
 
-import it.unipr.cfg.type.RustBooleanType;
-import it.unipr.cfg.type.RustStrType;
-import it.unipr.cfg.type.numeric.signed.RustI32Type;
+import it.unipr.cfg.type.numeric.integer.signed.RustI32Type;
+import it.unipr.cfg.type.primitive.RustBooleanType;
+import it.unipr.cfg.type.primitive.RustStrType;
 import it.unive.lisa.type.BooleanType;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.StringType;

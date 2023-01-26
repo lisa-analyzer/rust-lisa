@@ -1,7 +1,6 @@
 package it.unipr.cfg.type.numeric.floating;
 
-import it.unipr.cfg.type.RustType;
-import it.unipr.cfg.type.numeric.RustUnconstrainedFloat;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.type.NumericType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.TypeSystem;

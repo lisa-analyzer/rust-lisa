@@ -1,6 +1,6 @@
 package it.unipr.cfg.type.composite;
 
-import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;

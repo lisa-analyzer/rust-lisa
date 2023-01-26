@@ -1,7 +1,6 @@
 package it.unipr.frontend.interprocedural;
 
 import it.unipr.frontend.RustLiSATestExecutor;
-import it.unipr.frontend.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
 import it.unive.lisa.analysis.SimpleAbstractState;

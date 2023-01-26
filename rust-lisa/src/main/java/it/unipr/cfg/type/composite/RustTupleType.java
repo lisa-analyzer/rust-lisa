@@ -1,7 +1,7 @@
 package it.unipr.cfg.type.composite;
 
-import it.unipr.cfg.type.RustType;
 import it.unipr.cfg.type.composite.enums.RustEnumVariant;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.Statement;
 import it.unive.lisa.type.InMemoryType;

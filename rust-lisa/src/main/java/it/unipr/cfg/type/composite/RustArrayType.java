@@ -1,6 +1,6 @@
 package it.unipr.cfg.type.composite;
 
-import it.unipr.cfg.type.RustType;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.type.ArrayType;
 import it.unive.lisa.type.InMemoryType;
 import it.unive.lisa.type.Type;
