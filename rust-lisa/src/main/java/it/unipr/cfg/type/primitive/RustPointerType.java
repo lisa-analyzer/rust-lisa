@@ -137,4 +137,9 @@ public class RustPointerType implements PointerType, RustType {
 	public Type getInnerType() {
 		return innerType;
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

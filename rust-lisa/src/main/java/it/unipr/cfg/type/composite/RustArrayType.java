@@ -65,6 +65,7 @@ public class RustArrayType implements ArrayType, RustType, InMemoryType {
 	 */
 	private final Type contentType;
 	private final Integer length;
+	private boolean copiable = false;
 
 	/**
 	 * Construct the {@link RustArrayType} object.
@@ -162,5 +163,19 @@ public class RustArrayType implements ArrayType, RustType, InMemoryType {
 	 */
 	public Integer getLength() {
 		return length;
+	}
+	
+	/**
+	 * Sets if the type is copiable or not.
+	 * 
+	 * @param copiable if the type is copiable
+	 */
+	public void setCopiable(boolean copiable) {
+		this.copiable = copiable;
+	}
+	
+	@Override
+	public boolean isCopiable() {
+		return copiable;
 	}
 }

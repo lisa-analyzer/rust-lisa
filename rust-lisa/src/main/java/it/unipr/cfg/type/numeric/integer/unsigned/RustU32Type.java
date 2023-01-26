@@ -97,4 +97,9 @@ public class RustU32Type implements NumericType, RustType {
 	public String toString() {
 		return "u32";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

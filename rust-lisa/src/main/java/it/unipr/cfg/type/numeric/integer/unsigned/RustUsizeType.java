@@ -97,4 +97,9 @@ public class RustUsizeType implements NumericType, RustType {
 	public String toString() {
 		return "usize";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

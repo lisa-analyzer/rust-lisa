@@ -102,4 +102,8 @@ public class RustUnconstrainedFloat implements NumericType, RustType {
 		return "unconstrained float";
 	}
 
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

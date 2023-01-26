@@ -96,4 +96,9 @@ public class RustF32Type implements NumericType, RustType {
 	public String toString() {
 		return "f32";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

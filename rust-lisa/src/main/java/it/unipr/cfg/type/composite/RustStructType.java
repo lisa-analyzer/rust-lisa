@@ -90,6 +90,7 @@ public class RustStructType implements UnitType, RustType, RustEnumVariant, InMe
 
 	private final String name;
 	private final CompilationUnit unit;
+	private boolean copiable = false;
 
 	/**
 	 * Builds the struct type.
@@ -189,5 +190,19 @@ public class RustStructType implements UnitType, RustType, RustEnumVariant, InMe
 	public Statement match(Expression toMatch) {
 		// TODO too coarse
 		return null;
+	}
+	
+	/**
+	 * Sets if the type is copiable or not.
+	 * 
+	 * @param copiable if the type is copiable
+	 */
+	public void setCopiable(boolean copiable) {
+		this.copiable = copiable;
+	}
+	
+	@Override
+	public boolean isCopiable() {
+		return copiable;
 	}
 }

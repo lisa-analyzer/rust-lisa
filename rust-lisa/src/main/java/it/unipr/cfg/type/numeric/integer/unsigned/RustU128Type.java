@@ -99,4 +99,9 @@ public class RustU128Type implements NumericType, RustType {
 	public String toString() {
 		return "u128";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

@@ -59,5 +59,9 @@ public class RustUnitType implements RustType {
 	public String toString() {
 		return "()";
 	}
-
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

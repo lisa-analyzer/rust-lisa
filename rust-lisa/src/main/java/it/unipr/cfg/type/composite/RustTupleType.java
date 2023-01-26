@@ -152,4 +152,9 @@ public class RustTupleType implements RustType, RustEnumVariant, InMemoryType {
 	public List<Type> getTypes() {
 		return types;
 	}
+
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

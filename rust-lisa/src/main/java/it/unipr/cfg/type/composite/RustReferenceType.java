@@ -78,4 +78,9 @@ public class RustReferenceType extends ReferenceType implements RustType {
 
 		return getInnerType().canBeAssignedTo(o.getInnerType()) ? this : Untyped.INSTANCE;
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

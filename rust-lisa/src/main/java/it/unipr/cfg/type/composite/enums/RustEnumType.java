@@ -1,17 +1,18 @@
 package it.unipr.cfg.type.composite.enums;
 
-import it.unipr.cfg.program.unit.RustEnumUnit;
-import it.unipr.cfg.type.primitive.RustType;
-import it.unive.lisa.type.Type;
-import it.unive.lisa.type.TypeSystem;
-import it.unive.lisa.type.UnitType;
-import it.unive.lisa.type.Untyped;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import it.unipr.cfg.program.unit.RustEnumUnit;
+import it.unipr.cfg.type.primitive.RustType;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.TypeSystem;
+import it.unive.lisa.type.UnitType;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Instance of the Rust enum type.
@@ -90,10 +91,10 @@ public class RustEnumType implements RustType, UnitType {
 	 */
 	private final String name;
 	private final RustEnumUnit unit;
+	private boolean copiable = false;
 
 	/**
-	 * Construct the {@link RustEnumType} object. Note that {@code variantNames}
-	 * and {@code types} must have the same length.
+	 * Construct the {@link RustEnumType} object.
 	 * 
 	 * @param name the name of this enum
 	 * @param unit the compilation unit it belongs to
@@ -180,5 +181,19 @@ public class RustEnumType implements RustType, UnitType {
 	 */
 	public RustEnumUnit getUnit() {
 		return unit;
+	}
+	
+	/**
+	 * Sets if the type is copiable or not.
+	 * 
+	 * @param copiable if the type is copiable
+	 */
+	public void setCopiable(boolean copiable) {
+		this.copiable = copiable;
+	}
+	
+	@Override
+	public boolean isCopiable() {
+		return copiable;
 	}
 }

@@ -97,4 +97,9 @@ public class RustU8Type implements NumericType, RustType {
 	public String toString() {
 		return "u8";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

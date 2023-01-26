@@ -1,6 +1,9 @@
 package it.unipr.frontend.interprocedural;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import it.unipr.cfg.type.composite.RustReferenceType;
+import it.unipr.cfg.type.primitive.RustType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -19,7 +22,6 @@ import it.unive.lisa.symbolic.heap.HeapReference;
 import it.unive.lisa.symbolic.value.OutOfScopeIdentifier;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Implementation of the parameter assigning strategy for Rust.
@@ -47,15 +49,9 @@ public class RustParameterAssigningStrategy implements ParameterAssigningStrateg
 					StatementStore<A, H, V, T> expressions, Parameter[] formals,
 					ExpressionSet<SymbolicExpression>[] actuals)
 					throws SemanticException {
-
-		// forget actuals that are Variables and does not have RustReferenceType
-		for (int i = 0; i < formals.length; ++i)
-			if (!(formals[i].getStaticType() instanceof RustReferenceType))
-				for (ExpressionSet<SymbolicExpression> actualSet : actuals)
-					for (SymbolicExpression actualElement : actualSet)
-						if (actualElement instanceof OutOfScopeIdentifier)
-							callState = callState.lub(callState.forgetIdentifier((OutOfScopeIdentifier) actualElement));
-
+				
+		AnalysisState<A, H, V, T> result;
+							
 		// if it is an instance call, we need check the first parameter
 		// that corresponds to the callee of the instance call
 		if (call.getCallType() == CallType.INSTANCE) {
@@ -92,7 +88,7 @@ public class RustParameterAssigningStrategy implements ParameterAssigningStrateg
 				prepared = temp;
 			}
 
-			return Pair.of(prepared, actuals);
+			result = prepared;
 		} else {
 			// prepare the state for the call: assign the value to each
 			// parameter
@@ -112,7 +108,23 @@ public class RustParameterAssigningStrategy implements ParameterAssigningStrateg
 				prepared = temp;
 			}
 
-			return Pair.of(prepared, actuals);
+			result = prepared;
 		}
+		
+		// forget actuals that are Variables and does not have RustReferenceType
+		for (int i = 0; i < formals.length; ++i)
+			if (!(formals[i].getStaticType() instanceof RustReferenceType))
+				for (ExpressionSet<SymbolicExpression> actualSet : actuals)
+					for (SymbolicExpression actualElement : actualSet)
+						if (actualElement instanceof OutOfScopeIdentifier) {
+							boolean noneCopiable = actualElement.getRuntimeTypes(call.getProgram().getTypes()).stream()
+								.map(t -> t instanceof ReferenceType && !(t instanceof RustReferenceType) ? ((ReferenceType) t).getInnerType() : t)
+								.allMatch(t -> t instanceof RustType && !((RustType) t).isCopiable());
+							
+							if (noneCopiable)
+								result = result.forgetIdentifier((OutOfScopeIdentifier) actualElement);
+						}
+		
+		return Pair.of(result, actuals);
 	}
 }

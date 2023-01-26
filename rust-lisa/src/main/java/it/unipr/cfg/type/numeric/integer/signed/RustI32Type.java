@@ -97,4 +97,9 @@ public class RustI32Type implements NumericType, RustType {
 	public String toString() {
 		return "i32";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

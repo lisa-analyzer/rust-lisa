@@ -62,4 +62,9 @@ public class RustStrType implements StringType, RustType {
 	public String toString() {
 		return "str";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return false;
+	}
 }

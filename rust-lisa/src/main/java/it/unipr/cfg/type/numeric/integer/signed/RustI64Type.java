@@ -97,4 +97,9 @@ public class RustI64Type implements NumericType, RustType {
 	public String toString() {
 		return "i64";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

@@ -97,4 +97,9 @@ public class RustI8Type implements NumericType, RustType {
 	public String toString() {
 		return "i8";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

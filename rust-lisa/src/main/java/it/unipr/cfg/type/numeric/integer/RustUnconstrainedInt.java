@@ -102,4 +102,8 @@ public class RustUnconstrainedInt implements NumericType, RustType {
 		return "unconstrained int";
 	}
 
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

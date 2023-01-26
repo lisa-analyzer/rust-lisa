@@ -1,6 +1,7 @@
+
 trait Measures {
 	fn area(&self) -> i32;
-	fn perimeter(&self) -> i32;
+	fn perimeter(self) -> i32;
 }
 
 struct Circle {
@@ -14,7 +15,7 @@ impl Measures for Circle {
 		self.r * self.r
 	}
 	
-	fn perimeter(&self) -> i32 {
+	fn perimeter(self) -> i32 {
 		2 * self.r * 3
 	}
 }
@@ -30,11 +31,12 @@ impl Measures for Square {
 		self.l * self.l
 	}
 	
-	fn perimeter(&self) -> i32 {
+	fn perimeter(self) -> i32 {
 		4 * self.l
 	}
 }
 
+#[derive(Copy, Clone)]
 struct Rectangle {
 	x: i32,
 	y: i32,
@@ -42,13 +44,12 @@ struct Rectangle {
 	h: i32
 }
 
-
 impl Measures for Rectangle {
 	fn area(&self) -> i32 {
 		self.w * self.h
 	}
 	
-	fn perimeter(&self) -> i32 {
+	fn perimeter(self) -> i32 {
 		2 * self.w + 2 * self.h
 	}
 }
@@ -67,12 +68,10 @@ impl Rectangle {
 
 fn main() {
 	let c = Circle {x : 1, y : 1, r : 1};
-	let c_p = c.perimeter();
-	let c_a = c.area();
-	let _circle_asp = c.area() + c.perimeter();
+	let _c_a = c.area();
+	let _c_p = c.perimeter();
 	let s = Square {x : 1, y : 1, l : 1};
-	let _square_asp = s.area() + s.perimeter();
 	let s1 = s;
 	let r = Rectangle::new(1, 1, 1, 1);
-	let _rectangle_asp = r.area() + r.perimeter();
+	let _r_a = r.perimeter();
 }

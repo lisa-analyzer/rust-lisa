@@ -207,9 +207,29 @@ public class RustFrontend extends RustBaseVisitor<Object> {
 
 			currentUnit.addAncestor(externUnit);
 		}
-
-		if (ctx.pub_item() != null)
+		
+		if (ctx.pub_item() != null) {
 			visitPub_item(ctx.pub_item());
+			
+			// Parse the "#[derive(Copy)]" pragma, which is lost after accessing the struct/enum_decl, so it must be done here.
+			// Note that this is probably due to the fact that the g4 grammar expects the parsing to be done on the HIR
+			// representation and not the source code itself
+			if (ctx.pub_item().struct_decl() != null) {
+				String pragma = ctx.getText().split("]")[0];
+				if (pragma.contains("Copy")) {
+					RustStructType structType = RustStructType.get(ctx.pub_item().struct_decl().ident().getText());
+					structType.setCopiable(true);
+				}
+			}
+			
+			if (ctx.pub_item().enum_decl() != null) {
+				String pragma = ctx.pub_item().getText().split("]")[0];
+				if (pragma.contains("Copy")) {
+					RustEnumType enumType = RustEnumType.get(ctx.pub_item().enum_decl().ident().getText());
+					enumType.setCopiable(true);
+				}
+			}
+		}
 
 		for (Type t : RustStructType.all())
 			program.addUnit(((RustStructType) t).getUnit());

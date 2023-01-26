@@ -60,4 +60,9 @@ public class RustBooleanType implements BooleanType, RustType {
 	public String toString() {
 		return "bool";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

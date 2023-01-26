@@ -61,4 +61,9 @@ public class RustCharType implements RustType {
 	public String toString() {
 		return "char";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

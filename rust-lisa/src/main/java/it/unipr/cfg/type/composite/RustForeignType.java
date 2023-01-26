@@ -113,4 +113,9 @@ public class RustForeignType implements RustType {
 	public String toString() {
 		return name;
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return false;
+	}
 }

@@ -96,4 +96,9 @@ public class RustF64Type implements NumericType, RustType {
 	public String toString() {
 		return "f64";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

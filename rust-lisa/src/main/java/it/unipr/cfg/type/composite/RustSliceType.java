@@ -78,4 +78,11 @@ public class RustSliceType extends ReferenceType implements RustType {
 
 		return getInnerType().canBeAssignedTo(o.getInnerType()) ? this : Untyped.INSTANCE;
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		if (getInnerType() instanceof RustType)
+			return ((RustType) getInnerType()).isCopiable();
+		return false;
+	}
 }

@@ -97,4 +97,9 @@ public class RustI16Type implements NumericType, RustType {
 	public String toString() {
 		return "i16";
 	}
+	
+	@Override
+	public boolean isCopiable() {
+		return true;
+	}
 }

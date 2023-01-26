@@ -9,4 +9,11 @@ import it.unive.lisa.type.Type;
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
 public interface RustType extends Type {
+	
+	/**
+	 * Yields true if this type is copiable.
+	 * 
+	 * @return true if this type is copiable
+	 */
+	public boolean isCopiable();
 }
