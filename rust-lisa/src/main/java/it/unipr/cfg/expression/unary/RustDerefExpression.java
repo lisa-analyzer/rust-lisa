@@ -13,7 +13,9 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.HeapDereference;
 import it.unive.lisa.type.PointerType;
+import it.unive.lisa.type.Type;
 import it.unive.lisa.type.Untyped;
 
 /**
@@ -43,8 +45,19 @@ public class RustDerefExpression extends UnaryExpression {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> unarySemantics(
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
-
-		return state.smallStepSemantics(expr, this);
+		
+		AnalysisState<A, H, V, T> result = state.bottom();
+		for (Type type : expr.getRuntimeTypes(getProgram().getTypes())) {
+			HeapDereference deref = new HeapDereference(type, expr, getLocation());
+						
+			AnalysisState<A, H, V, T> tmp = state.smallStepSemantics(deref, this);
+			for (SymbolicExpression stateExpr : tmp.getComputedExpressions()) {
+				tmp = tmp.lub(result.smallStepSemantics(stateExpr, this));
+			}
+			result = result.lub(tmp.smallStepSemantics(deref, this));
+		}
+		
+		return result;
 	}
 
 }

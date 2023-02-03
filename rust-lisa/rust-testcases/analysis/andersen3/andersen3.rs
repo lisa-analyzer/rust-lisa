@@ -2,7 +2,7 @@ fn main() {
 	let mut x : i32 = 5;
 	let p = &mut x;
 	
-	while true {
+	loop {
 		*p += 1
 	}
 }
