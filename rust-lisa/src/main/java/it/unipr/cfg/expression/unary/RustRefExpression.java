@@ -1,6 +1,5 @@
 package it.unipr.cfg.expression.unary;
 
-import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -14,6 +13,9 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.UnaryExpression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.type.Type;
+import it.unive.lisa.type.Untyped;
 
 /**
  * Rust unary ref expression (e.g., &x).
@@ -32,7 +34,7 @@ public class RustRefExpression extends UnaryExpression {
 	 * @param mutable  the mutability of the reference
 	 */
 	public RustRefExpression(CFG cfg, CodeLocation location, Expression expr, boolean mutable) {
-		super(cfg, location, "&", new RustReferenceType(expr.getStaticType(), mutable), expr);
+		super(cfg, location, "&", Untyped.INSTANCE, expr);
 	}
 
 	@Override
@@ -42,8 +44,17 @@ public class RustRefExpression extends UnaryExpression {
 			T extends TypeDomain<T>> AnalysisState<A, H, V, T> unarySemantics(
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
-
-		return state.smallStepSemantics(expr, this);
+	
+		state = state.smallStepSemantics(expr, this);
+		
+		AnalysisState<A, H, V, T> result = state.bottom();
+		for (Type type : expr.getRuntimeTypes(getProgram().getTypes())) {
+			HeapReference ref = new HeapReference(type, expr, getLocation());
+			
+			result = result.lub(state.smallStepSemantics(ref, this));
+		}
+		
+		return result;
 	}
 
 }

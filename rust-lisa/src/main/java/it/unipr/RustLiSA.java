@@ -17,6 +17,8 @@ import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
 import it.unive.lisa.program.Program;
 import java.io.IOException;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 /**
  * RustLiSA static analyzer build upon LiSA.
  * 
@@ -48,7 +50,7 @@ public class RustLiSA {
 		conf.workdir = "output";
 		conf.jsonOutput = true;
 		conf.openCallPolicy = RustReturnTopPolicy.INSTANCE;
-
+		
 		LiSA lisa = new LiSA(conf);
 		lisa.run(program);
 	}

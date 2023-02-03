@@ -27,7 +27,7 @@ public class Andersen  extends RustLiSATestExecutor {
 		conf.callGraph = new RTACallGraph();
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.jsonOutput = true;
-
+		
 		perform("analysis/andersen1", "andersen1.rs", conf);
 	}
 
