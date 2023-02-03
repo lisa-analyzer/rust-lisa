@@ -1,0 +1,33 @@
+{
+  "warnings" : [ ],
+  "files" : [ "()_rust-testcases_analysis_andersen2_andersen2.rs.main().json", "report.json" ],
+  "info" : {
+    "cfgs" : "1",
+    "duration" : "786ms",
+    "end" : "2023-02-03T16:03:35.552+01:00",
+    "expressions" : "15",
+    "files" : "1",
+    "globals" : "0",
+    "members" : "1",
+    "programs" : "1",
+    "start" : "2023-02-03T16:03:34.766+01:00",
+    "statements" : "8",
+    "units" : "1",
+    "version" : "0.1b7",
+    "warnings" : "0"
+  },
+  "configuration" : {
+    "analysisGraphs" : "NONE",
+    "descendingGlbThreshold" : "5",
+    "descendingPhaseType" : "NONE",
+    "fixpointWorkingSet" : "FIFOWorkingSet",
+    "jsonOutput" : "true",
+    "openCallPolicy" : "WorstCasePolicy",
+    "semanticChecks" : "",
+    "serializeInputs" : "false",
+    "serializeResults" : "true",
+    "syntacticChecks" : "",
+    "wideningThreshold" : "5",
+    "workdir" : "rust-outputs/analysis/andersen2"
+  }
+}
