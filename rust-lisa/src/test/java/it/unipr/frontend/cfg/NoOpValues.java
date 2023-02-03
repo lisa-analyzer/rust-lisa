@@ -25,11 +25,6 @@ class NoOpValues implements ValueDomain<NoOpValues> {
 	}
 
 	@Override
-	public NoOpValues assume(ValueExpression expression, ProgramPoint pp) throws SemanticException {
-		return this;
-	}
-
-	@Override
 	public NoOpValues forgetIdentifier(Identifier id) throws SemanticException {
 		return this;
 	}
@@ -81,6 +76,11 @@ class NoOpValues implements ValueDomain<NoOpValues> {
 
 	@Override
 	public NoOpValues bottom() {
+		return this;
+	}
+
+	@Override
+	public NoOpValues assume(ValueExpression expression, ProgramPoint src, ProgramPoint dest) throws SemanticException {
 		return this;
 	}
 

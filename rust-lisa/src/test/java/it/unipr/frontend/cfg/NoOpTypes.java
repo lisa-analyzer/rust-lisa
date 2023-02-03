@@ -32,11 +32,6 @@ class NoOpTypes implements TypeDomain<NoOpTypes> {
 	}
 
 	@Override
-	public NoOpTypes assume(ValueExpression expression, ProgramPoint pp) throws SemanticException {
-		return this;
-	}
-
-	@Override
 	public NoOpTypes forgetIdentifier(Identifier id) throws SemanticException {
 		return this;
 	}
@@ -99,5 +94,10 @@ class NoOpTypes implements TypeDomain<NoOpTypes> {
 	@Override
 	public Type getInferredDynamicType() {
 		return Untyped.INSTANCE;
+	}
+
+	@Override
+	public NoOpTypes assume(ValueExpression expression, ProgramPoint src, ProgramPoint dest) throws SemanticException {
+		return this;
 	}
 }
