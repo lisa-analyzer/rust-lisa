@@ -5,6 +5,7 @@ import org.junit.Test;
 import it.unipr.frontend.RustLiSATestExecutor;
 import it.unive.lisa.AnalysisSetupException;
 import it.unive.lisa.LiSAConfiguration;
+import it.unive.lisa.LiSAConfiguration.GraphType;
 import it.unive.lisa.analysis.SimpleAbstractState;
 import it.unive.lisa.analysis.heap.pointbased.PointBasedHeap;
 import it.unive.lisa.analysis.nonrelational.value.TypeEnvironment;
@@ -59,5 +60,20 @@ public class Andersen  extends RustLiSATestExecutor {
 		conf.jsonOutput = true;
 				
 		perform("analysis/andersen3", "andersen3.rs", conf);
+	}
+	
+	@Test
+	public void testAndersen4() throws AnalysisSetupException {
+		LiSAConfiguration conf = new LiSAConfiguration();
+		conf.abstractState = new SimpleAbstractState<>(
+				new PointBasedHeap(),
+				new ValueEnvironment<>(new Interval()),
+				new TypeEnvironment<>(new InferredTypes()));
+		conf.serializeResults = true;
+		conf.callGraph = new RTACallGraph();
+		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
+		conf.jsonOutput = true;
+						
+		perform("analysis/andersen4", "andersen4.rs", conf);
 	}
 }
