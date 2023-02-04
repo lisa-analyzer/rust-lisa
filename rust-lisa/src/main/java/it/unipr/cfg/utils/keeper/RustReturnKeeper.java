@@ -1,4 +1,4 @@
-package it.unipr.cfg.expression.utils;
+package it.unipr.cfg.utils.keeper;
 
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
@@ -16,12 +16,16 @@ import it.unive.lisa.symbolic.SymbolicExpression;
 import it.unive.lisa.type.Untyped;
 
 /**
- * Rust explicit return expression (e.g., return x).
+ * Rust return expression keeper.
+ * 
+ * This expression is a placeholder for a return. It is an Expression only
+ * to avoid changing to the return type of too many methods in
+ * {@link RustCodeMemeberVisitor}.
  * 
  * @author <a href="mailto:vincenzo.arceri@unipr.it">Vincenzo Arceri</a>
  * @author <a href="mailto:simone.gazza@studenti.unipr.it">Simone Gazza</a>
  */
-public class RustReturnExpression extends UnaryExpression {
+public class RustReturnKeeper extends UnaryExpression {
 
 	/**
 	 * Builds the return expression.
@@ -30,14 +34,9 @@ public class RustReturnExpression extends UnaryExpression {
 	 * @param location the location where this expression is defined
 	 * @param expr     the inner
 	 */
-	public RustReturnExpression(CFG cfg, CodeLocation location,
+	public RustReturnKeeper(CFG cfg, CodeLocation location,
 			Expression expr) {
 		super(cfg, location, "return", Untyped.INSTANCE, expr);
-	}
-
-	@Override
-	public String toString() {
-		return "return " + getSubExpression();
 	}
 
 	@Override
@@ -50,7 +49,8 @@ public class RustReturnExpression extends UnaryExpression {
 		// Left intentionally blank. This expression is a placeholder for return
 		// statement, but it is then substituted by Return and Ret statement
 		// before starting the analysis.
-		return state.top();
+		throw new IllegalStateException("A RustReturnKeeper was not changed to a Return or a Ret"
+				+ "statement at line " + getLocation());
 	}
 
 }

@@ -1,8 +1,8 @@
 package it.unipr.cfg.program.cfg;
 
 import it.unipr.cfg.expression.literal.RustUnitLiteral;
-import it.unipr.cfg.expression.utils.RustReturnExpression;
 import it.unipr.cfg.type.primitive.RustUnitType;
+import it.unipr.cfg.utils.keeper.RustReturnKeeper;
 import it.unive.lisa.program.cfg.CFG;
 import it.unive.lisa.program.cfg.CodeMemberDescriptor;
 import it.unive.lisa.program.cfg.edge.Edge;
@@ -98,8 +98,8 @@ public class RustCFG extends CFG {
 			// Substitute return with ret nodes
 			List<Pair<Statement, Statement>> toSwitchList = new ArrayList<>();
 			for (Statement node : nodes) {
-				if (node instanceof RustReturnExpression) {
-					RustReturnExpression rustReturn = (RustReturnExpression) node;
+				if (node instanceof RustReturnKeeper) {
+					RustReturnKeeper rustReturn = (RustReturnKeeper) node;
 
 					// The value inside the return is null iff the return was
 					// empty or has a RustUnitLiteral
@@ -152,8 +152,8 @@ public class RustCFG extends CFG {
 
 			List<Pair<Statement, Return>> toSwitchList = new ArrayList<>();
 			for (Statement stmt : nodes)
-				if (stmt instanceof RustReturnExpression) {
-					Expression value = ((RustReturnExpression) stmt).getSubExpression();
+				if (stmt instanceof RustReturnKeeper) {
+					Expression value = ((RustReturnKeeper) stmt).getSubExpression();
 
 					Return ret = new Return(this, getDescriptor().getLocation(), value);
 

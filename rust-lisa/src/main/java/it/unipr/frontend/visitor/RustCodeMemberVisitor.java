@@ -47,7 +47,6 @@ import it.unipr.cfg.expression.unary.RustDoubleRefExpression;
 import it.unipr.cfg.expression.unary.RustNotExpression;
 import it.unipr.cfg.expression.unary.RustRangeFromExpression;
 import it.unipr.cfg.expression.unary.RustRefExpression;
-import it.unipr.cfg.expression.utils.RustReturnExpression;
 import it.unipr.cfg.program.cfg.RustCFG;
 import it.unipr.cfg.program.cfg.RustCodeMememberDescriptor;
 import it.unipr.cfg.program.cfg.RustParameter;
@@ -74,6 +73,7 @@ import it.unipr.cfg.utils.keeper.RustMatchAndKeeper;
 import it.unipr.cfg.utils.keeper.RustMatchKeeper;
 import it.unipr.cfg.utils.keeper.RustMatchOrKeeper;
 import it.unipr.cfg.utils.keeper.RustMethodKeeper;
+import it.unipr.cfg.utils.keeper.RustReturnKeeper;
 import it.unipr.cfg.utils.keeper.RustTupleAccessKeeper;
 import it.unipr.frontend.RustFrontend;
 import it.unipr.rust.antlr.RustBaseVisitor;
@@ -1426,7 +1426,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
-			RustReturnExpression ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+			RustReturnKeeper ret = new RustReturnKeeper(currentCfg, locationOf(ctx, filePath), expr);
 
 			currentCfg.addNode(ret);
 
@@ -1468,11 +1468,11 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 		if (ctx.expr() != null) {
 			Expression expr = visitExpr(ctx.expr());
 
-			RustReturnExpression ret;
-			if (expr instanceof RustReturnExpression)
-				ret = (RustReturnExpression) expr;
+			RustReturnKeeper ret;
+			if (expr instanceof RustReturnKeeper)
+				ret = (RustReturnKeeper) expr;
 			else
-				ret = new RustReturnExpression(currentCfg, locationOf(ctx, filePath), expr);
+				ret = new RustReturnKeeper(currentCfg, locationOf(ctx, filePath), expr);
 
 			currentCfg.addNode(ret);
 
@@ -1866,9 +1866,9 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 
 			// In case of return expression as a last statement inside an unsafe
 			// block, we do not consider a "unsafe exit" block
-			if (body.getRight() instanceof RustReturnExpression) {
-				RustReturnExpression oldReturn = (RustReturnExpression) body.getRight();
-				RustReturnExpression newReturn = new RustReturnExpression(currentCfg, locationOf(ctx, filePath),
+			if (body.getRight() instanceof RustReturnKeeper) {
+				RustReturnKeeper oldReturn = (RustReturnKeeper) body.getRight();
+				RustReturnKeeper newReturn = new RustReturnKeeper(currentCfg, locationOf(ctx, filePath),
 						oldReturn.getSubExpression());
 
 				currentCfg.addNode(newReturn);
@@ -2080,7 +2080,7 @@ public class RustCodeMemberVisitor extends RustBaseVisitor<Object> {
 			if (ctx.expr(0) != null)
 				returnValue = visitExpr(ctx.expr(0));
 
-			return new RustReturnExpression(currentCfg, locationOf(ctx, filePath), returnValue);
+			return new RustReturnKeeper(currentCfg, locationOf(ctx, filePath), returnValue);
 		} else if (ctx.blocky_expr() != null) {
 			// TODO watch out for expression and statements
 			// return visitBlocky_expr(ctx.blocky_expr());

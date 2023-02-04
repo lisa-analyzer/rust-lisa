@@ -3,6 +3,6 @@ fn main() {
 	let p = &mut x;
 	
 	loop {
-		*p += 1
+		*p += 1;
 	}
 }
