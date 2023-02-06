@@ -1,5 +1,8 @@
 package it.unipr.cfg.expression.unary;
 
+import java.util.Collections;
+
+import it.unipr.cfg.type.primitive.RustPointerType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -49,8 +52,8 @@ public class RustRefExpression extends UnaryExpression {
 		
 		AnalysisState<A, H, V, T> result = state.bottom();
 		for (Type type : expr.getRuntimeTypes(getProgram().getTypes())) {
-			HeapReference ref = new HeapReference(type, expr, getLocation());
-			
+			HeapReference ref = new HeapReference(new RustPointerType(type, false), expr, getLocation());
+			ref.setRuntimeTypes(Collections.singleton(new RustPointerType(type, false)));
 			result = result.lub(state.smallStepSemantics(ref, this));
 		}
 		
