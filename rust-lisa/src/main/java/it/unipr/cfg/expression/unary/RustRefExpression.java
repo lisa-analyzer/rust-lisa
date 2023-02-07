@@ -48,7 +48,7 @@ public class RustRefExpression extends UnaryExpression {
 					InterproceduralAnalysis<A, H, V, T> interprocedural, AnalysisState<A, H, V, T> state,
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {
 	
-		state = state.smallStepSemantics(expr, this);
+//		state = state.smallStepSemantics(expr, this);
 		
 		AnalysisState<A, H, V, T> result = state.bottom();
 		for (Type type : expr.getRuntimeTypes(getProgram().getTypes())) {
