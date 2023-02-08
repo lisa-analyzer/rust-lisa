@@ -9,6 +9,7 @@ import it.unipr.cfg.type.composite.RustStructType;
 import it.unipr.cfg.type.composite.RustTraitType;
 import it.unipr.cfg.type.composite.RustTupleType;
 import it.unipr.cfg.type.composite.enums.RustEnumType;
+import it.unipr.cfg.type.primitive.RustPointerType;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
 import it.unive.lisa.LiSAConfiguration;
@@ -47,6 +48,7 @@ public abstract class RustLiSATestExecutor {
 		RustEnumType.clearAll();
 		RustTraitType.clearAll();
 		RustForeignType.clearAll();
+		RustPointerType.clearAll();
 	}
 
 	/**
