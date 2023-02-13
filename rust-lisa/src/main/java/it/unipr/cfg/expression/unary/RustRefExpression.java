@@ -3,7 +3,6 @@ package it.unipr.cfg.expression.unary;
 import java.util.Collections;
 
 import it.unipr.cfg.type.composite.RustReferenceType;
-import it.unipr.cfg.type.primitive.RustPointerType;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;

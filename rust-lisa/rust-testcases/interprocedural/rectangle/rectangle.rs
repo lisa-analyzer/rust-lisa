@@ -9,13 +9,13 @@ impl Rectangle {
 	}
 }
 
-fn area(x : Rectangle) -> usize {
+fn area(x : &Rectangle) -> usize {
 	x.width * x.height
 }
 
 fn main() {
     let r = Rectangle { width: 4, height: 5};    
-    let _a = area(r); //passato per valore e poi distrutto
+    let _a = area(&r);
     
     let _b = r.area();
 }

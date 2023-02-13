@@ -1,6 +1,8 @@
 package it.unipr.cfg.statement.assignment;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unipr.cfg.type.primitive.RustType;
@@ -18,8 +20,11 @@ import it.unive.lisa.program.cfg.CodeLocation;
 import it.unive.lisa.program.cfg.statement.BinaryExpression;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.symbolic.SymbolicExpression;
+import it.unive.lisa.symbolic.heap.HeapReference;
+import it.unive.lisa.symbolic.heap.MemoryAllocation;
 import it.unive.lisa.symbolic.value.Variable;
 import it.unive.lisa.type.ReferenceType;
+import it.unive.lisa.type.Type;
 
 /**
  * Rust assignment expression (e.g., let x = y).
@@ -45,6 +50,23 @@ public class RustLetAssignment extends BinaryExpression {
 	public String toString() {
 		return "let " + getLeft().toString() + " : " + getLeft().getStaticType().toString() + " = " + getRight();
 	}
+	
+	/**
+	 * Implements ownership
+	 * 
+	 * Used to forget identifiers that are Variables, are not RustReferenceType and are the rhs of an assignment. This function modifies the state internally.
+	 */
+	private <A extends AbstractState<A, H, V, T>, H extends HeapDomain<H>, V extends ValueDomain<V>, T extends TypeDomain<T>> 
+	void checkOwnership(SymbolicExpression left, SymbolicExpression right, AnalysisState<A, H, V, T> state) throws SemanticException {
+		if (!(right.getStaticType() instanceof RustReferenceType) && right instanceof Variable) {
+			boolean noneCopiable = right.getRuntimeTypes(getProgram().getTypes()).stream()
+				.map(t -> t instanceof ReferenceType && !(t instanceof RustReferenceType) ? ((ReferenceType) t).getInnerType() : t)
+				.allMatch(t -> t instanceof RustType && !((RustType) t).isCopiable());
+		
+			if (noneCopiable)
+				state = state.assign(left, right, this).forgetIdentifier((Variable) right);
+		}
+	}
 
 	@Override
 	public <A extends AbstractState<A, H, V, T>,
@@ -59,16 +81,39 @@ public class RustLetAssignment extends BinaryExpression {
 			if (left.hasRuntimeTypes())
 				left.setRuntimeTypes(Collections.singleton(new ReferenceType(left.getStaticType())));
 		
-		// forget identifiers that are Variables, are not have RustReferenceType
-		// and are the rhs of an assignment
-		if (!(right.getStaticType() instanceof RustReferenceType) && right instanceof Variable) {
-			boolean noneCopiable = right.getRuntimeTypes(getProgram().getTypes()).stream()
-				.map(t -> t instanceof ReferenceType && !(t instanceof RustReferenceType) ? ((ReferenceType) t).getInnerType() : t)
-				.allMatch(t -> t instanceof RustType && !((RustType) t).isCopiable());
 		
-			if (noneCopiable)
-				return state.assign(left, right, this).forgetIdentifier((Variable) right);
+		if (right.getStaticType() instanceof ReferenceType 
+				&& !(right.getStaticType() instanceof RustReferenceType) 
+				&& right.getStaticType().asReferenceType().getInnerType().isUnitType()
+		) {
+			AnalysisState<A, H, V, T> result = state.bottom();
+			
+			for (Type runtimeRightType : right.getRuntimeTypes(getProgram().getTypes())) {
+				
+				Set<Type> runtimeLeftTypes = new HashSet<>();
+				for (Type type : left.getRuntimeTypes(getProgram().getTypes()))
+					runtimeLeftTypes.add(new ReferenceType(type));
+				left.setRuntimeTypes(runtimeLeftTypes);
+				
+				state = state.smallStepSemantics(left, this);
+				
+				MemoryAllocation alloc = new MemoryAllocation(runtimeRightType, getLocation(), false);
+				AnalysisState<A, H, V, T> allocationState = state.smallStepSemantics(alloc, this);
+				
+				AnalysisState<A, H, V, T> tmp = allocationState.bottom();
+				for (SymbolicExpression container : allocationState.getComputedExpressions())
+					tmp = tmp.lub(allocationState.assign(container, right, this));
+				
+				result = result.lub(tmp);
+				HeapReference allocRef = new HeapReference(alloc.getStaticType(), alloc, getLocation());
+				return result.assign(left, allocRef, this);
+			}
+			
+			checkOwnership(left, right, result);
+			return result;
 		}
+		
+		checkOwnership(left, right, state);
 		return state.assign(left, right, this);
 	}
 }

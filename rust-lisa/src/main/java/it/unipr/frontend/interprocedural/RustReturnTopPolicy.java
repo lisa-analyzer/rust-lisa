@@ -102,15 +102,10 @@ public class RustReturnTopPolicy implements OpenCallPolicy {
 		if (call.getConstructName().endsWith("!"))
 			return applyOnMacroCall(call, entryState, params);
 
+		// get every ancestors of the units
 		Optional<CompilationUnit> externCompilationUnit = call.getProgram().getUnits().stream()
 				.filter(unit -> unit instanceof CompilationUnit)
-				.flatMap(unit -> ((CompilationUnit) unit).getImmediateAncestors().stream()) // get
-																							// every
-																							// the
-																							// ancestors
-																							// of
-																							// the
-																							// units
+				.flatMap(unit -> ((CompilationUnit) unit).getImmediateAncestors().stream())
 				.filter(ancestor -> ancestor.getName().equals("extern"))
 				.findFirst();
 
