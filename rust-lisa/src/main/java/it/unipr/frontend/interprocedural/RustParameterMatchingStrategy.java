@@ -1,13 +1,16 @@
 package it.unipr.frontend.interprocedural;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import it.unipr.cfg.type.composite.RustReferenceType;
 import it.unive.lisa.program.cfg.Parameter;
 import it.unive.lisa.program.cfg.statement.Expression;
 import it.unive.lisa.program.cfg.statement.call.Call;
 import it.unive.lisa.program.cfg.statement.call.Call.CallType;
 import it.unive.lisa.program.language.resolution.FixedOrderMatchingStrategy;
+import it.unive.lisa.type.ReferenceType;
 import it.unive.lisa.type.Type;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the parameter matching strategy for Rust.
@@ -30,8 +33,8 @@ public class RustParameterMatchingStrategy extends FixedOrderMatchingStrategy {
 	public boolean matches(Call call, int pos, Parameter formal, Expression actual, Set<Type> types) {
 		Set<Type> runtimeTypesUnwrapped = types.stream().map(rt -> {
 			Type t = rt;
-			while (t.isPointerType())
-				t = t.asPointerType().getInnerType();
+			while (t instanceof ReferenceType && !(t instanceof RustReferenceType))
+				t = t.asReferenceType().getInnerType();
 			
 			return t;
 		}).collect(Collectors.toSet());
@@ -45,8 +48,8 @@ public class RustParameterMatchingStrategy extends FixedOrderMatchingStrategy {
 				// any of the runtime type canBeAssignedTo inner type or runtime
 				// type can be assigned to the formal static type (in case of
 				// passing reference / pointers)
-				return types.stream()
-						.anyMatch(rt -> rt.canBeAssignedTo(inner) || rt.canBeAssignedTo(formal.getStaticType()));
+				return runtimeTypesUnwrapped.stream()
+						.anyMatch(rt -> rt.canBeAssignedTo(inner) || rt.canBeAssignedTo(formal.getStaticType())) || actual.getStaticType().canBeAssignedTo(formal.getStaticType());
 			} else if (types.stream().anyMatch(rt -> rt.isPointerType()
 					&& rt.asPointerType().getInnerType().canBeAssignedTo(formal.getStaticType()))) {
 				// the runtime type is a pointer type and its inner type
@@ -57,10 +60,9 @@ public class RustParameterMatchingStrategy extends FixedOrderMatchingStrategy {
 				return true;
 			}
 
-
 			// simply check if any runtime type canBeAssignedTo the formal
 			// static type
-			return types.stream().anyMatch(rt -> rt.canBeAssignedTo(formal.getStaticType()));
+			return types.stream().anyMatch(rt -> rt.canBeAssignedTo(formal.getStaticType())) || actual.getStaticType().canBeAssignedTo(formal.getStaticType());
 
 		} else if (types.stream().anyMatch(rt -> rt.isPointerType()
 				&& rt.asPointerType().getInnerType().canBeAssignedTo(formal.getStaticType()))) {
@@ -72,7 +74,7 @@ public class RustParameterMatchingStrategy extends FixedOrderMatchingStrategy {
 		}
 
 		// simply check if the types canBeAssignedTo
-		return types.stream().anyMatch(rt -> rt.canBeAssignedTo(formal.getStaticType()));
+		return types.stream().anyMatch(rt -> rt.canBeAssignedTo(formal.getStaticType())) || actual.getStaticType().canBeAssignedTo(formal.getStaticType());
 	}
 
 }

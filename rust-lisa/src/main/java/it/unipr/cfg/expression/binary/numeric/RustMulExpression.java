@@ -1,6 +1,8 @@
 package it.unipr.cfg.expression.binary.numeric;
 
 import it.unipr.cfg.RustTyper;
+import it.unipr.cfg.type.numeric.floating.RustUnconstrainedFloat;
+import it.unipr.cfg.type.numeric.integer.RustUnconstrainedInt;
 import it.unive.lisa.analysis.AbstractState;
 import it.unive.lisa.analysis.AnalysisState;
 import it.unive.lisa.analysis.SemanticException;
@@ -36,8 +38,6 @@ public class RustMulExpression extends BinaryExpression {
 	 */
 	public RustMulExpression(CFG cfg, CodeLocation location,
 			Expression left, Expression right) {
-		// TODO: need to change type of this expression
-		// once we have modeled Rust types
 		super(cfg, location, "*", RustTyper.resultType(left, right), left, right);
 	}
 
@@ -54,13 +54,18 @@ public class RustMulExpression extends BinaryExpression {
 
 		TypeSystem types = getProgram().getTypes();
 
-		for (Type leftType : left.getRuntimeTypes(types))
-			for (Type rightType : right.getRuntimeTypes(types))
-				if (leftType.canBeAssignedTo(rightType) && rightType.canBeAssignedTo(leftType))
-					result = result
-							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
-									left, right, NumericNonOverflowingMul.INSTANCE, getLocation()), this));
+		for (Type leftType : left.getRuntimeTypes(types)) {			
+			for (Type rightType : right.getRuntimeTypes(types)) {
+				Type correctType = leftType;
+				
+				if (rightType.isNumericType() && ((leftType instanceof RustUnconstrainedInt) || (leftType instanceof RustUnconstrainedFloat)))
+					correctType = rightType;
 
+					result = result
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(correctType,
+									left, right, NumericNonOverflowingMul.INSTANCE, getLocation()), this));
+			}
+		}
 		return result;
 	}
 

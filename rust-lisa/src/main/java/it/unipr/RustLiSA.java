@@ -1,6 +1,9 @@
 package it.unipr;
 
+import java.io.IOException;
+
 import it.unipr.frontend.RustFrontend;
+import it.unipr.frontend.interprocedural.RustRTACallGraph;
 import it.unipr.frontend.interprocedural.RustReturnTopPolicy;
 import it.unive.lisa.AnalysisException;
 import it.unive.lisa.LiSA;
@@ -13,11 +16,7 @@ import it.unive.lisa.analysis.nonrelational.value.ValueEnvironment;
 import it.unive.lisa.analysis.numeric.Interval;
 import it.unive.lisa.analysis.types.InferredTypes;
 import it.unive.lisa.interprocedural.ModularWorstCaseAnalysis;
-import it.unive.lisa.interprocedural.callgraph.RTACallGraph;
 import it.unive.lisa.program.Program;
-import java.io.IOException;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * RustLiSA static analyzer build upon LiSA.
@@ -45,7 +44,7 @@ public class RustLiSA {
 				new TypeEnvironment<>(new InferredTypes()));
 		conf.serializeResults = true;
 		conf.analysisGraphs = GraphType.HTML;
-		conf.callGraph = new RTACallGraph();
+		conf.callGraph = new RustRTACallGraph();
 		conf.interproceduralAnalysis = new ModularWorstCaseAnalysis<>();
 		conf.workdir = "output";
 		conf.jsonOutput = true;

@@ -28,6 +28,7 @@ import it.unive.lisa.type.Untyped;
  */
 public class RustRefExpression extends UnaryExpression {
 
+	private final boolean mutable;
 	/**
 	 * Builds the unary ref expression.
 	 * 
@@ -38,6 +39,7 @@ public class RustRefExpression extends UnaryExpression {
 	 */
 	public RustRefExpression(CFG cfg, CodeLocation location, Expression expr, boolean mutable) {
 		super(cfg, location, "&", Untyped.INSTANCE, expr);
+		this.mutable = mutable;
 	}
 
 	@Override
@@ -49,8 +51,8 @@ public class RustRefExpression extends UnaryExpression {
 					SymbolicExpression expr, StatementStore<A, H, V, T> expressions) throws SemanticException {		
 		AnalysisState<A, H, V, T> result = state.bottom();
 		for (Type type : expr.getRuntimeTypes(getProgram().getTypes())) {
-			HeapReference ref = new HeapReference(new RustReferenceType(type, false), expr, getLocation());
-			ref.setRuntimeTypes(Collections.singleton(new RustReferenceType(type, false)));
+			HeapReference ref = new HeapReference(new RustReferenceType(type, mutable), expr, getLocation());
+			ref.setRuntimeTypes(Collections.singleton(new RustReferenceType(type, mutable)));
 			result = result.lub(state.smallStepSemantics(ref, this));
 		}
 		

@@ -63,7 +63,7 @@ public class RustAddExpression extends BinaryExpression {
 
 				if (leftType.canBeAssignedTo(correctType) && correctType.canBeAssignedTo(leftType))
 					result = result
-							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(leftType,
+							.lub(state.smallStepSemantics(new it.unive.lisa.symbolic.value.BinaryExpression(correctType,
 									left, right, NumericNonOverflowingAdd.INSTANCE, getLocation()), this));
 			}
 		return result;

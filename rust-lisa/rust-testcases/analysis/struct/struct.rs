@@ -5,15 +5,6 @@ struct PointTwo {
 	y : i32,
 }
 
-impl PointTwo {
-	fn reverse(&mut self) {
-		let a = self.x;
-		
-		self.x = self.y;
-		self.y = self.x;
-	}
-}
-
 fn main() {
 	let mut point_one = PointOne {};
 	let mut point_two = PointTwo { x : 1, y : 2 };
